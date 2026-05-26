@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fp-fullstack-app",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "observability": { "enabled": true },
+  // Non-secret config only. There are NO secrets here — auth is cookie-based,
+  // so no API key is stored. If you ever add a secret, use `wrangler secret put`,
+  // never `vars`.
+  "vars": {
+    "FOUNDERPLUS_API_BASE": "https://academy.founderplus.id/api/dev",
+    // The product slug this app gates on. Set after `fp products create`.
+    "FOUNDERPLUS_PRODUCT_SLUG": "",
+    // funnel-tracker.js project id (optional, for analytics attribution).
+    "FOUNDERPLUS_PROJECT_ID": "",
+    // MUST stay "false" in production. Only honored when NODE_ENV !== production.
+    "AUTH_DEV_BYPASS": "false"
+  }
+}

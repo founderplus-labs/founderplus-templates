@@ -1,0 +1,116 @@
+{
+  "$schema": "https://founderplus.id/schemas/agent-templates/v0.1.0.json",
+  "version": "0.1.0",
+  "repo": "founderplus-labs/founderplus-templates",
+  "publisher": {
+    "name": "Founder+",
+    "url": "https://founderplus.id"
+  },
+  "templates": [
+    {
+      "name": "fp-fullstack",
+      "title": "Founder+ Fullstack Starter",
+      "description": "Paywalled fullstack app: Founder+ login + product entitlement gate + checkout (no payment code). TanStack Start + Cloudflare + Tailwind. Owner access built in.",
+      "runtime": "node",
+      "stack": [
+        "tanstack-start",
+        "cloudflare-workers",
+        "tailwind",
+        "react19"
+      ],
+      "postInstall": [
+        "cp .env.example .env",
+        "npm install",
+        "Read SETUP.md"
+      ],
+      "setupDoc": "SETUP.md",
+      "securityDoc": "SECURITY.md",
+      "files": [
+        {
+          "path": ".env.example",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/.env.example",
+          "digest": "sha256:65efa0e23c254f0f3faa1ece41ac881b0f28066c947ebaa7b976569b43178556",
+          "size": 611
+        },
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/README.md",
+          "digest": "sha256:c3aaf93855f58f56de66e765fb21fc2cfd356e664cf3ed08f11fd5232d8e3918",
+          "size": 1128
+        },
+        {
+          "path": "SECURITY.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/SECURITY.md",
+          "digest": "sha256:75aae6277451d88382e3554d77e649c4f9e78c44dc832a30cc595e9f9fb49b22",
+          "size": 2838
+        },
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/SETUP.md",
+          "digest": "sha256:25ada26e1f5be9ade53ada7b15fc7c5686a9f3ee78dc36f2d2223165d67d8647",
+          "size": 2607
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/package.json",
+          "digest": "sha256:90b87fa42afda30b355249fb7a886b74b5859089eee1d04037d378aa228354af",
+          "size": 911
+        },
+        {
+          "path": "src/lib/auth-server.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/lib/auth-server.ts",
+          "digest": "sha256:b45544199022bca48d4915b4136b057715a42123cdc4b61772a0bc9c1d42bd8e",
+          "size": 2949
+        },
+        {
+          "path": "src/lib/buy-server.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/lib/buy-server.ts",
+          "digest": "sha256:931e93396d6b892df167d4028fec0f1c884b2e269a9e90bd6ecb76d4c513c396",
+          "size": 4209
+        },
+        {
+          "path": "src/lib/founderplus-auth.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/lib/founderplus-auth.ts",
+          "digest": "sha256:e4e764d8a36dcfb921aedeeab43e2646144c403b693b7255f685b9c15d48d19f",
+          "size": 10624
+        },
+        {
+          "path": "src/routes/__root.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/routes/__root.tsx",
+          "digest": "sha256:3d1dc96299a819e8fce7a7efc22ee5eca423025dbcf82d780cc6bfb390c402e2",
+          "size": 1379
+        },
+        {
+          "path": "src/routes/index.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/routes/index.tsx",
+          "digest": "sha256:79cd4306459b1ca2598c996ab8b0fd17b4e7a26db672e17b6a3a2bdd1b1978f3",
+          "size": 3738
+        },
+        {
+          "path": "src/routes/login.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/routes/login.tsx",
+          "digest": "sha256:3d911ea72fd9be10db54e8118952058496f0ca20b70d3d7ca40851506bf4d940",
+          "size": 2760
+        },
+        {
+          "path": "tsconfig.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/tsconfig.json",
+          "digest": "sha256:bfda7ec978fd813ee7b36979a777892fc1428662f910f60bab4838995fdf54de",
+          "size": 427
+        },
+        {
+          "path": "vite.config.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/vite.config.ts",
+          "digest": "sha256:b1672a8b4bc28939c6598dceb563ac67a3f083b4b6ec3e20182849651cf969c9",
+          "size": 441
+        },
+        {
+          "path": "wrangler.jsonc",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/wrangler.jsonc",
+          "digest": "sha256:0cf971757defbe2ceb03eb9bbc7713b0d4a9bd75d53dbb96ed09dd561be0bc1e",
+          "size": 864
+        }
+      ]
+    }
+  ]
+}
