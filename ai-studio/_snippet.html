@@ -1,0 +1,28 @@
+<!--
+  FOUNDER+ CHECKOUT SNIPPET — keep this VERBATIM in the generated page.
+
+  How it works: funnel-tracker.js (from cdn.founderplus.id) auto-detects clicks
+  on any element with data-product-slug + data-product-type, fetches the product,
+  and redirects to the Founder+ checkout. No payment code, no server.
+
+  Replace:
+    GANTI-SLUG-PRODUK   → your product slug (fp products list)
+    GANTI-PROJECT-ID    → your funnel-tracker project id (optional)
+    product-type        → customProduct | course | event | subscriptionPackage | mentoring
+-->
+
+<!-- Buy button — put wherever the CTA belongs. Style freely; keep the data-* attrs. -->
+<button
+  type="button"
+  data-product-slug="GANTI-SLUG-PRODUK"
+  data-product-type="customProduct"
+>
+  Beli sekarang
+</button>
+
+<!-- Funnel tracker — MUST be the last thing before </body>. -->
+<script
+  src="https://cdn.founderplus.id/funnel-tracker.js"
+  data-project-id="GANTI-PROJECT-ID"
+  defer
+></script>

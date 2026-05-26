@@ -21,6 +21,15 @@ const META = {
     postInstall: ['Edit index.html (slug + copy)', 'fp sites publish index.html'],
     setupDoc: 'SETUP.md'
   },
+  'ai-studio': {
+    title: 'AI Studio Prompt Pack',
+    description:
+      'Product-specific prompts for Google AI Studio that generate a static selling page pre-wired to the Founder+ CDN checkout. Ebook, course, event, and freemium Gemini tool. No build, no payment code.',
+    runtime: 'static',
+    stack: ['google-ai-studio', 'static', 'cdn'],
+    postInstall: ['Pick a prompt in prompts/', 'Fill placeholders + paste into AI Studio', 'Read SETUP.md'],
+    setupDoc: 'SETUP.md'
+  },
   'fp-fullstack': {
     title: 'Founder+ Fullstack Starter',
     description:
@@ -63,10 +72,14 @@ const META = {
   }
 }
 
+const SKIP_DIRS = new Set([
+  '.git', 'node_modules', 'dist', 'build', '.astro', '.next', '.vercel', '.wrangler'
+])
+
 function walk(dir, root) {
   let out = []
   for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (e.name === '.git') continue
+    if (e.isDirectory() && SKIP_DIRS.has(e.name)) continue
     const p = join(dir, e.name)
     if (e.isDirectory()) out = out.concat(walk(p, root))
     else out.push(relative(root, p))

@@ -37,6 +37,67 @@
       ]
     },
     {
+      "name": "ai-studio",
+      "title": "AI Studio Prompt Pack",
+      "description": "Product-specific prompts for Google AI Studio that generate a static selling page pre-wired to the Founder+ CDN checkout. Ebook, course, event, and freemium Gemini tool. No build, no payment code.",
+      "runtime": "static",
+      "stack": [
+        "google-ai-studio",
+        "static",
+        "cdn"
+      ],
+      "postInstall": [
+        "Pick a prompt in prompts/",
+        "Fill placeholders + paste into AI Studio",
+        "Read SETUP.md"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/README.md",
+          "digest": "sha256:b880ac848f88c1abcfe8725bbaefd54e10ff622e06fed39f496a8aff52e4c47a",
+          "size": 1847
+        },
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/SETUP.md",
+          "digest": "sha256:ccaf72c8c21e55de8de8c33a8a4aea7dd9fc48982e2f0b48df41591285f0bcae",
+          "size": 1934
+        },
+        {
+          "path": "_snippet.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/_snippet.html",
+          "digest": "sha256:258b3f1e44772fae31264c516c3936e14e09636c3d398863f8537176370641ee",
+          "size": 961
+        },
+        {
+          "path": "prompts/ai-tool-freemium.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/prompts/ai-tool-freemium.md",
+          "digest": "sha256:89622202ed6c3e6928261275ca172cca9ef928f6f312e14495248a4eef1a4814",
+          "size": 1818
+        },
+        {
+          "path": "prompts/course-landing.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/prompts/course-landing.md",
+          "digest": "sha256:9355b6e2edb6f38e5402042bbe060468a7c00bb474b39f3af133ac0a1f0465a7",
+          "size": 1414
+        },
+        {
+          "path": "prompts/ebook-landing.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/prompts/ebook-landing.md",
+          "digest": "sha256:ddeecbe2cdf4e3d8b2739901c822a207532b6ae6c9b524f7aaa1d16629cbac89",
+          "size": 1675
+        },
+        {
+          "path": "prompts/event-registration.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/ai-studio/prompts/event-registration.md",
+          "digest": "sha256:1641498a68d3b89f186ef73a163c9b43e45c456897cd2c5d27abaf582f90c7a2",
+          "size": 1214
+        }
+      ]
+    },
+    {
       "name": "fp-fullstack",
       "title": "Founder+ Fullstack Starter",
       "description": "Paywalled fullstack app: Founder+ login + product entitlement gate + checkout (no payment code). TanStack Start + Cloudflare + Tailwind. Owner access built in.",
@@ -187,6 +248,12 @@
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/astro.config.mjs",
           "digest": "sha256:24ce54e19927e2d560768186236f0d246840138f371fa49c8357a6946e62d833",
           "size": 247
+        },
+        {
+          "path": "bun.lock",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/bun.lock",
+          "digest": "sha256:d04cd1b74ce9503341214937f19af510b0c6345721b8bd2f5c69201cf6345bbf",
+          "size": 117746
         },
         {
           "path": "package.json",

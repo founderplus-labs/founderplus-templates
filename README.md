@@ -12,6 +12,7 @@ and checkout; your app just gates content by product ownership.
 | Name | Stack | What you get |
 |------|-------|--------------|
 | **`static-landing`** | HTML · no-build | One-file sell page + funnel-tracker buy button. Zero server. Lowest friction — deploy with `fp sites publish`. |
+| **`ai-studio`** | Google AI Studio · static · CDN | Product-specific prompts → Gemini generates a static selling page wired to the Founder+ CDN checkout. |
 | **`fp-fullstack`** | TanStack Start · Cloudflare · Tailwind · React 19 | Login + product gate + checkout + tracking. Full app. |
 | **`astro`** | Astro SSR · Cloudflare | Login + gate + checkout. Content + interactive islands. |
 | **`nextjs`** | Next.js App Router · Node/Vercel | Login + gate + checkout. Server Component gate. Biggest ecosystem. |
