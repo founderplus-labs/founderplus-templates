@@ -104,6 +104,12 @@
           "size": 10624
         },
         {
+          "path": "src/router.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/router.tsx",
+          "digest": "sha256:8d89b2a9df70a1fa81fcc2e9c3b30ff06ca48200097d879089f12c9412978651",
+          "size": 798
+        },
+        {
           "path": "src/routes/__root.tsx",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/src/routes/__root.tsx",
           "digest": "sha256:3d1dc96299a819e8fce7a7efc22ee5eca423025dbcf82d780cc6bfb390c402e2",
