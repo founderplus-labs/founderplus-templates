@@ -8,6 +8,35 @@
   },
   "templates": [
     {
+      "name": "static-landing",
+      "title": "Static Landing + Checkout",
+      "description": "No-build sell page: one HTML file + funnel-tracker.js buy button. Founder+ handles payment. Zero server. Lowest friction — deploy with fp sites publish.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build"
+      ],
+      "postInstall": [
+        "Edit index.html (slug + copy)",
+        "fp sites publish index.html"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/static-landing/SETUP.md",
+          "digest": "sha256:f5f0655cf5c38d3bef7fbceae81c40192ef59f3a1a53b71d1e752898b0dc1e67",
+          "size": 1318
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/static-landing/index.html",
+          "digest": "sha256:035a9f5951886c2bbbcfaa333645d0424933873979d9ecb849facd32eb7f29a9",
+          "size": 2554
+        }
+      ]
+    },
+    {
       "name": "fp-fullstack",
       "title": "Founder+ Fullstack Starter",
       "description": "Paywalled fullstack app: Founder+ login + product entitlement gate + checkout (no payment code). TanStack Start + Cloudflare + Tailwind. Owner access built in.",
@@ -109,6 +138,298 @@
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/fp-fullstack/wrangler.jsonc",
           "digest": "sha256:0cf971757defbe2ceb03eb9bbc7713b0d4a9bd75d53dbb96ed09dd561be0bc1e",
           "size": 864
+        }
+      ]
+    },
+    {
+      "name": "astro",
+      "title": "Founder+ Astro Starter",
+      "description": "Astro SSR on Cloudflare with Founder+ login + product gate + checkout. Vendored auth, owner access. Great for content + interactive islands.",
+      "runtime": "node",
+      "stack": [
+        "astro",
+        "cloudflare-workers"
+      ],
+      "postInstall": [
+        "cp .env.example .env",
+        "npm install",
+        "Read SETUP.md"
+      ],
+      "setupDoc": "SETUP.md",
+      "securityDoc": "SECURITY.md",
+      "files": [
+        {
+          "path": ".env.example",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/.env.example",
+          "digest": "sha256:5f8345ac3faa7ce7eb117318e971dd9aaeab85d0688168ccc9bca4d592c1faee",
+          "size": 240
+        },
+        {
+          "path": "SECURITY.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/SECURITY.md",
+          "digest": "sha256:75aae6277451d88382e3554d77e649c4f9e78c44dc832a30cc595e9f9fb49b22",
+          "size": 2838
+        },
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/SETUP.md",
+          "digest": "sha256:e103dad233daab2f93113adf9f6266d88c3300ddcba2100439b21e12459dd157",
+          "size": 1211
+        },
+        {
+          "path": "astro.config.mjs",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/astro.config.mjs",
+          "digest": "sha256:24ce54e19927e2d560768186236f0d246840138f371fa49c8357a6946e62d833",
+          "size": 247
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/package.json",
+          "digest": "sha256:6b2418a0ff485eebb8babd356fe7e8ca762201aa5f49c70f3d4a0fb517be1c69",
+          "size": 359
+        },
+        {
+          "path": "src/lib/auth.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/lib/auth.ts",
+          "digest": "sha256:f4b4655015e9e875b8bf4901de5343e5690349cebc47b8e544b4cc0edc711b67",
+          "size": 1514
+        },
+        {
+          "path": "src/lib/founderplus-auth.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/lib/founderplus-auth.ts",
+          "digest": "sha256:e4e764d8a36dcfb921aedeeab43e2646144c403b693b7255f685b9c15d48d19f",
+          "size": 10624
+        },
+        {
+          "path": "src/lib/founderplus-checkout.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/lib/founderplus-checkout.ts",
+          "digest": "sha256:c64be6b9437e0ad4d048f8a79aaec4015ec762bce4fb8042a2a069ca9ca4e0fd",
+          "size": 3453
+        },
+        {
+          "path": "src/pages/api/buy.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/pages/api/buy.ts",
+          "digest": "sha256:ef1b96355e717f2353e5f42651296cd703fe90827d09dc31add1fe964e5ef6b6",
+          "size": 632
+        },
+        {
+          "path": "src/pages/api/login.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/pages/api/login.ts",
+          "digest": "sha256:b6dba20e1b87a1f1c5fce0266290ec380ce14e43512a4c6bdbffcd525ab23762",
+          "size": 951
+        },
+        {
+          "path": "src/pages/api/logout.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/pages/api/logout.ts",
+          "digest": "sha256:66179fdc0cc999e18a3bf0406680c0d93d85cece922367e091b1039d8969f898",
+          "size": 404
+        },
+        {
+          "path": "src/pages/index.astro",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/pages/index.astro",
+          "digest": "sha256:2412834939a53b08fc70ab97cabdf473f6240adef7bcb683ec31ce61bf9d633f",
+          "size": 2566
+        },
+        {
+          "path": "src/pages/login.astro",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/src/pages/login.astro",
+          "digest": "sha256:126ba55c3240a1f19bfa8b3cf1ed8ef435b5b84cb0a5284ece3e3fdcfada7a1d",
+          "size": 2102
+        },
+        {
+          "path": "tsconfig.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/tsconfig.json",
+          "digest": "sha256:e818b9a55a0405537a3d02671e9f72f8ad64ffeeed64a6a81e8dc839c15c1a13",
+          "size": 94
+        }
+      ]
+    },
+    {
+      "name": "nextjs",
+      "title": "Founder+ Next.js Starter",
+      "description": "Next.js App Router with Founder+ login + product gate + checkout. Server Component gate, owner access. Runs on Node / Vercel.",
+      "runtime": "node",
+      "stack": [
+        "nextjs",
+        "react19",
+        "node"
+      ],
+      "postInstall": [
+        "cp .env.example .env",
+        "npm install",
+        "Read SETUP.md"
+      ],
+      "setupDoc": "SETUP.md",
+      "securityDoc": "SECURITY.md",
+      "files": [
+        {
+          "path": ".env.example",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/.env.example",
+          "digest": "sha256:86ca38e5118cbbeb747938197048ed2db27ae0cb8bfaaf014e301a9dfc276332",
+          "size": 220
+        },
+        {
+          "path": "SECURITY.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/SECURITY.md",
+          "digest": "sha256:75aae6277451d88382e3554d77e649c4f9e78c44dc832a30cc595e9f9fb49b22",
+          "size": 2838
+        },
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/SETUP.md",
+          "digest": "sha256:4530653b3a10241edb3187c610ac7461cef6397c55b82d704d706fe27d00e886",
+          "size": 1461
+        },
+        {
+          "path": "next.config.mjs",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/next.config.mjs",
+          "digest": "sha256:765a6f5b8e307120a6a3233eebadda75aa411fa21a0abe35f899f3341e022d8b",
+          "size": 82
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/package.json",
+          "digest": "sha256:a864826837d9a5dfd3836f79e43b6381e07652b9db2276dc127bd6474c136451",
+          "size": 361
+        },
+        {
+          "path": "src/app/api/checkout/route.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/api/checkout/route.ts",
+          "digest": "sha256:75e24f58aa7a1f197e49c098702bbacfb4d088f69f19a7336771ae9843593ea4",
+          "size": 478
+        },
+        {
+          "path": "src/app/api/login/route.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/api/login/route.ts",
+          "digest": "sha256:2fec3a13496da9cd54e6d811823de6e1a791ea416bbe622aa81624bac289a336",
+          "size": 846
+        },
+        {
+          "path": "src/app/api/logout/route.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/api/logout/route.ts",
+          "digest": "sha256:af5c971cedd2e316141399c67069b358514ba65629ca03f23b19bd20427d17db",
+          "size": 331
+        },
+        {
+          "path": "src/app/client-actions.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/client-actions.tsx",
+          "digest": "sha256:513ebd995f1b483acdedab6d5309f8e5927b273a9c1a44666c9e50cc0b45ffe8",
+          "size": 1276
+        },
+        {
+          "path": "src/app/layout.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/layout.tsx",
+          "digest": "sha256:c9e77ad9a69ec2062a2b4cfb5a1e3a402addf82635622b40e6c22fc42d09cc80",
+          "size": 545
+        },
+        {
+          "path": "src/app/login/page.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/login/page.tsx",
+          "digest": "sha256:b7a70f19c5a23ec94aadf4f624b25899c14869605f8ab56c0c725ea8da5ce5c5",
+          "size": 2163
+        },
+        {
+          "path": "src/app/page.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/app/page.tsx",
+          "digest": "sha256:de5ed5f649e909e72f1a43d9b3272dd38c4d2bef4a9de30e5803f0467344c34e",
+          "size": 1690
+        },
+        {
+          "path": "src/lib/auth.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/lib/auth.ts",
+          "digest": "sha256:8813baec5418a37aab9f4a785d01ebe2193528835d4e7c643f1ae8a7173d15e8",
+          "size": 1155
+        },
+        {
+          "path": "src/lib/founderplus-auth.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/lib/founderplus-auth.ts",
+          "digest": "sha256:e4e764d8a36dcfb921aedeeab43e2646144c403b693b7255f685b9c15d48d19f",
+          "size": 10624
+        },
+        {
+          "path": "src/lib/founderplus-checkout.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/src/lib/founderplus-checkout.ts",
+          "digest": "sha256:c64be6b9437e0ad4d048f8a79aaec4015ec762bce4fb8042a2a069ca9ca4e0fd",
+          "size": 3453
+        },
+        {
+          "path": "tsconfig.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/nextjs/tsconfig.json",
+          "digest": "sha256:eaa113f23211d1eb055770e6724be3a64599c40a22cfbf59f4bfb568b1a9023f",
+          "size": 485
+        }
+      ]
+    },
+    {
+      "name": "hono",
+      "title": "Founder+ Hono Starter",
+      "description": "Minimal edge app: Hono on Cloudflare Workers with Founder+ login + product gate + checkout. JSX HTML, no client framework, owner access.",
+      "runtime": "node",
+      "stack": [
+        "hono",
+        "cloudflare-workers"
+      ],
+      "postInstall": [
+        "npm install",
+        "Set FOUNDERPLUS_PRODUCT_SLUG in wrangler.jsonc",
+        "Read SETUP.md"
+      ],
+      "setupDoc": "SETUP.md",
+      "securityDoc": "SECURITY.md",
+      "files": [
+        {
+          "path": ".env.example",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/.env.example",
+          "digest": "sha256:697c1494bc7896e374a4829a373e877cb77c19703e2ebebd3afacd38e7dec636",
+          "size": 176
+        },
+        {
+          "path": "SECURITY.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/SECURITY.md",
+          "digest": "sha256:75aae6277451d88382e3554d77e649c4f9e78c44dc832a30cc595e9f9fb49b22",
+          "size": 2838
+        },
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/SETUP.md",
+          "digest": "sha256:1bf0e663844589b7ab63f3e5711c7cf9c72569a3427edbe75e6f56a28a6bc96b",
+          "size": 1099
+        },
+        {
+          "path": "package.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/package.json",
+          "digest": "sha256:fa56dbbfc2dc09a4faa70b9d4c06e5ceaeeb67f25fa2c2fa3c648a92e4c265a8",
+          "size": 324
+        },
+        {
+          "path": "src/founderplus-auth.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/src/founderplus-auth.ts",
+          "digest": "sha256:e4e764d8a36dcfb921aedeeab43e2646144c403b693b7255f685b9c15d48d19f",
+          "size": 10624
+        },
+        {
+          "path": "src/founderplus-checkout.ts",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/src/founderplus-checkout.ts",
+          "digest": "sha256:c64be6b9437e0ad4d048f8a79aaec4015ec762bce4fb8042a2a069ca9ca4e0fd",
+          "size": 3453
+        },
+        {
+          "path": "src/index.tsx",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/src/index.tsx",
+          "digest": "sha256:c6946875e627230285625303d601f24f29ed69d24a6c213818f5a5e12468eab9",
+          "size": 5838
+        },
+        {
+          "path": "tsconfig.json",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/tsconfig.json",
+          "digest": "sha256:dec9e9e41dedac7e52d414c544c0b413fcda62af8e26bf37206aeaf459c43af8",
+          "size": 327
+        },
+        {
+          "path": "wrangler.jsonc",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/wrangler.jsonc",
+          "digest": "sha256:370571153ff872a8538e931aa3a13b1fdb78a8f2bf15f29982b24bc3458fe762",
+          "size": 454
         }
       ]
     }

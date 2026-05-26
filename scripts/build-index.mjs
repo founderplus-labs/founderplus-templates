@@ -12,6 +12,15 @@ const RAW = 'https://raw.githubusercontent.com/founderplus-labs/founderplus-temp
 
 // Per-template metadata. Add an entry here when you add a template dir.
 const META = {
+  'static-landing': {
+    title: 'Static Landing + Checkout',
+    description:
+      'No-build sell page: one HTML file + funnel-tracker.js buy button. Founder+ handles payment. Zero server. Lowest friction — deploy with fp sites publish.',
+    runtime: 'static',
+    stack: ['html', 'no-build'],
+    postInstall: ['Edit index.html (slug + copy)', 'fp sites publish index.html'],
+    setupDoc: 'SETUP.md'
+  },
   'fp-fullstack': {
     title: 'Founder+ Fullstack Starter',
     description:
@@ -19,6 +28,36 @@ const META = {
     runtime: 'node',
     stack: ['tanstack-start', 'cloudflare-workers', 'tailwind', 'react19'],
     postInstall: ['cp .env.example .env', 'npm install', 'Read SETUP.md'],
+    setupDoc: 'SETUP.md',
+    securityDoc: 'SECURITY.md'
+  },
+  astro: {
+    title: 'Founder+ Astro Starter',
+    description:
+      'Astro SSR on Cloudflare with Founder+ login + product gate + checkout. Vendored auth, owner access. Great for content + interactive islands.',
+    runtime: 'node',
+    stack: ['astro', 'cloudflare-workers'],
+    postInstall: ['cp .env.example .env', 'npm install', 'Read SETUP.md'],
+    setupDoc: 'SETUP.md',
+    securityDoc: 'SECURITY.md'
+  },
+  nextjs: {
+    title: 'Founder+ Next.js Starter',
+    description:
+      'Next.js App Router with Founder+ login + product gate + checkout. Server Component gate, owner access. Runs on Node / Vercel.',
+    runtime: 'node',
+    stack: ['nextjs', 'react19', 'node'],
+    postInstall: ['cp .env.example .env', 'npm install', 'Read SETUP.md'],
+    setupDoc: 'SETUP.md',
+    securityDoc: 'SECURITY.md'
+  },
+  hono: {
+    title: 'Founder+ Hono Starter',
+    description:
+      'Minimal edge app: Hono on Cloudflare Workers with Founder+ login + product gate + checkout. JSX HTML, no client framework, owner access.',
+    runtime: 'node',
+    stack: ['hono', 'cloudflare-workers'],
+    postInstall: ['npm install', 'Set FOUNDERPLUS_PRODUCT_SLUG in wrangler.jsonc', 'Read SETUP.md'],
     setupDoc: 'SETUP.md',
     securityDoc: 'SECURITY.md'
   }

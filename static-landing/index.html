@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- TODO: ganti judul + deskripsi produkmu -->
+    <title>Nama Produk — Founder+</title>
+    <meta name="description" content="Deskripsi singkat produkmu." />
+    <style>
+      :root { --purple: #7f2dbf; --ink: #231838; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        color: var(--ink);
+        line-height: 1.6;
+        background: #faf9fb;
+      }
+      .wrap { max-width: 640px; margin: 0 auto; padding: 72px 24px; }
+      h1 { font-size: clamp(28px, 6vw, 44px); line-height: 1.15; margin: 0 0 16px; }
+      p.lead { font-size: 18px; color: #4b4458; }
+      ul { padding-left: 20px; }
+      li { margin: 6px 0; }
+      .price { font-size: 28px; font-weight: 700; margin: 24px 0 8px; }
+      .buy {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: var(--purple); color: #fff; border: none;
+        padding: 14px 28px; border-radius: 14px; font-size: 16px;
+        font-weight: 600; cursor: pointer; text-decoration: none;
+      }
+      .buy:hover { background: #6b26a3; }
+      .note { font-size: 13px; color: #777; margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <!-- TODO: isi copy produkmu -->
+      <h1>Judul produk yang menjual</h1>
+      <p class="lead">Satu kalimat janji hasil yang spesifik buat pembeli.</p>
+
+      <ul>
+        <li>Benefit konkret 1</li>
+        <li>Benefit konkret 2</li>
+        <li>Benefit konkret 3</li>
+      </ul>
+
+      <div class="price">Rp 99.000</div>
+
+      <!--
+        TOMBOL BELI — funnel-tracker.js otomatis nge-wire klik elemen yang punya
+        data-product-slug + data-product-type ke checkout Founder+.
+        Ganti SLUG dengan slug produkmu (dari: fp products list).
+        product-type: customProduct | course | event | subscriptionPackage | mentoring
+      -->
+      <button
+        class="buy"
+        type="button"
+        data-product-slug="GANTI-SLUG-PRODUK"
+        data-product-type="customProduct"
+      >
+        Beli sekarang
+      </button>
+
+      <p class="note">Pembayaran aman lewat Founder+. Akses instan setelah bayar.</p>
+    </main>
+
+    <!-- Funnel tracker — WAJIB di akhir body. Capture UTM + wire tombol beli. -->
+    <script
+      src="https://cdn.founderplus.id/funnel-tracker.js"
+      data-project-id="GANTI-PROJECT-ID"
+      defer
+    ></script>
+  </body>
+</html>

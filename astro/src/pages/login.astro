@@ -1,0 +1,43 @@
+---
+// Login page — posts to /api/login which sets the session cookie.
+---
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Masuk — Founder+</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 400px; margin: 80px auto; padding: 0 20px; }
+      label { display: block; margin-top: 16px; margin-bottom: 4px; font-size: 14px; font-weight: 600; }
+      input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px; box-sizing: border-box; }
+      button { margin-top: 20px; width: 100%; padding: 11px; background: #7f2dbf; color: #fff; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+      .err { color: #c0392b; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>Masuk Founder+</h1>
+    <form id="f">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" required />
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required />
+      <p class="err" id="err" hidden></p>
+      <button type="submit">Login</button>
+    </form>
+    <p style="margin-top:16px;font-size:13px">Belum punya akun? <a href="https://academy.founderplus.id/register" target="_blank" rel="noopener noreferrer">Daftar di Founder+</a></p>
+    <script>
+      const f = document.getElementById('f')
+      const err = document.getElementById('err')
+      f.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        err.hidden = true
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+        const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) })
+        const d = await r.json()
+        if (d.ok) location.href = '/'
+        else { err.textContent = d.error || 'Login gagal'; err.hidden = false }
+      })
+    </script>
+  </body>
+</html>

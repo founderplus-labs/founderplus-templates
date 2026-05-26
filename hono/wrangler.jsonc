@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fp-hono-app",
+  "main": "src/index.tsx",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  // Non-secret config only. No secrets — auth is cookie-based.
+  "vars": {
+    "FOUNDERPLUS_API_BASE": "https://academy.founderplus.id/api/dev",
+    "FOUNDERPLUS_PRODUCT_SLUG": "",
+    "AUTH_DEV_BYPASS": "false"
+  }
+}
