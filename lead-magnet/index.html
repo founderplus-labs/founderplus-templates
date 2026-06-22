@@ -6,110 +6,122 @@
     <!-- TODO: ganti judul + deskripsi materimu -->
     <title>Download Gratis — Founder+</title>
     <meta name="description" content="Isi form, materi dikirim ke emailmu." />
-    <style>
-      :root { --purple: #7f2dbf; --ink: #231838; }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: system-ui, -apple-system, sans-serif;
-        color: var(--ink);
-        line-height: 1.6;
-        background: #faf9fb;
-      }
-      .wrap { max-width: 560px; margin: 0 auto; padding: 64px 24px; }
-      h1 { font-size: clamp(28px, 6vw, 42px); line-height: 1.15; margin: 0 0 14px; }
-      p.lead { font-size: 18px; color: #4b4458; margin: 0 0 28px; }
-      ul { padding-left: 20px; margin: 0 0 28px; }
-      li { margin: 6px 0; }
-      .card {
-        background: #fff; border: 1px solid #eceaf0; border-radius: 20px;
-        padding: 24px;
-      }
-      .field { margin-bottom: 12px; }
-      input, select {
-        width: 100%; padding: 12px 14px; font-size: 15px; color: var(--ink);
-        background: #f6f5f8; border: none; border-radius: 12px;
-        font-family: inherit; outline: none;
-      }
-      input:focus, select:focus { box-shadow: 0 0 0 2px #d9c7ee; }
-      .err { color: #dc2626; font-size: 13px; margin: 6px 2px 0; }
-      .hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
-      .status {
-        margin: 4px 0 12px; padding: 12px 14px; border-radius: 12px;
-        font-size: 14px; background: #e6fff7; color: #005c44;
-      }
-      .status[data-lm-status-state="error"] { background: #fef2f2; color: #b91c1c; }
-      .buy {
-        width: 100%; margin-top: 6px; background: var(--purple); color: #fff;
-        border: none; padding: 14px 28px; border-radius: 14px; font-size: 16px;
-        font-weight: 600; cursor: pointer;
-      }
-      .buy:hover { background: #6b26a3; }
-      .buy:disabled { opacity: 0.7; cursor: not-allowed; }
-      .note { font-size: 13px; color: #777; margin-top: 14px; text-align: center; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] },
+            colors: {
+              ink: '#231838',
+              brand: { DEFAULT: '#7f2dbf', 700: '#6b26a3' },
+              mint: { DEFAULT: '#00edad', bg: '#e6fff7', ink: '#005c44' },
+              app: '#faf9fb',
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <main class="wrap">
-      <!-- TODO: isi copy materimu -->
-      <h1>Judul materi yang menjanjikan hasil</h1>
-      <p class="lead">Satu kalimat: apa yang mereka dapat setelah download.</p>
+  <body class="bg-app font-sans text-ink antialiased">
+    <main class="mx-auto grid min-h-screen max-w-5xl items-center gap-10 px-5 py-12 md:grid-cols-2 md:gap-16 md:py-20">
+      <!-- ── Pitch ─────────────────────────────────────────── -->
+      <section>
+        <span class="inline-flex items-center gap-2 rounded-full bg-mint-bg px-3 py-1 text-xs font-semibold tracking-wide text-mint-ink">
+          MATERI GRATIS
+        </span>
+        <!-- TODO: isi copy materimu -->
+        <h1 class="mt-4 text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-4xl md:text-[2.75rem]">
+          Judul materi yang menjanjikan hasil
+        </h1>
+        <p class="mt-4 text-lg leading-relaxed text-ink/70">
+          Satu kalimat: apa yang mereka dapat setelah mengunduh materi ini.
+        </p>
 
-      <ul>
-        <li>Isi konkret 1</li>
-        <li>Isi konkret 2</li>
-        <li>Isi konkret 3</li>
-      </ul>
+        <ul class="mt-7 space-y-3">
+          <li class="flex items-start gap-3">
+            <svg class="mt-0.5 h-5 w-5 shrink-0 text-brand" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.3 3.3 6.8-6.8a1 1 0 0 1 1.4 0Z" clip-rule="evenodd"/></svg>
+            <span class="text-ink/80">Isi konkret 1 yang bikin mereka mau</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="mt-0.5 h-5 w-5 shrink-0 text-brand" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.3 3.3 6.8-6.8a1 1 0 0 1 1.4 0Z" clip-rule="evenodd"/></svg>
+            <span class="text-ink/80">Isi konkret 2 yang spesifik + actionable</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="mt-0.5 h-5 w-5 shrink-0 text-brand" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.3 3.3 6.8-6.8a1 1 0 0 1 1.4 0Z" clip-rule="evenodd"/></svg>
+            <span class="text-ink/80">Isi konkret 3 yang langsung kepakai</span>
+          </li>
+        </ul>
+      </section>
 
+      <!-- ── Form ──────────────────────────────────────────── -->
       <!--
         FORM LEAD MAGNET — funnel-tracker.js otomatis nge-wire submit form yang
-        punya data-lead-magnet ke endpoint newsletter Founder+. Saat user submit:
-        jadi subscriber + materi (PDF/file) dikirim ke email mereka.
+        punya data-lead-magnet ke endpoint newsletter Founder+. Saat submit:
+        user jadi subscriber + materi (PDF/file) dikirim ke email mereka.
         Ganti GANTI-ASSET-UUID dengan uuid asset materimu:
-          - upload di admin Founder+ (Marketing > Assets, visibility=public,
-            category=lead-magnet), salin uuid-nya; ATAU
-          - lihat uuid yang ada:
-            GET https://academy.founderplus.id/api/dev/newsletter/available-files?category=lead-magnet
-        Nama field (name/email/phone/umur/pekerjaan/stage_bisnis) HARUS persis.
+          - admin Founder+: Marketing > Assets (visibility=public,
+            category=lead-magnet) → salin uuid; ATAU
+          - GET https://academy.founderplus.id/api/dev/newsletter/available-files?category=lead-magnet
+        JANGAN ubah atribut name= (kontrak funnel-tracker) & jangan hapus honeypot.
       -->
-      <div class="card">
-        <form data-lead-magnet="GANTI-ASSET-UUID">
-          <div class="field">
-            <input name="name" type="text" placeholder="Nama lengkap" required />
-            <p class="err" data-error-for="name" hidden></p>
+      <section
+        class="rounded-3xl border border-ink/5 bg-white p-6 shadow-xl shadow-brand/5 sm:p-8"
+      >
+        <h2 class="text-xl font-bold">Kirim materinya ke email saya</h2>
+        <p class="mt-1 text-sm text-ink/60">Gratis. Langsung masuk inbox.</p>
+
+        <form data-lead-magnet="GANTI-ASSET-UUID" class="mt-6 space-y-3.5">
+          <div>
+            <input
+              name="name" type="text" placeholder="Nama lengkap" required
+              class="w-full rounded-xl border-0 bg-app px-4 py-3 text-[15px] outline-none ring-1 ring-transparent transition placeholder:text-ink/40 focus:bg-white focus:ring-2 focus:ring-brand/40"
+            />
+            <p class="mt-1.5 text-[13px] text-red-600" data-error-for="name" hidden></p>
           </div>
-          <div class="field">
-            <input name="email" type="email" placeholder="Email" required />
-            <p class="err" data-error-for="email" hidden></p>
+          <div>
+            <input
+              name="email" type="email" placeholder="Email" required
+              class="w-full rounded-xl border-0 bg-app px-4 py-3 text-[15px] outline-none ring-1 ring-transparent transition placeholder:text-ink/40 focus:bg-white focus:ring-2 focus:ring-brand/40"
+            />
+            <p class="mt-1.5 text-[13px] text-red-600" data-error-for="email" hidden></p>
           </div>
-          <div class="field">
-            <input name="phone" type="tel" placeholder="No. WhatsApp (08…)" required />
-            <p class="err" data-error-for="phone" hidden></p>
+          <div>
+            <input
+              name="phone" type="tel" placeholder="No. WhatsApp (08…)" required
+              class="w-full rounded-xl border-0 bg-app px-4 py-3 text-[15px] outline-none ring-1 ring-transparent transition placeholder:text-ink/40 focus:bg-white focus:ring-2 focus:ring-brand/40"
+            />
+            <p class="mt-1.5 text-[13px] text-red-600" data-error-for="phone" hidden></p>
           </div>
-          <div class="field">
-            <select name="umur" required>
-              <option value="">Pilih umur</option>
+          <div class="grid gap-3.5 sm:grid-cols-2">
+            <select name="umur" required
+              class="w-full rounded-xl border-0 bg-app px-4 py-3 text-[15px] text-ink/80 outline-none ring-1 ring-transparent transition focus:bg-white focus:ring-2 focus:ring-brand/40">
+              <option value="">Umur</option>
               <option value="18-25 tahun">18-25 tahun</option>
               <option value="26-30 tahun">26-30 tahun</option>
               <option value="30-45 tahun">30-45 tahun</option>
               <option value="&gt; 50 tahun">&gt; 50 tahun</option>
             </select>
-            <p class="err" data-error-for="umur" hidden></p>
-          </div>
-          <div class="field">
-            <select name="pekerjaan" required>
-              <option value="">Pilih pekerjaan</option>
+            <select name="pekerjaan" required
+              class="w-full rounded-xl border-0 bg-app px-4 py-3 text-[15px] text-ink/80 outline-none ring-1 ring-transparent transition focus:bg-white focus:ring-2 focus:ring-brand/40">
+              <option value="">Pekerjaan</option>
               <option value="Siswa / Mahasiswa">Siswa / Mahasiswa</option>
               <option value="Karyawan">Karyawan</option>
               <option value="Pengusaha/founder">Pengusaha/founder</option>
               <option value="Manager/Head">Manager/Head</option>
               <option value="Direktur/C-level">Direktur/C-level</option>
             </select>
-            <p class="err" data-error-for="pekerjaan" hidden></p>
           </div>
-          <div class="field">
-            <select name="stage_bisnis" required>
-              <option value="">Pilih stage bisnis</option>
+          <div>
+            <select name="stage_bisnis" required
+              class="w-full rounded-xl border-0 bg-app px-4 py-3 text-[15px] text-ink/80 outline-none ring-1 ring-transparent transition focus:bg-white focus:ring-2 focus:ring-brand/40">
+              <option value="">Stage bisnis (setahun terakhir)</option>
               <option value="Belum punya bisnis">Belum punya bisnis</option>
               <option value="Belum Revenue">Belum Revenue</option>
               <option value="Revenue &lt;500 Juta">Revenue &lt;500 Juta</option>
@@ -118,18 +130,26 @@
               <option value="Revenue 5 - 10 M">Revenue 5 - 10 M</option>
               <option value="Revenue &gt;10 M">Revenue &gt;10 M</option>
             </select>
-            <p class="err" data-error-for="stage_bisnis" hidden></p>
+            <p class="mt-1.5 text-[13px] text-red-600" data-error-for="stage_bisnis" hidden></p>
           </div>
 
           <!-- Honeypot anti-bot: JANGAN dihapus, JANGAN diisi. -->
-          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <input class="absolute -left-[9999px] h-px w-px" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
-          <div class="status" data-lm-status hidden></div>
-          <button class="buy" type="submit">Kirim &amp; akses materi</button>
+          <div class="rounded-xl bg-mint-bg px-4 py-3 text-sm text-mint-ink" data-lm-status hidden></div>
+
+          <button
+            type="submit"
+            class="w-full rounded-2xl bg-brand px-6 py-3.5 text-[15px] font-semibold text-white transition hover:bg-brand-700 disabled:opacity-70"
+          >
+            Kirim &amp; akses materi
+          </button>
         </form>
-      </div>
 
-      <p class="note">Materi dikirim ke emailmu. Gratis, tanpa spam.</p>
+        <p class="mt-3 text-center text-xs text-ink/45">
+          Materi dikirim ke emailmu. Gratis, tanpa spam.
+        </p>
+      </section>
     </main>
 
     <!-- Funnel tracker — WAJIB di akhir body. Capture UTM + wire form lead-magnet. -->
