@@ -21,6 +21,15 @@ const META = {
     postInstall: ['Edit index.html (slug + copy)', 'fp sites publish index.html'],
     setupDoc: 'SETUP.md'
   },
+  'lead-magnet': {
+    title: 'Lead Magnet Capture',
+    description:
+      'No-build capture page: one HTML file + funnel-tracker.js lead form (data-lead-magnet). Email/WhatsApp gate, asset (PDF/sheet) emailed on submit, UTM captured. Founder+ handles signup + delivery. Deploy with fp sites publish.',
+    runtime: 'static',
+    stack: ['html', 'no-build'],
+    postInstall: ['Edit index.html (asset uuid + copy)', 'fp sites publish index.html'],
+    setupDoc: 'SETUP.md'
+  },
   'ai-studio': {
     title: 'AI Studio Prompt Pack',
     description:

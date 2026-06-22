@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- TODO: ganti judul + deskripsi materimu -->
+    <title>Download Gratis — Founder+</title>
+    <meta name="description" content="Isi form, materi dikirim ke emailmu." />
+    <style>
+      :root { --purple: #7f2dbf; --ink: #231838; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        color: var(--ink);
+        line-height: 1.6;
+        background: #faf9fb;
+      }
+      .wrap { max-width: 560px; margin: 0 auto; padding: 64px 24px; }
+      h1 { font-size: clamp(28px, 6vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+      p.lead { font-size: 18px; color: #4b4458; margin: 0 0 28px; }
+      ul { padding-left: 20px; margin: 0 0 28px; }
+      li { margin: 6px 0; }
+      .card {
+        background: #fff; border: 1px solid #eceaf0; border-radius: 20px;
+        padding: 24px;
+      }
+      .field { margin-bottom: 12px; }
+      input, select {
+        width: 100%; padding: 12px 14px; font-size: 15px; color: var(--ink);
+        background: #f6f5f8; border: none; border-radius: 12px;
+        font-family: inherit; outline: none;
+      }
+      input:focus, select:focus { box-shadow: 0 0 0 2px #d9c7ee; }
+      .err { color: #dc2626; font-size: 13px; margin: 6px 2px 0; }
+      .hp { position: absolute; left: -9999px; width: 1px; height: 1px; }
+      .status {
+        margin: 4px 0 12px; padding: 12px 14px; border-radius: 12px;
+        font-size: 14px; background: #e6fff7; color: #005c44;
+      }
+      .status[data-lm-status-state="error"] { background: #fef2f2; color: #b91c1c; }
+      .buy {
+        width: 100%; margin-top: 6px; background: var(--purple); color: #fff;
+        border: none; padding: 14px 28px; border-radius: 14px; font-size: 16px;
+        font-weight: 600; cursor: pointer;
+      }
+      .buy:hover { background: #6b26a3; }
+      .buy:disabled { opacity: 0.7; cursor: not-allowed; }
+      .note { font-size: 13px; color: #777; margin-top: 14px; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <!-- TODO: isi copy materimu -->
+      <h1>Judul materi yang menjanjikan hasil</h1>
+      <p class="lead">Satu kalimat: apa yang mereka dapat setelah download.</p>
+
+      <ul>
+        <li>Isi konkret 1</li>
+        <li>Isi konkret 2</li>
+        <li>Isi konkret 3</li>
+      </ul>
+
+      <!--
+        FORM LEAD MAGNET — funnel-tracker.js otomatis nge-wire submit form yang
+        punya data-lead-magnet ke endpoint newsletter Founder+. Saat user submit:
+        jadi subscriber + materi (PDF/file) dikirim ke email mereka.
+        Ganti GANTI-ASSET-UUID dengan uuid asset materimu:
+          - upload di admin Founder+ (Marketing > Assets, visibility=public,
+            category=lead-magnet), salin uuid-nya; ATAU
+          - lihat uuid yang ada:
+            GET https://academy.founderplus.id/api/dev/newsletter/available-files?category=lead-magnet
+        Nama field (name/email/phone/umur/pekerjaan/stage_bisnis) HARUS persis.
+      -->
+      <div class="card">
+        <form data-lead-magnet="GANTI-ASSET-UUID">
+          <div class="field">
+            <input name="name" type="text" placeholder="Nama lengkap" required />
+            <p class="err" data-error-for="name" hidden></p>
+          </div>
+          <div class="field">
+            <input name="email" type="email" placeholder="Email" required />
+            <p class="err" data-error-for="email" hidden></p>
+          </div>
+          <div class="field">
+            <input name="phone" type="tel" placeholder="No. WhatsApp (08…)" required />
+            <p class="err" data-error-for="phone" hidden></p>
+          </div>
+          <div class="field">
+            <select name="umur" required>
+              <option value="">Pilih umur</option>
+              <option value="18-25 tahun">18-25 tahun</option>
+              <option value="26-30 tahun">26-30 tahun</option>
+              <option value="30-45 tahun">30-45 tahun</option>
+              <option value="&gt; 50 tahun">&gt; 50 tahun</option>
+            </select>
+            <p class="err" data-error-for="umur" hidden></p>
+          </div>
+          <div class="field">
+            <select name="pekerjaan" required>
+              <option value="">Pilih pekerjaan</option>
+              <option value="Siswa / Mahasiswa">Siswa / Mahasiswa</option>
+              <option value="Karyawan">Karyawan</option>
+              <option value="Pengusaha/founder">Pengusaha/founder</option>
+              <option value="Manager/Head">Manager/Head</option>
+              <option value="Direktur/C-level">Direktur/C-level</option>
+            </select>
+            <p class="err" data-error-for="pekerjaan" hidden></p>
+          </div>
+          <div class="field">
+            <select name="stage_bisnis" required>
+              <option value="">Pilih stage bisnis</option>
+              <option value="Belum punya bisnis">Belum punya bisnis</option>
+              <option value="Belum Revenue">Belum Revenue</option>
+              <option value="Revenue &lt;500 Juta">Revenue &lt;500 Juta</option>
+              <option value="Revenue 500 Juta - 1 M">Revenue 500 Juta - 1 M</option>
+              <option value="Revenue 1 - 5 M">Revenue 1 - 5 M</option>
+              <option value="Revenue 5 - 10 M">Revenue 5 - 10 M</option>
+              <option value="Revenue &gt;10 M">Revenue &gt;10 M</option>
+            </select>
+            <p class="err" data-error-for="stage_bisnis" hidden></p>
+          </div>
+
+          <!-- Honeypot anti-bot: JANGAN dihapus, JANGAN diisi. -->
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <div class="status" data-lm-status hidden></div>
+          <button class="buy" type="submit">Kirim &amp; akses materi</button>
+        </form>
+      </div>
+
+      <p class="note">Materi dikirim ke emailmu. Gratis, tanpa spam.</p>
+    </main>
+
+    <!-- Funnel tracker — WAJIB di akhir body. Capture UTM + wire form lead-magnet. -->
+    <script
+      src="https://cdn.founderplus.id/funnel-tracker.js"
+      data-project-id="GANTI-PROJECT-ID"
+      defer
+    ></script>
+  </body>
+</html>

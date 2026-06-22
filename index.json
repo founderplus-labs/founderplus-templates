@@ -37,6 +37,35 @@
       ]
     },
     {
+      "name": "lead-magnet",
+      "title": "Lead Magnet Capture",
+      "description": "No-build capture page: one HTML file + funnel-tracker.js lead form (data-lead-magnet). Email/WhatsApp gate, asset (PDF/sheet) emailed on submit, UTM captured. Founder+ handles signup + delivery. Deploy with fp sites publish.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build"
+      ],
+      "postInstall": [
+        "Edit index.html (asset uuid + copy)",
+        "fp sites publish index.html"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/lead-magnet/SETUP.md",
+          "digest": "sha256:de01eefaf3ff723e12148c69304ed3932cacf5185647696faec9f8ac6cc3ce7d",
+          "size": 1844
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/lead-magnet/index.html",
+          "digest": "sha256:6ed8651a4968cbfe258d1c0a82a69b9d53e0fcb666d344956cb289c75945087e",
+          "size": 6306
+        }
+      ]
+    },
+    {
       "name": "ai-studio",
       "title": "AI Studio Prompt Pack",
       "description": "Product-specific prompts for Google AI Studio that generate a static selling page pre-wired to the Founder+ CDN checkout. Ebook, course, event, and freemium Gemini tool. No build, no payment code.",
@@ -248,12 +277,6 @@
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/astro.config.mjs",
           "digest": "sha256:24ce54e19927e2d560768186236f0d246840138f371fa49c8357a6946e62d833",
           "size": 247
-        },
-        {
-          "path": "bun.lock",
-          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/astro/bun.lock",
-          "digest": "sha256:d04cd1b74ce9503341214937f19af510b0c6345721b8bd2f5c69201cf6345bbf",
-          "size": 117746
         },
         {
           "path": "package.json",
