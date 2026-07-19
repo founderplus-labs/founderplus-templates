@@ -109,16 +109,16 @@
         backdrop-filter:saturate(1.8) blur(20px); -webkit-backdrop-filter:saturate(1.8) blur(20px);
         box-shadow:0 -1px 0 color-mix(in srgb, var(--line) 70%, transparent); }
       .bar .in { max-width:520px; margin:0 auto; }
-      .bar .totalrow { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
-      .bar .totalrow .l { color:var(--muted); font-size:13px; }
-      .bar .totalrow .v { font-weight:800; font-size:22px; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+      .bar .qris { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+      .bar .qris .lbl { font-weight:650; }
+      .bar .qris .amt { font-weight:800; letter-spacing:-0.01em; font-variant-numeric:tabular-nums; }
       .bar .actions { display:flex; gap:10px; }
       .bar button { flex:1; border:none; cursor:pointer; font:inherit; font-weight:700; font-size:15px;
         padding:15px; border-radius:14px; transition:transform 150ms var(--ease-out), opacity 160ms var(--ease-out); }
       .bar button:active { transform:scale(.98); }
       .bar button[disabled] { opacity:.4; }
       .bar .qris { background:var(--ink); color:var(--card); box-shadow:0 4px 16px rgba(26,20,32,.18); }
-      .bar .print { background:var(--card); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); flex:0 0 46%; }
+      .bar .print { background:var(--card); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); flex:0 0 34%; }
 
       /* Dialogs (QRIS + settings) */
       dialog { border:none; padding:0; width:100%; max-width:520px; color:var(--ink); background:var(--card);
@@ -136,6 +136,25 @@
           overlay 300ms allow-discrete, display 300ms allow-discrete; }
       dialog#qris[open] { transform:scale(1); opacity:1; }
       @starting-style { dialog#qris[open] { transform:scale(.94); opacity:0; } }
+
+      /* Payment success — clean confirmation before the next sale (Apple/Shopify). */
+      dialog#success { margin:auto; border-radius:24px; max-width:340px;
+        transform:scale(.94); opacity:0;
+        transition:transform 300ms var(--ease-out), opacity 220ms var(--ease-out),
+          overlay 300ms allow-discrete, display 300ms allow-discrete; }
+      dialog#success[open] { transform:scale(1); opacity:1; }
+      @starting-style { dialog#success[open] { transform:scale(.94); opacity:0; } }
+      .okwrap { padding:28px 22px calc(20px + var(--safe-b)); text-align:center; }
+      .okcheck { width:60px; height:60px; border-radius:999px; margin:2px auto 14px; display:grid; place-items:center;
+        color:var(--ok); background:color-mix(in srgb, var(--ok) 13%, transparent);
+        animation:ok-pop 380ms var(--ease-out) both; }
+      .okcheck svg { width:30px; height:30px; }
+      @keyframes ok-pop { from { transform:scale(.6); opacity:0; } to { transform:scale(1); opacity:1; } }
+      .oktitle { font-weight:700; font-size:17px; letter-spacing:-0.01em; }
+      .okamt { font-weight:800; font-size:30px; letter-spacing:-0.02em; margin:6px 0 2px; font-variant-numeric:tabular-nums; }
+      .oksub { color:var(--muted); font-size:12.5px; margin-bottom:18px; }
+      @media (prefers-reduced-motion: reduce) { .okcheck { animation:none; } }
+
       .qwrap { padding:22px 22px calc(20px + var(--safe-b)); text-align:center; }
       .qwrap .qtitle { font-weight:700; font-size:16px; letter-spacing:-0.01em; }
       .qwrap .qamt { font-weight:800; font-size:30px; letter-spacing:-0.02em; margin:2px 0 2px; font-variant-numeric:tabular-nums; }
@@ -209,8 +228,8 @@
         margin-bottom:10px; text-align:left; font:inherit; color:var(--ink);
         transition:transform 150ms var(--ease-out), box-shadow 160ms var(--ease-out); }
       .method:active { transform:scale(.985); }
-      .method .mi { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; color:var(--brand-ink); flex:0 0 44px;
-        background:var(--brand-soft); }
+      .method .mi { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; color:var(--ink); flex:0 0 44px;
+        background:color-mix(in srgb, var(--ink) 6%, var(--card)); }
       .method .mt { flex:1; min-width:0; }
       .method .mt .ml { display:block; font-weight:650; font-size:15.5px; letter-spacing:-0.01em; }
       .method .mt .ms { display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
@@ -312,10 +331,9 @@
 
     <div class="bar">
       <div class="in">
-        <div class="totalrow"><span class="l">Total</span><span class="v" id="barTotal">Rp 0</span></div>
         <div class="actions">
           <button class="print" id="btnPrint" type="button" disabled>Struk</button>
-          <button class="qris" id="btnPay" type="button" disabled>Bayar</button>
+          <button class="qris" id="btnPay" type="button" disabled><span class="lbl">Bayar</span><span class="amt" id="barTotal">Rp 0</span></button>
         </div>
       </div>
     </div>
@@ -394,6 +412,20 @@
         <div class="qactions" style="margin-top:16px">
           <button class="pr" id="cPrint" type="button">Cetak struk</button>
           <button class="done" id="cDone2" type="button">Selesai</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Payment success -->
+    <dialog id="success">
+      <div class="okwrap">
+        <div class="okcheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <div class="oktitle">Pembayaran diterima</div>
+        <div class="okamt" id="okAmt">Rp 0</div>
+        <div class="oksub" id="okMethod">QRIS</div>
+        <div class="qactions">
+          <button class="pr" id="okPrint" type="button">Cetak struk</button>
+          <button class="done" id="okNew" type="button">Transaksi baru</button>
         </div>
       </div>
     </dialog>
@@ -651,7 +683,16 @@
       $("qClose").onclick = () => $("qris").close();
       $("qDone").onclick = () => { $("qris").close(); finishSale(); };
       $("qPrint").onclick = () => printReceipt();
-      function finishSale() { resetSale(); toast("Transaksi selesai"); }
+      // Clean success confirmation; the sale stays intact (so the receipt can
+      // print) until the success sheet closes, which resets for the next order.
+      function finishSale() {
+        $("okAmt").textContent = fmt(currentTotal());
+        $("okMethod").textContent = payLabel() + (proofUrl ? " · bukti terlampir" : "");
+        $("success").showModal();
+      }
+      $("okPrint").onclick = () => printReceipt();
+      $("okNew").onclick = () => $("success").close();
+      $("success").addEventListener("close", resetSale);
       function resetSale() {
         amountDigits = ""; items.length = 0;
         payMethod = null; cashReceived = 0; proofUrl = null;

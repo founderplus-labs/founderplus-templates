@@ -140,8 +140,12 @@
       .thumb, .thumb-ph {
         width: 92px; height: 92px; border-radius: 14px; object-fit: cover; display: block;
       }
-      .thumb-ph { display: grid; place-items: center; color: color-mix(in srgb, var(--ink) 30%, transparent); }
-      .thumb-ph svg { width: 40px; height: 40px; }
+      /* Neutral photo placeholder (Apple/Shopify register — a calm surface, not
+         a colored gradient) shown until the owner adds a real product photo. */
+      .thumb-ph { display: grid; place-items: center;
+        background: color-mix(in srgb, var(--ink) 6%, var(--card));
+        color: color-mix(in srgb, var(--ink) 26%, transparent); }
+      .thumb-ph svg { width: 38px; height: 38px; }
       .control {
         position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%);
       }
@@ -235,7 +239,8 @@
         width: 46px; height: 46px; border-radius: 11px; object-fit: cover; flex: 0 0 46px;
         display: grid; place-items: center;
       }
-      .cline .cthumb-ph { color: color-mix(in srgb, var(--ink) 32%, transparent); }
+      .cline .cthumb-ph { background: color-mix(in srgb, var(--ink) 6%, var(--card));
+        color: color-mix(in srgb, var(--ink) 28%, transparent); }
       .cline .cthumb-ph svg { width: 22px; height: 22px; }
       .cline .cinfo { flex: 1; min-width: 0; }
       .cline .cname { font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em;
@@ -397,22 +402,6 @@
       const itemById = (id) => MENU.find((m) => m.id === id);
       const iconFor = (it) => ICONS[it.icon || CONFIG.categoryIcon[it.category]] || ICONS.food;
 
-      // Deterministic soft gradient from the item id — a tasteful placeholder so
-      // the menu looks intentional out of the box (owners add real photos later).
-      function placeholderBg(id) {
-        let h = 0;
-        for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
-        return `linear-gradient(135deg, hsl(${h} 52% 90%), hsl(${(h + 42) % 360} 56% 82%))`;
-      }
-      // Dark-mode placeholder: deeper, still tinted.
-      function placeholderBgDark(id) {
-        let h = 0;
-        for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
-        return `linear-gradient(135deg, hsl(${h} 32% 26%), hsl(${(h + 42) % 360} 34% 20%))`;
-      }
-      const isDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
-      const phStyle = (id) => `background:${isDark() ? placeholderBgDark(id) : placeholderBg(id)}`;
-
       function money() {
         let total = 0, count = 0;
         for (const [id, qty] of cart) {
@@ -470,7 +459,7 @@
 
       function thumbHtml(it) {
         if (it.image) return `<img class="thumb" src="${escapeAttr(it.image)}" alt="" loading="lazy" />`;
-        return `<div class="thumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${iconFor(it)}</div>`;
+        return `<div class="thumb-ph" aria-hidden="true">${iconFor(it)}</div>`;
       }
 
       function itemEl(it, idx) {
@@ -528,7 +517,7 @@
 
       function cthumbHtml(it) {
         if (it.image) return `<img class="cthumb" src="${escapeAttr(it.image)}" alt="" />`;
-        return `<div class="cthumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${iconFor(it)}</div>`;
+        return `<div class="cthumb-ph" aria-hidden="true">${iconFor(it)}</div>`;
       }
 
       function renderSheet() {
