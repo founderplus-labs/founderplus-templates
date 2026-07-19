@@ -348,16 +348,31 @@
         // Nomor WhatsApp kasir/dapur (format internasional tanpa +, mis. 62812xxxx).
         // Jalur pesanan default yang LANGSUNG BEKERJA tanpa backend.
         whatsapp: "6281234567890",
-        // (Opsional) Endpoint POS Founder+. Kalau diisi, pesanan dikirim ke
-        // backend POS dulu; WhatsApp jadi fallback. Biarkan null sampai
-        // endpoint tersedia. Lihat SETUP.md → "Sambungkan ke POS Founder+".
-        posApi: null, // mis. "https://api.founderplus.id/creator/pos/orders"
         // Param URL yang dipakai untuk nomor meja (dukung beberapa alias).
         tableParams: ["meja", "table", "t"],
         // Ikon placeholder per kategori (dipakai kalau item belum punya foto).
         // Nilai = key dari ICONS: "coffee" | "cup" | "food".
         categoryIcon: { Kopi: "coffee", "Non-Kopi": "cup", Makanan: "food" },
+
+        // ─────────────────────────────────────────────────────────────
+        // Integrasi Founder+ (SPEC-DRIVEN — lihat SPEC.md).
+        // Halaman ini kamu host sendiri. Yang lewat Founder+ (kita):
+        //   • TRANSAKSI  → backend POS/checkout Founder+
+        //   • GROWTH/GTM → funnel-tracker (analytics, atribusi UTM)
+        // Semua deklaratif di sini — tak ada integrasi yang di-hardcode.
+        // ─────────────────────────────────────────────────────────────
+        founderplus: {
+          env: "prod",        // "prod" → api.founderplus.id · "dev" → ops.founderplus.id
+          projectId: "",      // GTM: id project funnel-tracker (analytics + atribusi). Kosong = tracker off.
+          orders: false,      // true → kirim pesanan ke backend POS Founder+ (default: WhatsApp)
+        },
       };
+
+      // Resolusi endpoint dari spec di atas — bukan URL yang disebar di kode.
+      const FP_ENVS = { prod: "https://api.founderplus.id", dev: "https://ops.founderplus.id" };
+      const FP_API = FP_ENVS[CONFIG.founderplus.env] || FP_ENVS.prod;
+      // Endpoint transaksi (Founder+). null → jalur WhatsApp.
+      const POS_ORDERS = CONFIG.founderplus.orders ? `${FP_API}/creator/pos/orders` : null;
 
       // Ikon line monokrom (currentColor) untuk placeholder — bukan emoji.
       const ICONS = {
@@ -564,11 +579,12 @@
         const order = { ...orderSummary(), customer: name || null, note: note || null };
         if (order.items.length === 0) return;
 
-        // Preferred path: Founder+ POS backend (when configured). Falls back to
-        // WhatsApp on any failure so a table order is NEVER silently lost.
-        if (CONFIG.posApi) {
+        // Transaksi → Founder+ POS backend (spec-driven: founderplus.orders).
+        // Fallback ke WhatsApp pada kegagalan apa pun agar pesanan meja tak
+        // pernah hilang diam-diam.
+        if (POS_ORDERS) {
           try {
-            const res = await fetch(CONFIG.posApi, {
+            const res = await fetch(POS_ORDERS, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(order),
@@ -634,6 +650,20 @@
       renderCats();
       renderMenu();
       renderCartBar();
+
+      // GROWTH/GTM → Founder+ funnel-tracker (analytics + atribusi UTM). Dimuat
+      // hanya kalau projectId diisi (spec-driven). Berjalan di infra Founder+
+      // (cdn.founderplus.id); env dev diarahkan via data-api-base.
+      (function loadTracker() {
+        const pid = CONFIG.founderplus.projectId;
+        if (!pid) return;
+        const s = document.createElement("script");
+        s.src = "https://cdn.founderplus.id/funnel-tracker.js";
+        s.setAttribute("data-project-id", pid);
+        if (CONFIG.founderplus.env === "dev") s.setAttribute("data-api-base", FP_ENVS.dev);
+        s.defer = true;
+        document.body.appendChild(s);
+      })();
     </script>
   </body>
 </html>

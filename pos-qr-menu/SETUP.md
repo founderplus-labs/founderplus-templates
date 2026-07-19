@@ -19,6 +19,7 @@ satu file HTML.
 | `servis.html` | **Kamu (owner)** | **Manajemen servis**: tiket kerjaan, jadwal, status pengerjaan — untuk usaha jasa apa pun. |
 | `tables.html` | **Kamu (owner)** | Generate + print QR untuk tiap meja. Buka di browser, klik Print/PDF, potong, tempel di meja. |
 | `qrcode.vendor.js` | — | Encoder QR offline (MIT, tanpa CDN pihak ketiga). Dipakai `kasir.html` + `tables.html`. |
+| `SPEC.md` | — | **Kontrak integrasi** (spec-driven): apa yang milik user vs. Founder+ (transaksi + GTM), env, bentuk endpoint. |
 
 > Semua tool owner (`kasir`/`meja`/`servis`) **jalan lokal di HP/tablet, tanpa server** — datanya
 > tersimpan di browser perangkat itu (localStorage). Sinkronisasi multi-perangkat menyusul
@@ -69,33 +70,28 @@ Buka `tables.html` di browser (dobel-klik file-nya). Isi:
 Klik **Buat** lalu **Print / PDF**. Tiap kartu berisi QR yang membuka
 `…/?meja=<nomor>`. Potong, laminasi, taruh di meja. Selesai — pelanggan tinggal scan.
 
-## 4. (Opsional) Sambungkan ke POS Founder+
+## 4. Integrasi Founder+ (spec-driven)
 
-Saat endpoint POS backend sudah aktif, isi `CONFIG.posApi`:
+Kamu host template ini sendiri. Yang lewat **Founder+ (kita)**: **transaksi** +
+**growth/GTM**. Wiring-nya deklaratif di satu blok `CONFIG.founderplus` (`index.html`):
 
 ```js
-posApi: "https://api.founderplus.id/creator/pos/orders",
+founderplus: {
+  env: "prod",       // "prod" → api.founderplus.id · "dev" → ops.founderplus.id
+  projectId: "",     // GTM: id project funnel-tracker (analytics + atribusi). Kosong = off.
+  orders: false,     // true → kirim pesanan ke backend POS Founder+ (default: WhatsApp)
+},
 ```
 
-Pesanan akan di-`POST` sebagai JSON:
+- **Transaksi** — `orders: true` → pesanan meja di-`POST` ke `{api}/creator/pos/orders`
+  (gagal/kosong → fallback WhatsApp). QRIS di kasir juga rail Founder+ (dari payload
+  QRIS statis merchant-mu).
+- **GTM** — isi `projectId` → `index.html` otomatis memuat funnel-tracker Founder+
+  (`cdn.founderplus.id`) untuk analytics + atribusi UTM. Kosongkan untuk mematikannya.
+- **Environment** sama dengan CLI: `prod` = `api.founderplus.id`, `dev` = `ops.founderplus.id`.
 
-```json
-{
-  "table": "A1",
-  "items": [
-    { "id": "kopi-susu", "name": "Kopi Susu", "qty": 2, "price": 22000, "subtotal": 44000 }
-  ],
-  "total": 44000,
-  "customer": "Budi",
-  "note": "es sedikit"
-}
-```
-
-Kalau `posApi` gagal atau kosong, halaman **otomatis fallback ke WhatsApp** —
-pesanan tidak pernah hilang diam-diam.
-
-> Environment mengikuti CLI: production `api.founderplus.id`, dev
-> `ops.founderplus.id`. Ganti host `posApi` sesuai environment yang kamu pakai.
+📄 Detail kontrak lengkap (batas kepemilikan, bentuk endpoint, event tracker,
+data lokal) ada di **`SPEC.md`**.
 
 ## Kasir — QRIS dinamis + cetak struk (`kasir.html`)
 
