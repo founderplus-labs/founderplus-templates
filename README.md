@@ -98,8 +98,23 @@ instead of vendoring.
 the digests for integrity + change detection. Files are served from this repo's
 `main` branch via `raw.githubusercontent.com`.
 
+## Spec system
+
+Perilaku produk didokumentasikan sebagai **spec YAML per vertical slice** di
+[`specs/`](./specs/) — satu file per hal yang bisa dilakukan user (JTBD → user
+story → acceptance criteria), dengan checklist sebagai sumber kebenaran progres.
+Terinspirasi spec bernomor [operately/operately](https://github.com/operately/operately/tree/main/specs).
+
+```bash
+cp specs/_TEMPLATE.spec.yaml specs/00NN-nama-slice.spec.yaml   # slice baru
+node specs/progress.mjs                                        # meter checklist
+```
+
+Mulai dari [`specs/README.md`](./specs/README.md).
+
 ## Contributing a template
 
 1. Add `your-template/` with the files.
 2. Regenerate `index.json` (digests + raw URLs).
 3. PR. Keep a `SETUP.md` + `SECURITY.md` in every template.
+4. Tambah spec slice-nya di `specs/` (salin `_TEMPLATE.spec.yaml`), perbarui indeks di `specs/README.md`.

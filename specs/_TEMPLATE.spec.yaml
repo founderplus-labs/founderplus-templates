@@ -1,0 +1,124 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+# ────────────────────────────────────────────────────────────────────────────
+# FOUNDER+ VERTICAL-SLICE SPEC — TEMPLATE
+# Copy this file to `NNNN-<slug>.spec.yaml`, bump NNNN, fill in, delete hints.
+# One file = one vertical slice = one thing a user can DO, end to end.
+# Read specs/README.md first. Checklists (`done: true/false`) are the source of
+# truth for progress — run `node specs/progress.mjs <file>`.
+# ────────────────────────────────────────────────────────────────────────────
+
+id: "0000"                       # zero-padded, matches filename prefix
+slug: my-slice                   # kebab-case, matches filename
+title: "Judul singkat slice ini"
+app: cross-cutting               # funnel-tracker-cdn | static-landing | pos-qr-menu |
+                                 # ai-studio | fp-fullstack | astro | nextjs | hono |
+                                 # lead-magnet | cross-cutting
+status: draft                    # draft | in_review | in_progress | shipped | archived
+owner: "@your-handle"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Satu–dua kalimat, bahasa manusia: slice ini apa dan buat siapa.
+
+# ── WHY ─ Jobs To Be Done ────────────────────────────────────────────────────
+# Job = kemajuan yang orang mau capai dalam sebuah situasi. Bukan fitur.
+jtbd:
+  - id: JTBD-1
+    when: "Ketika <situasi/pemicu>,"
+    i_want: "aku ingin <motivasi>,"
+    so_that: "supaya <hasil yang diharapkan>."
+    persona: creator             # id dari daftar personas di bawah
+    signal: "Metrik yang membuktikan job ini SELESAI DENGAN BAIK."
+
+# ── WHO ─ Personas ───────────────────────────────────────────────────────────
+personas:
+  - id: creator
+    label: "Creator / penjual"
+    context: "Punya produk digital, mau jualan, tidak mau ngoding."
+
+# ── Framing (gaya Operately) ─────────────────────────────────────────────────
+problem: >
+  Kondisi sekarang & rasa sakitnya. Kenapa slice ini perlu ada.
+goals:
+  - "Hasil yang kita kejar."
+non_goals:
+  - "Yang SENGAJA tidak dikerjakan di slice ini (cegah scope creep)."
+
+# ── WHAT ─ The vertical cut ──────────────────────────────────────────────────
+# Buktikan ini slice vertikal (nembus semua lapisan), bukan lapisan horizontal.
+slice:
+  entry_points:
+    - "Dari mana user masuk (URL, tombol, atribut HTML, screen)."
+  ui:
+    - "Yang user lihat/sentuh."
+  logic:
+    - "Aturan/perhitungan di sisi klien/server."
+  data:
+    - "Yang dibaca/ditulis (localStorage key, tabel, field)."
+  integrations:
+    - "Sistem luar yang disentuh (Founder+ API, CDN, printer, dll)."
+
+# ── HOW ─ User stories (tiap story bawa checklist sendiri) ───────────────────
+user_stories:
+  - id: US-1
+    persona: creator
+    as_a: "creator"
+    i_want: "<kemampuan konkret>"
+    so_that: "<manfaat>"
+    priority: must               # must | should | could | wont
+    acceptance_criteria:         # Given/When/Then. Story done kalau semua ✔.
+      - text: "Given <konteks>, when <aksi>, then <hasil terobservasi>."
+        done: false
+    tasks:                       # langkah implementasi (unit yang bisa di-merge)
+      - text: "<langkah kerja>"
+        done: false
+    edge_cases:
+      - "<kasus tepi & bagaimana ditangani>"
+
+# ── Contracts ─ interface stabil yang di-expose/dikonsumsi ───────────────────
+contracts:
+  config: |
+    // blok config deklaratif, kalau ada
+  attributes:                    # untuk toolkit berbasis atribut HTML
+    - name: data-product-slug
+      required: true
+      desc: "Slug produk Founder+."
+  api:
+    - name: "Nama endpoint"
+      method: POST
+      path: "{FP_API}/creator/..."
+      request: |
+        { }
+      response: |
+        2xx = ...
+
+# ── Cross-cutting ────────────────────────────────────────────────────────────
+security:
+  - "Batasan keamanan / privasi yang tidak boleh dilanggar."
+telemetry:
+  - "Event/metric yang dipancarkan."
+accessibility:
+  - "Kontrak a11y (fokus, kontras, keyboard, screen reader)."
+
+test_plan:
+  - id: T-1
+    kind: manual                 # manual | unit | integration | e2e
+    text: "<skenario uji>"
+    done: false
+
+# ── The gate ─────────────────────────────────────────────────────────────────
+definition_of_done:
+  - text: "Semua acceptance criteria semua user story ✔."
+    done: false
+  - text: "Test plan ✔."
+    done: false
+  - text: "Docs (README/SETUP) diperbarui bila kontrak berubah."
+    done: false
+
+open_questions:
+  - "Yang belum diputuskan — catat di sini, jangan kubur di dalam."
+
+links:
+  - label: "Isu / PR / referensi"
+    url: "https://..."

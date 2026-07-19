@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0003"
+slug: sticky-cta
+title: "Tombol beli yang ikut scroll (sticky CTA)"
+app: funnel-tracker-cdn
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Setelah pengunjung menggulir melewati tombol beli utama, sebuah tombol nempel
+  di bawah layar supaya CTA selalu terjangkau — terutama penting di HP. Cukup
+  tambah satu kata kunci pada tombol yang sudah ada.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika pengunjung menggulir jauh dari tombol beli utama di HP,"
+    i_want: "aku ingin CTA tetap terlihat tanpa mereka harus scroll balik,"
+    so_that: "supaya momen niat beli tidak hilang."
+    persona: buyer
+    signal: "Rasio klik dari sticky CTA > 0 dan tidak menurunkan klik CTA utama."
+
+personas:
+  - id: creator
+    label: "Creator / penjual"
+    context: "Ingin CTA selalu di jangkauan tanpa menata ulang layout."
+  - id: buyer
+    label: "Pembeli (mobile-first)"
+    context: "Baca panjang di HP, jempol dekat bawah layar."
+
+problem: >
+  Di halaman panjang, tombol beli utama menghilang dari viewport begitu
+  pengunjung menggulir — konversi bocor karena CTA tidak terjangkau.
+goals:
+  - "Sticky CTA muncul otomatis setelah tombol utama tergulir keluar layar."
+  - "Reuse atribut produk yang sama (tidak ada konfigurasi ganda)."
+non_goals:
+  - "Bukan banner promo umum; khusus mem-follow CTA beli."
+  - "Tidak menutupi konten penting/footer secara permanen."
+
+slice:
+  entry_points:
+    - "Atribut `data-sticky-cta` pada tombol beli yang sudah ada."
+  ui:
+    - "Bar melayang di bawah viewport berisi tombol beli."
+  logic:
+    - "Observasi visibilitas tombol utama; tampilkan/sembunyikan sticky sesuai posisi scroll."
+  data: []
+  integrations:
+    - "Memakai jalur checkout yang sama dengan slice 0001 (data-product-*)."
+
+user_stories:
+  - id: US-1
+    persona: buyer
+    as_a: "pembeli di HP"
+    i_want: "tombol beli tetap terlihat saat aku scroll jauh"
+    so_that: "aku bisa beli kapan pun tanpa scroll balik"
+    priority: must
+    acceptance_criteria:
+      - text: "Given tombol utama punya data-sticky-cta, when tombol utama keluar dari viewport, then sticky CTA muncul di bawah layar."
+        done: true
+      - text: "Given sticky CTA tampil, when pengunjung scroll balik dan tombol utama terlihat lagi, then sticky CTA menghilang."
+        done: true
+      - text: "Given sticky CTA diklik, when ditekan, then perilaku checkout sama persis dengan tombol utama."
+        done: true
+    tasks:
+      - text: "Pakai IntersectionObserver pada tombol utama untuk toggle sticky."
+        done: true
+      - text: "Kloning atribut produk ke elemen sticky agar handler beli identik."
+        done: true
+    edge_cases:
+      - "Lebih dari satu tombol sticky di satu halaman → hanya satu bar yang aktif (hindari tumpuk)."
+      - "IntersectionObserver tidak didukung → fallback tanpa sticky (tidak crash)."
+
+contracts:
+  attributes:
+    - name: data-sticky-cta
+      required: false
+      desc: "Menandai tombol beli agar di-mirror sebagai sticky CTA saat tombol utama tergulir keluar."
+
+security:
+  - "Tidak menambah surface baru; memakai jalur checkout slice 0001."
+telemetry:
+  - "Klik sticky CTA dapat ditandai sumbernya (sticky vs utama) untuk analitik."
+accessibility:
+  - "Sticky bar tidak menjebak fokus; tetap dapat di-dismiss/di-skip via keyboard."
+  - "Kontras & area tap memadai (>=44px)."
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Scroll melewati tombol utama di HP → sticky muncul; scroll balik → hilang."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "Klik sticky → checkout sama dengan tombol utama."
+    done: true
+
+definition_of_done:
+  - text: "Muncul/hilang mengikuti visibilitas tombol utama."
+    done: true
+  - text: "Perilaku beli identik dengan CTA utama."
+    done: true
+  - text: "README funnel-tracker mendokumentasikan data-sticky-cta."
+    done: true
+
+open_questions:
+  - "Perlukah opsi menonaktifkan sticky di desktop lebar?"
+
+links:
+  - label: "Slice 0001 — tombol beli"
+    url: "./0001-funnel-buy-button.spec.yaml"

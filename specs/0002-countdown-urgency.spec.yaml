@@ -1,0 +1,132 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0002"
+slug: countdown-urgency
+title: "Countdown urgency (evergreen per-pengunjung & deadline tetap)"
+app: funnel-tracker-cdn
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Hitung mundur siap pakai untuk menaikkan urgensi penawaran — dua mode:
+  per-pengunjung (evergreen) yang mulai saat orang membuka halaman, dan deadline
+  tetap yang sama untuk semua orang.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku mau bikin penawaran terasa terbatas tanpa berbohong,"
+    i_want: "aku ingin memasang hitung mundur yang jujur & tidak reset saat refresh,"
+    so_that: "supaya pembeli terdorong memutuskan sekarang, bukan menunda."
+    persona: creator
+    signal: "Kenaikan conversion pada halaman ber-countdown vs kontrol; timer tidak reset saat refresh."
+
+personas:
+  - id: creator
+    label: "Creator / penjual"
+    context: "Mau taktik urgensi tanpa nulis JS timer sendiri."
+  - id: buyer
+    label: "Pembeli"
+    context: "Melihat sisa waktu untuk ambil penawaran."
+
+problem: >
+  Timer urgensi buatan sendiri sering reset saat refresh (tidak kredibel) atau
+  butuh JS yang tidak dikuasai creator non-teknis.
+goals:
+  - "Dua mode: evergreen per-pengunjung dan deadline absolut — cukup satu atribut."
+  - "Evergreen persisten di browser pengunjung; refresh tidak me-reset."
+non_goals:
+  - "Bukan penjadwalan kampanye server-side; tidak sinkron lintas device."
+  - "Tidak menyembunyikan/menonaktifkan tombol beli saat waktu habis (di luar scope slice ini)."
+
+slice:
+  entry_points:
+    - "Atribut `data-countdown-evergreen=\"<menit>\"`."
+    - "Atribut `data-countdown=\"<ISO datetime>\"`."
+  ui:
+    - "Elemen penampung yang di-render jadi hitung mundur (hh:mm:ss)."
+  logic:
+    - "Evergreen: simpan waktu mulai per pengunjung; hitung sisa dari itu."
+    - "Fixed: hitung sisa dari deadline absolut."
+  data:
+    - "localStorage untuk waktu mulai evergreen per pengunjung."
+  integrations: []
+
+user_stories:
+  - id: US-1
+    persona: creator
+    as_a: "creator"
+    i_want: "menaruh data-countdown-evergreen=\"60\" pada sebuah elemen"
+    so_that: "tiap pengunjung dapat hitung mundur 60 menit sejak dia buka halaman"
+    priority: must
+    acceptance_criteria:
+      - text: "Given elemen punya data-countdown-evergreen=60, when pengunjung pertama kali buka, then timer mulai dari 60:00."
+        done: true
+      - text: "Given timer berjalan, when pengunjung refresh, then timer melanjutkan sisa waktu (tidak reset)."
+        done: true
+      - text: "Given waktu habis, when 00:00 tercapai, then timer berhenti di 00:00 (tidak negatif)."
+        done: true
+    tasks:
+      - text: "Simpan timestamp mulai di localStorage keyed per elemen."
+        done: true
+      - text: "Tick tiap detik; render hh:mm:ss."
+        done: true
+    edge_cases:
+      - "localStorage diblokir → fallback ke sesi memori (reset saat refresh, tapi tidak crash)."
+  - id: US-2
+    persona: creator
+    as_a: "creator"
+    i_want: "menaruh data-countdown=\"2026-12-31T23:59\""
+    so_that: "semua pengunjung melihat deadline yang sama"
+    priority: must
+    acceptance_criteria:
+      - text: "Given deadline absolut, when halaman dibuka kapan pun, then sisa waktu dihitung dari now ke deadline."
+        done: true
+      - text: "Given deadline sudah lewat, when dibuka, then tampil 00:00 / state kadaluarsa."
+        done: true
+    tasks:
+      - text: "Parse ISO datetime; hormati zona waktu lokal pengunjung sesuai spesifikasi."
+        done: true
+    edge_cases:
+      - "Format datetime tidak valid → console warning, elemen tidak diaktifkan."
+
+contracts:
+  attributes:
+    - name: data-countdown-evergreen
+      required: false
+      desc: "Durasi menit per pengunjung (mis. 60)."
+    - name: data-countdown
+      required: false
+      desc: "Deadline absolut ISO (mis. 2026-12-31T23:59)."
+
+security:
+  - "Hanya baca/tulis localStorage milik origin sendiri; tidak ada data pribadi."
+telemetry:
+  - "Opsional: event 'countdown_expired' ke GTM bila project id aktif."
+accessibility:
+  - "Gunakan aria-live sopan agar screen reader tidak membanjiri update tiap detik."
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Evergreen 60m → refresh beberapa kali, pastikan lanjut, bukan reset."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "Deadline lampau → tampil state kadaluarsa."
+    done: true
+
+definition_of_done:
+  - text: "Kedua mode lulus acceptance criteria."
+    done: true
+  - text: "Perilaku persist evergreen terverifikasi lintas refresh."
+    done: true
+  - text: "README funnel-tracker mendokumentasikan kedua atribut."
+    done: true
+
+open_questions:
+  - "Perlukah hook untuk menyembunyikan penawaran saat evergreen habis (koordinasi dengan slice tombol beli)?"
+
+links:
+  - label: "Repo funnel-tracker-cdn"
+    url: "https://github.com/founderplus-labs/funnel-tracker-cdn"

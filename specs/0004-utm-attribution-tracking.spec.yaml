@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0004"
+slug: utm-attribution-tracking
+title: "Tracking otomatis & atribusi UTM ke checkout"
+app: funnel-tracker-cdn
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  UTM dari iklan/sosmed tercatat saat pengunjung mendarat dan ikut terbawa
+  sampai checkout, plus event analytics dikirim ke backend GTM Founder+ — tanpa
+  perlu memasang Google Analytics tambahan.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku belanja iklan ke beberapa campaign,"
+    i_want: "aku ingin tahu campaign mana yang menghasilkan penjualan,"
+    so_that: "supaya aku menaruh budget di yang menghasilkan uang."
+    persona: creator
+    signal: "Setiap penjualan bisa ditelusuri balik ke utm_source/medium/campaign asalnya."
+
+personas:
+  - id: creator
+    label: "Creator / pengiklan"
+    context: "Jalankan campaign berbayar, butuh atribusi tanpa setup analytics rumit."
+
+problem: >
+  Tanpa atribusi, creator tidak tahu campaign mana yang closing; memasang GA
+  penuh terlalu berat untuk sekadar melacak sumber → penjualan.
+goals:
+  - "Tangkap UTM saat pertama mendarat dan pertahankan sepanjang sesi."
+  - "Sisipkan UTM ke URL checkout (atribusi end-to-end)."
+  - "Kirim event analytics ke backend GTM Founder+ bila project id diisi."
+non_goals:
+  - "Bukan pengganti analitik produk lengkap; fokus pada atribusi funnel jualan."
+  - "Tidak melacak pengunjung lintas situs / tidak menaruh cookie pihak ketiga."
+
+slice:
+  entry_points:
+    - "URL landing dengan parameter utm_*."
+    - "data-project-id pada tag script funnel-tracker."
+  ui: []
+  logic:
+    - "Parse UTM saat load; simpan first-touch; append ke URL checkout saat klik beli."
+    - "Emit event (page_view, product_click) ke endpoint GTM."
+  data:
+    - "sessionStorage untuk UTM first-touch."
+  integrations:
+    - "Backend GTM Founder+ (prod: api.founderplus.id, dev: ops.founderplus.id)."
+
+user_stories:
+  - id: US-1
+    persona: creator
+    as_a: "pengiklan"
+    i_want: "UTM dari URL landing terbawa sampai checkout"
+    so_that: "penjualan bisa diatribusikan ke campaign yang benar"
+    priority: must
+    acceptance_criteria:
+      - text: "Given landing dibuka dengan ?utm_source=ig&utm_campaign=x, when pembeli klik beli, then UTM ikut di URL checkout."
+        done: true
+      - text: "Given pengunjung berpindah antar halaman internal dalam satu sesi, when akhirnya klik beli, then UTM first-touch tetap terbawa."
+        done: true
+    tasks:
+      - text: "Baca utm_* dari query; simpan sekali (first-touch) ke sessionStorage."
+        done: true
+      - text: "Gabungkan UTM ke URL checkout di slice 0001."
+        done: true
+    edge_cases:
+      - "Tidak ada UTM → jalan normal tanpa parameter."
+  - id: US-2
+    persona: creator
+    as_a: "creator"
+    i_want: "mengaktifkan analytics dengan mengisi project id"
+    so_that: "event funnel terekam di dashboard Founder+"
+    priority: should
+    acceptance_criteria:
+      - text: "Given data-project-id diisi, when halaman dibuka, then event dikirim ke endpoint GTM env yang sesuai."
+        done: true
+      - text: "Given data-project-id kosong, when halaman dibuka, then tracking non-aktif (tidak ada request)."
+        done: true
+    tasks:
+      - text: "Turunkan base API dari env (prod/dev); kirim event via beacon/fetch."
+        done: true
+    edge_cases:
+      - "Jaringan gagal → event di-drop diam-diam, tidak mengganggu UX beli."
+
+contracts:
+  config: |
+    <script src="https://cdn.founderplus.id/funnel-tracker.js"
+            data-project-id="<PROJECT_ID>"
+            data-api-base="https://ops.founderplus.id"  <!-- hanya untuk env dev -->
+            defer></script>
+  attributes:
+    - name: data-project-id
+      required: false
+      desc: "Id project funnel-tracker (analytics + atribusi). Kosong = tracking mati."
+    - name: data-api-base
+      required: false
+      desc: "Override base API untuk env dev (ops.founderplus.id)."
+
+security:
+  - "Tidak ada PII yang dikirim tanpa perlu; tidak ada cookie pihak ketiga."
+  - "Env dev/prod dipisah tegas (ops vs api founderplus.id)."
+telemetry:
+  - "page_view, product_click, (opsional) countdown_expired."
+accessibility: []
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Buka landing dgn UTM → klik beli → cek UTM di URL checkout."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "Isi project id → cek request event terkirim ke env yang benar."
+    done: true
+  - id: T-3
+    kind: manual
+    text: "Kosongkan project id → pastikan tidak ada request analytics."
+    done: true
+
+definition_of_done:
+  - text: "Atribusi UTM end-to-end terverifikasi."
+    done: true
+  - text: "Toggle project id on/off berperilaku benar."
+    done: true
+  - text: "Pemisahan env prod/dev terdokumentasi."
+    done: true
+
+open_questions:
+  - "Perlukah dukungan parameter klik-id platform (fbclid/gclid) selain utm_*?"
+
+links:
+  - label: "Repo funnel-tracker-cdn"
+    url: "https://github.com/founderplus-labs/funnel-tracker-cdn"
+  - label: "llms.txt (panduan AI agent)"
+    url: "https://cdn.founderplus.id/llms.txt"

@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0006"
+slug: pos-cashier-qris-receipt
+title: "Kasir: bayar (QRIS/transfer/tunai) + struk Bluetooth + rekap harian"
+app: pos-qr-menu
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Layar kasir (kasir.html) untuk menerima pembayaran QRIS dinamis, transfer bank,
+  atau tunai (dengan foto bukti), mencetak struk ke printer Bluetooth ESC/POS,
+  dan menyimpan riwayat transaksi + rekap harian — berjalan penuh di perangkat
+  owner tanpa server.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika pelanggan mau membayar di kasir,"
+    i_want: "aku ingin menagih nominal pas lewat QRIS/transfer/tunai lalu cetak struk,"
+    so_that: "supaya transaksi selesai rapi dan tercatat untuk rekap harian."
+    persona: cashier
+    signal: "Setiap transaksi tersimpan; rekap harian cocok dengan uang masuk; struk tercetak."
+
+personas:
+  - id: cashier
+    label: "Kasir / owner"
+    context: "Pegang HP/tablet Android, punya akun QRIS statis & rekening bank."
+  - id: customer
+    label: "Pelanggan"
+    context: "Scan QRIS nominal pas atau transfer / bayar tunai."
+
+problem: >
+  Mesin EDC & POS berlangganan mahal. Owner kecil butuh terima QRIS nominal pas,
+  cetak struk, dan tahu pemasukan harian — tanpa biaya bulanan atau server.
+goals:
+  - "QRIS dinamis: nominal ditanam ke payload QRIS statis merchant + CRC16 dihitung ulang."
+  - "Dukung transfer (rekening sendiri) & tunai (+foto bukti)."
+  - "Cetak struk ESC/POS via Bluetooth (Android Chrome)."
+  - "Riwayat transaksi + rekap harian tersimpan lokal."
+non_goals:
+  - "Template TIDAK menyimpan/ memproses kartu; settlement QRIS lewat acquirer, bukan template."
+  - "Belum sinkron multi-device (data di localStorage perangkat)."
+
+slice:
+  entry_points:
+    - "kasir.html dibuka di perangkat owner (tidak untuk URL publik)."
+  ui:
+    - "Input nominal, pilih metode, tampil QR dinamis, tombol cetak, layar riwayat & rekap, halaman Pengaturan."
+  logic:
+    - "Bangun QRIS dinamis (inject amount + recompute CRC16); catat transaksi; agregasi rekap harian."
+  data:
+    - "localStorage: fp_kasir_txns_v1 (transaksi), fp_kasir_settings_v1 (payload QRIS, rekening, dll)."
+  integrations:
+    - "Web Bluetooth → printer ESC/POS. Jaringan QRIS/acquirer untuk settlement (di luar template)."
+
+user_stories:
+  - id: US-1
+    persona: cashier
+    as_a: "kasir"
+    i_want: "memasukkan nominal dan menampilkan QRIS nominal pas"
+    so_that: "pelanggan tinggal scan & bayar tepat"
+    priority: must
+    acceptance_criteria:
+      - text: "Given payload QRIS statis tersimpan, when aku input nominal, then QR dinamis dengan nominal itu ter-render dan CRC16 valid."
+        done: true
+      - text: "Given nominal 0/kosong, when aku coba tampilkan, then ditolak dengan pesan jelas."
+        done: true
+    tasks:
+      - text: "Parse payload QRIS statis; sisipkan tag amount; hitung ulang CRC16."
+        done: true
+      - text: "Render QR dari payload dinamis (qrcode.vendor.js)."
+        done: true
+    edge_cases:
+      - "Payload QRIS belum diisi di Pengaturan → arahkan owner mengisi dulu."
+  - id: US-2
+    persona: cashier
+    as_a: "kasir"
+    i_want: "menerima transfer atau tunai dengan bukti"
+    so_that: "semua metode bayar tercatat seragam"
+    priority: must
+    acceptance_criteria:
+      - text: "Given metode transfer, when dipilih, then rekening sendiri tampil untuk pelanggan."
+        done: true
+      - text: "Given metode tunai, when aku selesaikan, then aku bisa lampirkan foto bukti dan transaksi tercatat."
+        done: true
+    tasks:
+      - text: "Form metode: transfer (rekening) / tunai (foto bukti)."
+        done: true
+    edge_cases:
+      - "Foto bukti besar → kompres/menolak dengan pesan agar localStorage tidak penuh."
+  - id: US-3
+    persona: cashier
+    as_a: "kasir"
+    i_want: "mencetak struk ke printer Bluetooth"
+    so_that: "pelanggan dapat bukti fisik"
+    priority: should
+    acceptance_criteria:
+      - text: "Given printer ESC/POS terpasang via Bluetooth, when aku cetak, then struk tercetak berisi item, total, metode, waktu."
+        done: true
+    tasks:
+      - text: "Susun perintah ESC/POS; kirim via Web Bluetooth."
+        done: true
+    edge_cases:
+      - "Browser tanpa Web Bluetooth (iOS) → sembunyikan/nonaktifkan cetak dengan penjelasan."
+  - id: US-4
+    persona: cashier
+    as_a: "kasir/owner"
+    i_want: "melihat riwayat transaksi & rekap harian"
+    so_that: "aku tahu pemasukan hari ini dan bisa tutup buku"
+    priority: must
+    acceptance_criteria:
+      - text: "Given transaksi tersimpan, when aku buka riwayat, then daftar & total per hari tampil benar."
+        done: true
+      - text: "Given aku refresh/menutup app, when buka lagi, then data tetap ada (localStorage)."
+        done: true
+    tasks:
+      - text: "Simpan tiap transaksi ke fp_kasir_txns_v1; agregasi rekap harian."
+        done: true
+    edge_cases:
+      - "Ganti hari/tanggal → rekap terpisah per tanggal lokal."
+
+contracts:
+  config: |
+    // localStorage keys
+    fp_kasir_txns_v1      // array transaksi
+    fp_kasir_settings_v1  // { qrisPayload, bankAccounts[], storeName, ... }
+  attributes: []
+
+security:
+  - "kasir.html jangan ditaruh di URL publik yang mudah ditebak (tanpa auth)."
+  - "Template tidak menyimpan kredensial acquirer; payload QRIS = milik merchant."
+telemetry:
+  - "Tidak mengirim data transaksi keluar; semua lokal by design (versi template)."
+accessibility:
+  - "Tombol besar untuk operasi cepat di layar sentuh; angka mudah dibaca."
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Isi payload QRIS di Pengaturan; uji 1x bayar nominal kecil sungguhan → QR valid & terbayar."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "Uji cetak struk ke printer Bluetooth fisik (Android Chrome)."
+    done: true
+  - id: T-3
+    kind: manual
+    text: "Buat beberapa transaksi → rekap harian cocok; refresh → data persist."
+    done: true
+
+definition_of_done:
+  - text: "QRIS dinamis valid (CRC16) & terbayar pada uji nyata."
+    done: true
+  - text: "Struk tercetak di printer fisik."
+    done: true
+  - text: "Riwayat & rekap harian akurat dan persisten."
+    done: true
+  - text: "SETUP/SPEC pos-qr-menu menjelaskan pengisian payload QRIS & rekening."
+    done: true
+
+open_questions:
+  - "Sinkron multi-device (kasir HP A = tablet B) menyusul lewat backend POS Founder+ — kontrak tipe di founderplus-cli core/pos.ts (PosOrder, dsb.). Slice terpisah."
+
+links:
+  - label: "SPEC integrasi pos-qr-menu"
+    url: "../pos-qr-menu/SPEC.md"

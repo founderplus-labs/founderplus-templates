@@ -1,0 +1,217 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/founderplus-labs/founderplus-templates/specs/schema/spec.schema.json",
+  "title": "Founder+ Vertical-Slice Spec",
+  "description": "One YAML file = one vertical slice, from the job it does (JTBD) down to the checkbox that says it's done. Inspired by operately/operately's numbered feature specs, expressed as YAML with checklists.",
+  "type": "object",
+  "required": ["id", "slug", "title", "app", "status", "summary", "jtbd", "user_stories"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9]{4}$",
+      "description": "Zero-padded sequence number, matches the filename prefix (e.g. \"0001\")."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "kebab-case identifier, matches the filename (e.g. \"funnel-buy-button\")."
+    },
+    "title": { "type": "string", "minLength": 3 },
+    "app": {
+      "type": "string",
+      "description": "Which template/app this slice belongs to.",
+      "enum": [
+        "funnel-tracker-cdn",
+        "static-landing",
+        "pos-qr-menu",
+        "ai-studio",
+        "fp-fullstack",
+        "astro",
+        "nextjs",
+        "hono",
+        "lead-magnet",
+        "cross-cutting"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "description": "Lifecycle state. Drives the index in specs/README.md.",
+      "enum": ["draft", "in_review", "in_progress", "shipped", "archived"]
+    },
+    "owner": { "type": "string", "description": "GitHub @handle accountable for the slice." },
+    "created": { "type": "string", "format": "date" },
+    "updated": { "type": "string", "format": "date" },
+    "summary": {
+      "type": "string",
+      "description": "One or two sentences: what this slice is, in plain language."
+    },
+    "jtbd": {
+      "type": "array",
+      "description": "Jobs To Be Done — the WHY. The functional/emotional job a persona hires this slice to do.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "when", "i_want", "so_that"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^JTBD-[0-9]+$" },
+          "when": { "type": "string", "description": "Situation / trigger (\"When ...\")." },
+          "i_want": { "type": "string", "description": "Motivation (\"I want ...\")." },
+          "so_that": { "type": "string", "description": "Expected outcome (\"so that ...\")." },
+          "persona": { "type": "string", "description": "id of a persona defined below." },
+          "signal": {
+            "type": "string",
+            "description": "Observable metric that proves the job is done WELL (not just done)."
+          }
+        }
+      }
+    },
+    "personas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "context": { "type": "string" }
+        }
+      }
+    },
+    "problem": { "type": "string" },
+    "goals": { "type": "array", "items": { "type": "string" } },
+    "non_goals": { "type": "array", "items": { "type": "string" } },
+    "slice": {
+      "type": "object",
+      "description": "The vertical cut: every layer this slice touches, top to bottom. Proves it is a real end-to-end slice, not a horizontal layer.",
+      "additionalProperties": false,
+      "properties": {
+        "entry_points": { "type": "array", "items": { "type": "string" } },
+        "ui": { "type": "array", "items": { "type": "string" } },
+        "logic": { "type": "array", "items": { "type": "string" } },
+        "data": { "type": "array", "items": { "type": "string" } },
+        "integrations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "user_stories": {
+      "type": "array",
+      "description": "The HOW, per role. Each story carries its own acceptance-criteria and task checklists.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "as_a", "i_want", "so_that", "acceptance_criteria"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^US-[0-9]+$" },
+          "persona": { "type": "string" },
+          "as_a": { "type": "string" },
+          "i_want": { "type": "string" },
+          "so_that": { "type": "string" },
+          "priority": {
+            "type": "string",
+            "description": "MoSCoW.",
+            "enum": ["must", "should", "could", "wont"]
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "description": "Given/When/Then checklist. A story is done only when every box is checked.",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/checkitem" }
+          },
+          "tasks": {
+            "type": "array",
+            "description": "Implementation steps for this story (the mergeable units).",
+            "items": { "$ref": "#/$defs/checkitem" }
+          },
+          "edge_cases": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "description": "The stable interfaces the slice exposes/consumes. Config blocks, HTML data-attributes, API shapes.",
+      "additionalProperties": false,
+      "properties": {
+        "config": { "type": "string" },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "required": { "type": "boolean" },
+              "desc": { "type": "string" }
+            }
+          }
+        },
+        "api": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "method": { "type": "string", "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"] },
+              "path": { "type": "string" },
+              "request": { "type": "string" },
+              "response": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "security": { "type": "array", "items": { "type": "string" } },
+    "telemetry": { "type": "array", "items": { "type": "string" } },
+    "accessibility": { "type": "array", "items": { "type": "string" } },
+    "test_plan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^T-[0-9]+$" },
+          "kind": { "type": "string", "enum": ["manual", "unit", "integration", "e2e"] },
+          "text": { "type": "string" },
+          "done": { "type": "boolean" }
+        }
+      }
+    },
+    "definition_of_done": {
+      "type": "array",
+      "description": "The final gate. When every box here is checked, status may move to `shipped`.",
+      "items": { "$ref": "#/$defs/checkitem" }
+    },
+    "open_questions": { "type": "array", "items": { "type": "string" } },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "url"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "checkitem": {
+      "type": "object",
+      "required": ["text", "done"],
+      "additionalProperties": false,
+      "description": "The atom of the checklist system. `done` is the checkbox.",
+      "properties": {
+        "text": { "type": "string" },
+        "done": { "type": "boolean" },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

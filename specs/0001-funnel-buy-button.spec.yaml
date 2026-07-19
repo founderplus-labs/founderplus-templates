@@ -1,0 +1,165 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0001"
+slug: funnel-buy-button
+title: "Tombol Beli funnel-tracker (checkout tanpa payment gateway)"
+app: funnel-tracker-cdn
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Satu baris <script> + satu atribut di tombol mengubah tombol HTML biasa
+  menjadi tombol beli yang mengarahkan pembeli ke checkout Founder+ — tanpa
+  setup Stripe/Midtrans, tanpa pegang data kartu.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku punya produk digital dan mau jualan dari halaman apa pun (HTML, Notion, Carrd, Webflow),"
+    i_want: "aku ingin memasang tombol beli tanpa menyetel payment gateway,"
+    so_that: "supaya pembeli bisa langsung bayar dan aku terima notif — cukup tempel satu baris script."
+    persona: creator
+    signal: "Conversion rate klik tombol → halaman checkout terbuka mendekati 100% (tidak ada tombol gagal karena salah slug)."
+  - id: JTBD-2
+    when: "Ketika aku mengarahkan traffic iklan ke halaman jualan,"
+    i_want: "aku ingin sumber traffic ikut terbawa sampai checkout,"
+    so_that: "supaya aku tahu campaign mana yang benar-benar menghasilkan penjualan."
+    persona: creator
+    signal: "UTM utuh dari landing → checkout pada 100% klik yang membawa UTM."
+
+personas:
+  - id: creator
+    label: "Creator / penjual"
+    context: "Punya produk di Founder+, jualan dari landing sendiri, tidak mau ngoding."
+  - id: buyer
+    label: "Pembeli"
+    context: "Datang dari iklan/sosmed, mau bayar cepat lewat transfer/QRIS/kartu."
+
+problem: >
+  Menaruh tombol beli biasanya berarti integrasi payment gateway, webhook, dan
+  penyimpanan data kartu — mahal, lama, dan berisiko. Creator non-teknis mentok
+  di sini.
+goals:
+  - "Tombol beli berfungsi hanya dengan satu atribut data-product-slug."
+  - "Checkout & uang 100% diproses Founder+ (Midtrans di sisi mereka)."
+  - "Atribusi UTM terbawa otomatis tanpa Google Analytics tambahan."
+non_goals:
+  - "Template TIDAK memproses pembayaran, tidak menyimpan kartu, tidak menjalankan webhook."
+  - "Bukan keranjang multi-item — satu tombol = satu produk."
+
+slice:
+  entry_points:
+    - "Atribut HTML `data-product-slug` (+ `data-product-type`) pada elemen apa pun."
+    - "<script src=\"https://cdn.founderplus.id/funnel-tracker.js\" defer>"
+  ui:
+    - "Tombol yang sudah ada di halaman user (tidak memaksa markup tertentu)."
+  logic:
+    - "Scan DOM saat load, pasang handler klik, susun URL checkout dari slug + UTM."
+  data:
+    - "Baca UTM dari URL & sessionStorage (atribusi)."
+  integrations:
+    - "Redirect ke checkout Founder+ (academy.founderplus.id/payment)."
+
+user_stories:
+  - id: US-1
+    persona: creator
+    as_a: "creator"
+    i_want: "menandai tombol dengan data-product-slug dan data-product-type"
+    so_that: "tombol itu langsung jadi tombol beli"
+    priority: must
+    acceptance_criteria:
+      - text: "Given tombol punya data-product-slug valid, when pembeli klik, then browser membuka checkout Founder+ untuk slug tersebut."
+        done: true
+      - text: "Given halaman punya banyak tombol beli, when load, then semuanya terpasang handler tanpa konflik."
+        done: true
+    tasks:
+      - text: "Query semua [data-product-slug] saat DOMContentLoaded."
+        done: true
+      - text: "Bangun URL checkout dari slug + type."
+        done: true
+    edge_cases:
+      - "Slug kosong/hilang → tombol tidak diaktifkan + peringatan di console (tidak silently gagal)."
+      - "Produk di-rename → toolkit tetap melayani slug lama (alias)."
+  - id: US-2
+    persona: buyer
+    as_a: "pembeli"
+    i_want: "saat klik beli, pilihan pembayaran langsung muncul"
+    so_that: "aku bisa bayar cepat tanpa bikin akun ribet"
+    priority: must
+    acceptance_criteria:
+      - text: "Given aku klik tombol beli, when checkout terbuka, then metode transfer/QRIS/kartu tersedia di sisi Founder+."
+        done: true
+    tasks:
+      - text: "Serahkan pemrosesan ke checkout Founder+ (tidak ada UI bayar di template)."
+        done: true
+    edge_cases:
+      - "Popup diblokir → fallback navigasi tab yang sama."
+  - id: US-3
+    persona: creator
+    as_a: "creator"
+    i_want: "UTM dari iklan ikut sampai ke checkout"
+    so_that: "aku tahu campaign mana yang closing"
+    priority: should
+    acceptance_criteria:
+      - text: "Given landing dibuka dengan ?utm_source=..., when pembeli klik beli, then UTM ikut ke URL checkout."
+        done: true
+    tasks:
+      - text: "Persist UTM pertama-kali ke sessionStorage; append ke URL checkout."
+        done: true
+    edge_cases:
+      - "UTM tidak ada → tetap jalan tanpa parameter atribusi."
+
+contracts:
+  attributes:
+    - name: data-product-slug
+      required: true
+      desc: "Slug permanen produk Founder+ (mis. ebook-saya-abcd1234). Ambil dari `fp products list`."
+    - name: data-product-type
+      required: true
+      desc: "Jenis produk, mis. customProduct."
+  api:
+    - name: "Redirect checkout"
+      method: GET
+      path: "https://academy.founderplus.id/payment?slug={slug}&type={type}&{utm}"
+      response: |
+        Founder+ menampilkan halaman pembayaran (Midtrans). Template tidak
+        menerima/menyimpan data apa pun dari langkah ini.
+
+security:
+  - "Tidak ada kredensial di klien. Tidak ada data kartu yang menyentuh template."
+  - "Slug divalidasi bentuknya; tidak ada open-redirect ke domain arbitrer."
+telemetry:
+  - "Event klik produk dikirim ke backend GTM Founder+ (bila project id aktif) — lihat 0004."
+accessibility:
+  - "Elemen tombol tetap fokusable & dapat ditekan via keyboard (Enter/Space)."
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Pasang script + tombol slug valid, klik → checkout terbuka untuk slug yang benar."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "Buka landing dengan ?utm_source=ig → cek UTM muncul di URL checkout."
+    done: true
+  - id: T-3
+    kind: manual
+    text: "Slug kosong → console memberi peringatan, tidak crash halaman."
+    done: true
+
+definition_of_done:
+  - text: "Semua acceptance criteria US-1..US-3 ✔."
+    done: true
+  - text: "Test plan ✔."
+    done: true
+  - text: "README funnel-tracker mendokumentasikan atribut data-product-*."
+    done: true
+
+open_questions:
+  - "Perlukah indikator loading di tombol saat redirect lambat di 3G?"
+
+links:
+  - label: "Repo funnel-tracker-cdn"
+    url: "https://github.com/founderplus-labs/funnel-tracker-cdn"
+  - label: "Panduan copy-paste"
+    url: "https://cdn.founderplus.id/guide"

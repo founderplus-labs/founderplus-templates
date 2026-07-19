@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+# Contoh spec yang MASIH DIRENCANAKAN (status: draft, semua checkbox kosong).
+# Menunjukkan tampilan spec SEBELUM dikerjakan — `node specs/progress.mjs` = 0%.
+id: "0008"
+slug: pos-multi-device-sync
+title: "Sinkron POS multi-device (kasir HP A = tablet B)"
+app: pos-qr-menu
+status: draft
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Menaikkan data owner POS (riwayat kasir, status meja, reservasi, tiket servis)
+  dari localStorage per-perangkat menjadi tersinkron lintas device lewat backend
+  POS Founder+, sehingga beberapa perangkat melihat state yang sama secara
+  real-time.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku menjalankan warung dengan lebih dari satu perangkat kasir,"
+    i_want: "aku ingin semua perangkat melihat pesanan & status meja yang sama,"
+    so_that: "supaya tidak ada tabrakan/duplikasi dan tutup buku tetap akurat."
+    persona: owner
+    signal: "Perubahan di perangkat A tampak di perangkat B < 2 detik; nol kehilangan/duplikasi transaksi."
+
+personas:
+  - id: owner
+    label: "Owner / operator multi-perangkat"
+    context: "Punya HP kasir + tablet display, ingin state tunggal."
+
+problem: >
+  Versi template menyimpan data owner di localStorage per-perangkat — tidak
+  tersinkron. Warung dengan >1 perangkat butuh satu sumber kebenaran.
+goals:
+  - "Sinkronkan PosOrder, PosTable, Reservation, ServiceTicket via backend POS Founder+."
+  - "Reuse kontrak tipe di founderplus-cli core/pos.ts (POS_ENDPOINTS relatif ke FP_API)."
+  - "Degradasi anggun ke localStorage saat offline; rekonsiliasi saat online lagi."
+non_goals:
+  - "Bukan menggantikan jalur pembayaran (tetap seperti 0006)."
+  - "Bukan sistem multi-tenant/peran kompleks pada iterasi pertama."
+
+slice:
+  entry_points:
+    - "Toggle sinkron di Pengaturan kasir (mis. founderplus.sync=true)."
+  ui:
+    - "Indikator status sinkron (online/menyinkron/offline)."
+  logic:
+    - "Baca/tulis via POS_ENDPOINTS; antrean offline; rekonsiliasi konflik."
+  data:
+    - "Migrasi dari localStorage v1 → state tersinkron; cache offline."
+  integrations:
+    - "Backend POS Founder+ (FP_API) — endpoints & tipe dari founderplus-cli core/pos.ts."
+
+user_stories:
+  - id: US-1
+    persona: owner
+    as_a: "owner multi-perangkat"
+    i_want: "transaksi yang dibuat di satu perangkat muncul di perangkat lain"
+    so_that: "semua kasir bekerja dari data yang sama"
+    priority: must
+    acceptance_criteria:
+      - text: "Given sync aktif & dua perangkat login akun sama, when perangkat A menyimpan transaksi, then perangkat B melihatnya < 2 detik."
+        done: false
+      - text: "Given perangkat offline lalu online, when koneksi pulih, then perubahan lokal ter-push tanpa duplikasi."
+        done: false
+    tasks:
+      - text: "Definisikan client POS_ENDPOINTS relatif FP_API; petakan ke tipe core/pos.ts."
+        done: false
+      - text: "Antrean tulis offline + rekonsiliasi idempoten (id transaksi unik)."
+        done: false
+    edge_cases:
+      - "Konflik edit status meja dari dua perangkat → strategi last-write-wins + audit."
+  - id: US-2
+    persona: owner
+    as_a: "owner"
+    i_want: "data localStorage lama ikut ter-migrasi saat mengaktifkan sync"
+    so_that: "riwayat sebelumnya tidak hilang"
+    priority: should
+    acceptance_criteria:
+      - text: "Given ada data fp_kasir_txns_v1 lokal, when sync pertama kali diaktifkan, then data lama ter-upload sekali tanpa duplikasi."
+        done: false
+    tasks:
+      - text: "Rutin migrasi one-shot dengan penanda 'migrated'."
+        done: false
+    edge_cases:
+      - "Migrasi terputus di tengah → aman diulang (idempoten)."
+
+contracts:
+  config: |
+    founderplus: {
+      env: "prod",
+      sync: false,   // true → sinkron lintas device via backend POS Founder+
+    }
+  api:
+    - name: "POS sync endpoints"
+      method: POST
+      path: "{FP_API}/creator/pos/* (orders, tables, reservations, service-tickets)"
+      request: |
+        Sesuai tipe di founderplus-cli core/pos.ts (PosOrder, PosTable, Reservation, ServiceTicket).
+      response: |
+        2xx dengan entitas ter-normalisasi + id server.
+
+security:
+  - "Autentikasi pakai sesi Founder+; owner hanya akses datanya sendiri."
+  - "Tidak menaruh endpoint hardcode; turunkan dari env (sama seperti 0005/0006)."
+telemetry:
+  - "Metrik latency sinkron & tingkat konflik untuk observabilitas."
+accessibility:
+  - "Indikator status sinkron terbaca screen reader; tidak mengganggu alur kasir."
+
+test_plan:
+  - id: T-1
+    kind: e2e
+    text: "Dua perangkat, satu akun: buat transaksi di A → tampak di B < 2s."
+    done: false
+  - id: T-2
+    kind: integration
+    text: "Offline → buat 3 transaksi → online → semua ter-push, nol duplikasi."
+    done: false
+  - id: T-3
+    kind: manual
+    text: "Aktifkan sync dengan data lokal lama → termigrasi sekali, tidak dobel."
+    done: false
+
+definition_of_done:
+  - text: "Sinkron dua arah < 2s pada uji e2e."
+    done: false
+  - text: "Antrean offline + rekonsiliasi idempoten terbukti."
+    done: false
+  - text: "Migrasi localStorage → server aman & idempoten."
+    done: false
+  - text: "SPEC.md pos-qr-menu diperbarui (bagian 'Yang tetap lokal' → tersinkron)."
+    done: false
+
+open_questions:
+  - "Strategi konflik final: last-write-wins global atau per-field?"
+  - "Perlukah realtime channel (websocket/SSE) atau cukup polling pada iterasi pertama?"
+
+links:
+  - label: "SPEC integrasi pos-qr-menu (bagian sinkron)"
+    url: "../pos-qr-menu/SPEC.md"

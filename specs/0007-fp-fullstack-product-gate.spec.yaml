@@ -1,0 +1,170 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0007"
+slug: fp-fullstack-product-gate
+title: "Product gate + owner bypass (fp-fullstack)"
+app: fp-fullstack
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Gerbang akses konten yang mengunci app ke satu produk Founder+: pengunjung
+  harus login dan memiliki (atau membuat) produk untuk masuk. Pembuat produk
+  bisa mengakses produknya sendiri tanpa membeli (owner bypass) — jadi flow bisa
+  diuji tanpa beli dari diri sendiri.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku menjual akses ke sebuah app/konten,"
+    i_want: "aku ingin konten terkunci untuk yang belum beli dan terbuka untuk yang sudah,"
+    so_that: "supaya aku jualan produk berbayar tanpa menulis kode pembayaran."
+    persona: creator
+    signal: "Non-pembeli selalu terkunci; pembeli & owner selalu terbuka; nol kebocoran akses."
+  - id: JTBD-2
+    when: "Ketika aku (pembuat) mau menguji app-ku sendiri,"
+    i_want: "aku ingin bisa masuk tanpa membeli produkku sendiri,"
+    so_that: "supaya aku menguji flow asli tanpa transaksi palsu."
+    persona: creator
+    signal: "Login akun pembuat → akses terbuka [owner] tanpa pembelian."
+
+personas:
+  - id: creator
+    label: "Creator / pembuat produk"
+    context: "Punya produk di Founder+, deploy app ter-gate ke produk itu."
+  - id: buyer
+    label: "Pembeli"
+    context: "Sudah membeli produk, berhak akses."
+  - id: visitor
+    label: "Pengunjung belum beli"
+    context: "Belum login / belum beli → harus lihat paywall."
+
+problem: >
+  Menggate konten berbayar biasanya butuh auth + integrasi pembayaran + webhook.
+  Pembuat juga sering terjebak tidak bisa menguji karena tak mau beli dari diri
+  sendiri.
+goals:
+  - "Kunci app ke satu FOUNDERPLUS_PRODUCT_SLUG."
+  - "Evaluasi gate server-side: bypass(dev) → login-tanpa-produk → staff → owner → pembeli."
+  - "Owner bypass: pemilik produk masuk tanpa beli, memakai sesi login sendiri (tanpa privilege ekstra)."
+non_goals:
+  - "Tidak menyimpan data kartu; pembayaran & checkout diproses Founder+."
+  - "Bukan RBAC multi-peran umum; khusus gate kepemilikan satu produk."
+
+slice:
+  entry_points:
+    - "Request ke route ter-gate (mis. `/`)."
+    - "Env: FOUNDERPLUS_PRODUCT_SLUG, AUTH_DEV_BYPASS."
+  ui:
+    - "State: 'Masuk dulu' (belum login) / 'Akses terbuka [owner|purchased]' / 'Konten terkunci' + tombol Beli."
+  logic:
+    - "evaluateGate() memeriksa urutan izin dan mengembalikan keputusan + alasan."
+  data:
+    - "Sesi login user (cookie) diproksikan server-side ke academy.founderplus.id."
+  integrations:
+    - "creator/products (owner-check) & jalur checkout Founder+."
+
+user_stories:
+  - id: US-1
+    persona: visitor
+    as_a: "pengunjung belum login"
+    i_want: "diminta login saat membuka konten terkunci"
+    so_that: "aku tahu harus masuk dulu"
+    priority: must
+    acceptance_criteria:
+      - text: "Given belum login, when buka route ter-gate, then tampil 'Masuk dulu' (bukan konten)."
+        done: true
+    tasks:
+      - text: "Deteksi ketiadaan sesi; render state login."
+        done: true
+    edge_cases:
+      - "Sesi kedaluwarsa → diperlakukan sebagai belum login."
+  - id: US-2
+    persona: buyer
+    as_a: "pembeli"
+    i_want: "langsung masuk setelah login"
+    so_that: "aku menikmati yang sudah kubeli"
+    priority: must
+    acceptance_criteria:
+      - text: "Given sudah beli produk, when login & buka route, then 'Akses terbuka' dan konten tampil."
+        done: true
+    tasks:
+      - text: "Cek kepemilikan produk untuk user; buka gate bila memiliki."
+        done: true
+    edge_cases:
+      - "Refund/akses dicabut → kembali terkunci pada evaluasi berikutnya."
+  - id: US-3
+    persona: creator
+    as_a: "pembuat produk"
+    i_want: "masuk tanpa membeli produkku sendiri"
+    so_that: "aku bisa menguji flow asli"
+    priority: must
+    acceptance_criteria:
+      - text: "Given aku login dengan akun pembuat produk, when buka route ter-gate, then 'Akses terbuka [owner]' tanpa pembelian."
+        done: true
+      - text: "Given allowOwner=false diset, when pembuat login, then owner bypass dinonaktifkan."
+        done: true
+    tasks:
+      - text: "Owner-check via creator/products memakai sesi user sendiri (server-side)."
+        done: true
+      - text: "Sediakan flag allowOwner di checkGate."
+        done: true
+    edge_cases:
+      - "Slug tidak ada di katalog user → bukan owner → lanjut evaluasi berikutnya."
+
+contracts:
+  config: |
+    # .env
+    FOUNDERPLUS_PRODUCT_SLUG=...   # produk yang di-gate
+    FOUNDERPLUS_PROJECT_ID=        # opsional (analytics)
+    AUTH_DEV_BYPASS=false          # true hanya untuk dev
+  api:
+    - name: "Owner/ownership check"
+      method: GET
+      path: "creator/products (via sesi login user, di-proksi server-side)"
+      response: |
+        Bila slug produk ada di katalog buatan user → owner → gate terbuka.
+
+security:
+  - "Owner-check tidak menambah privilege; pakai sesi user sendiri."
+  - "AUTH_DEV_BYPASS wajib false di produksi."
+  - "HTTPS wajib — cookie sesi butuh TLS."
+telemetry:
+  - "Opsional funnel-tracker via FOUNDERPLUS_PROJECT_ID."
+accessibility:
+  - "State paywall & tombol Beli dapat dioperasikan keyboard; pesan status jelas."
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Belum login → 'Masuk dulu'."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "Login akun pembuat → 'Akses terbuka [owner]' tanpa beli."
+    done: true
+  - id: T-3
+    kind: manual
+    text: "Login akun lain belum beli → 'Konten terkunci' + tombol Beli."
+    done: true
+  - id: T-4
+    kind: manual
+    text: "Set AUTH_DEV_BYPASS=false → verifikasi bypass mati di produksi."
+    done: true
+
+definition_of_done:
+  - text: "Tiga state (belum login / sudah beli / belum beli) benar."
+    done: true
+  - text: "Owner bypass terverifikasi & dapat dimatikan (allowOwner)."
+    done: true
+  - text: "SETUP.md & SECURITY.md fp-fullstack sinkron dengan perilaku gate."
+    done: true
+
+open_questions:
+  - "Perlukah dukungan multi-produk (gate ke salah satu dari beberapa produk) sebagai slice terpisah?"
+
+links:
+  - label: "fp-fullstack SETUP.md"
+    url: "../fp-fullstack/SETUP.md"
+  - label: "fp-fullstack SECURITY.md"
+    url: "../fp-fullstack/SECURITY.md"

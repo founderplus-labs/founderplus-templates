@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0005"
+slug: pos-table-ordering
+title: "Pesan dari meja lewat QR (customer ordering)"
+app: pos-qr-menu
+status: shipped
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Pelanggan memindai QR per-meja, membuka menu, dan memesan dengan nomor meja
+  otomatis menempel. Pesanan dikirim ke backend POS Founder+ bila diaktifkan,
+  atau fallback ke WhatsApp supaya pesanan tidak pernah hilang.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika pelanggan duduk di meja kafe/resto dan mau memesan,"
+    i_want: "aku (owner) ingin mereka bisa memesan sendiri dari HP dengan meja terdeteksi,"
+    so_that: "supaya antrean/human error berkurang dan meja langsung terhubung ke pesanan."
+    persona: owner
+    signal: "Pesanan masuk membawa nomor meja yang benar; nol pesanan hilang (selalu ada fallback)."
+
+personas:
+  - id: owner
+    label: "Owner / operator warung"
+    context: "Host template sendiri, isi menu, tempel QR di tiap meja."
+  - id: customer
+    label: "Pelanggan di meja"
+    context: "Scan QR, lihat menu, pesan dari HP sendiri."
+
+problem: >
+  Ambil pesanan manual bikin antre & salah tulis meja. Solusi POS komersial
+  mahal & butuh langganan. Owner butuh yang gratis, host sendiri, tanpa server.
+goals:
+  - "Menu per-meja dari QR; nomor meja otomatis menempel ke pesanan."
+  - "Kirim pesanan ke backend POS Founder+ bila `orders=true`, else fallback WhatsApp."
+  - "Frontend & hosting sepenuhnya milik user (user owns the storefront)."
+non_goals:
+  - "Template TIDAK memproses uang di jalur ini (pembayaran via kasir / checkout terpisah)."
+  - "Belum sinkron multi-device untuk data owner (localStorage; lihat 0006)."
+
+slice:
+  entry_points:
+    - "URL menu dengan parameter meja dari QR (mis. ?table=A1)."
+  ui:
+    - "index.html: daftar menu, keranjang, form nama/catatan, tombol kirim pesanan."
+  logic:
+    - "Baca nomor meja dari URL; susun payload pesanan; pilih kanal kirim."
+  data:
+    - "CONFIG.storeName, whatsapp, MENU (diisi owner di index.html)."
+  integrations:
+    - "POST {FP_API}/creator/pos/orders bila orders=true; else WhatsApp deep link."
+
+user_stories:
+  - id: US-1
+    persona: customer
+    as_a: "pelanggan"
+    i_want: "scan QR meja dan langsung lihat menu"
+    so_that: "aku bisa pesan tanpa menunggu pelayan"
+    priority: must
+    acceptance_criteria:
+      - text: "Given QR meja dipindai, when menu terbuka, then nomor meja terbaca dari URL dan tampil di UI."
+        done: true
+      - text: "Given aku menambah item, when membuka keranjang, then subtotal & total terhitung benar."
+        done: true
+    tasks:
+      - text: "Parse ?table= dari URL; tampilkan badge meja."
+        done: true
+      - text: "Render MENU dari CONFIG; keranjang dengan qty & subtotal."
+        done: true
+    edge_cases:
+      - "URL tanpa nomor meja → minta pelanggan memilih meja / tampilkan 'takeaway'."
+  - id: US-2
+    persona: customer
+    as_a: "pelanggan"
+    i_want: "mengirim pesanan dengan nama & catatan"
+    so_that: "dapur tahu persis pesananku"
+    priority: must
+    acceptance_criteria:
+      - text: "Given orders=true, when aku kirim, then pesanan di-POST ke backend POS dan aku lihat konfirmasi terkirim."
+        done: true
+      - text: "Given orders=false atau POST gagal, when aku kirim, then aku diarahkan ke WhatsApp berisi ringkasan pesanan."
+        done: true
+    tasks:
+      - text: "Bangun payload {table, items[], total, customer, note}."
+        done: true
+      - text: "POST ke POS_ORDERS; tangani 2xx vs gagal → fallback WA."
+        done: true
+    edge_cases:
+      - "Jaringan mati saat POST → langsung fallback WA (pesanan tidak hilang)."
+
+contracts:
+  config: |
+    founderplus: {
+      env: "prod",       // prod → api.founderplus.id · dev → ops.founderplus.id
+      projectId: "",     // GTM analytics + atribusi. Kosong = off.
+      orders: false,     // true → kirim pesanan ke backend POS Founder+
+    }
+  api:
+    - name: "Kirim pesanan meja"
+      method: POST
+      path: "{FP_API}/creator/pos/orders"
+      request: |
+        { "table": "A1",
+          "items": [ { "id", "name", "qty", "price", "subtotal" } ],
+          "total": 44000, "customer": "Budi", "note": "es sedikit" }
+      response: |
+        2xx = diterima. Gagal / orders=false → fallback WhatsApp.
+
+security:
+  - "Template tidak menyimpan kredensial; endpoint diturunkan dari env, bukan URL hardcode."
+telemetry:
+  - "Bila projectId aktif, funnel-tracker mencatat kunjungan menu (lihat 0004)."
+accessibility:
+  - "Menu & keranjang dapat dioperasikan satu tangan di HP; target tap memadai."
+
+test_plan:
+  - id: T-1
+    kind: manual
+    text: "Buka ?table=A1 → badge meja benar; tambah item → total benar."
+    done: true
+  - id: T-2
+    kind: manual
+    text: "orders=true, backend aktif → pesanan masuk membawa nomor meja."
+    done: true
+  - id: T-3
+    kind: manual
+    text: "orders=false → tombol kirim membuka WA berisi ringkasan pesanan."
+    done: true
+
+definition_of_done:
+  - text: "Nomor meja end-to-end (QR → payload) terverifikasi."
+    done: true
+  - text: "Fallback WhatsApp berfungsi saat backend off/gagal."
+    done: true
+  - text: "SETUP.md pos-qr-menu menjelaskan pengisian CONFIG."
+    done: true
+
+open_questions:
+  - "Perlukah status pesanan real-time (diproses/siap) ke pelanggan sebelum sinkron multi-device ada?"
+
+links:
+  - label: "SPEC integrasi pos-qr-menu"
+    url: "../pos-qr-menu/SPEC.md"
