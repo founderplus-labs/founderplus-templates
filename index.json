@@ -60,8 +60,8 @@
         {
           "path": "index.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/lead-magnet/index.html",
-          "digest": "sha256:6ed8651a4968cbfe258d1c0a82a69b9d53e0fcb666d344956cb289c75945087e",
-          "size": 6306
+          "digest": "sha256:c9248106ecec215e0ae4ebb120cf63aed98eea4d39c20dbbab4387d0fcb11034",
+          "size": 8985
         }
       ]
     },
@@ -526,6 +526,50 @@
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/hono/wrangler.jsonc",
           "digest": "sha256:370571153ff872a8538e931aa3a13b1fdb78a8f2bf15f29982b24bc3458fe762",
           "size": 454
+        }
+      ]
+    },
+    {
+      "name": "pos-qr-menu",
+      "title": "POS QR-Menu (scan meja → pesan)",
+      "description": "No-build QR ordering for dine-in POS: customer scans a per-table QR, sees the menu, and orders from their phone with the table number attached. Orders route to WhatsApp today, or to the Founder+ POS backend when configured. Ships an offline QR print tool (tables.html). Deploy index.html with fp sites publish.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build",
+        "pos",
+        "qr"
+      ],
+      "postInstall": [
+        "Edit CONFIG + MENU in index.html (store, WhatsApp, items)",
+        "fp sites publish index.html",
+        "Open tables.html in a browser to print per-table QR codes"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/SETUP.md",
+          "digest": "sha256:751e35d8f4835fbd3249d4987e45317be54f20ceeacc98f380b6e041af2a5486",
+          "size": 3430
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/index.html",
+          "digest": "sha256:843a0e7cf37beea853e8f98324e9bd47c8fc8f25755997445d9fa53b294165dc",
+          "size": 19841
+        },
+        {
+          "path": "qrcode.vendor.js",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/qrcode.vendor.js",
+          "digest": "sha256:0fa64f99bcc06acf3eb27e28a2c4916f51c4eb235a6c132e36a51733141e79bd",
+          "size": 56989
+        },
+        {
+          "path": "tables.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/tables.html",
+          "digest": "sha256:c97edd4070a6b5fda267ecf57e7a429f954ba6c6e9c9887e4aa2ec59eef60911",
+          "size": 5951
         }
       ]
     }

@@ -78,6 +78,19 @@ const META = {
     postInstall: ['npm install', 'Set FOUNDERPLUS_PRODUCT_SLUG in wrangler.jsonc', 'Read SETUP.md'],
     setupDoc: 'SETUP.md',
     securityDoc: 'SECURITY.md'
+  },
+  'pos-qr-menu': {
+    title: 'POS QR-Menu (scan meja → pesan)',
+    description:
+      'No-build QR ordering for dine-in POS: customer scans a per-table QR, sees the menu, and orders from their phone with the table number attached. Orders route to WhatsApp today, or to the Founder+ POS backend when configured. Ships an offline QR print tool (tables.html). Deploy index.html with fp sites publish.',
+    runtime: 'static',
+    stack: ['html', 'no-build', 'pos', 'qr'],
+    postInstall: [
+      'Edit CONFIG + MENU in index.html (store, WhatsApp, items)',
+      'fp sites publish index.html',
+      'Open tables.html in a browser to print per-table QR codes'
+    ],
+    setupDoc: 'SETUP.md'
   }
 }
 
