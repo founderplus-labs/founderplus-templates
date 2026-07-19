@@ -194,6 +194,68 @@
         transition:opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
       .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
+      /* Payment method picker (bottom sheet) */
+      dialog#methods, dialog#transfer, dialog#cash { margin:auto auto 0; border-radius:24px 24px 0 0; max-height:92vh;
+        transform:translateY(100%); transition:transform 440ms var(--ease-drawer),
+          overlay 440ms allow-discrete, display 440ms allow-discrete; }
+      dialog#methods[open], dialog#transfer[open], dialog#cash[open] { transform:translateY(0); }
+      @starting-style { dialog#methods[open], dialog#transfer[open], dialog#cash[open] { transform:translateY(100%); } }
+      .method { display:flex; align-items:center; gap:13px; width:100%; border:none; cursor:pointer;
+        background:var(--card); box-shadow:inset 0 0 0 1px var(--line); border-radius:16px; padding:14px;
+        margin-bottom:10px; text-align:left; font:inherit; color:var(--ink);
+        transition:transform 150ms var(--ease-out), box-shadow 160ms var(--ease-out); }
+      .method:active { transform:scale(.985); }
+      .method .mi { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:21px; flex:0 0 44px;
+        background:var(--brand-soft); }
+      .method .mt { flex:1; min-width:0; }
+      .method .mt .ml { display:block; font-weight:650; font-size:15.5px; letter-spacing:-0.01em; }
+      .method .mt .ms { display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+      .method .chev { color:var(--muted); font-size:17px; }
+
+      /* Bank account rows (transfer sheet + settings) */
+      .bank { display:flex; align-items:center; gap:12px; background:var(--bg); border-radius:14px; padding:12px 13px;
+        box-shadow:inset 0 0 0 1px var(--line); margin-bottom:9px; }
+      .bank .binfo { flex:1; min-width:0; }
+      .bank .bname { font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--brand-ink); }
+      .bank .bnum { font-size:19px; font-weight:700; letter-spacing:.02em; font-variant-numeric:tabular-nums; margin:1px 0; }
+      .bank .bhold { font-size:12.5px; color:var(--muted); }
+      .copy { border:none; cursor:pointer; background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
+        border-radius:10px; padding:9px 13px; font:inherit; font-weight:650; font-size:13px; color:var(--brand-ink); flex:0 0 auto;
+        transition:transform 150ms var(--ease-out); }
+      .copy:active { transform:scale(.92); }
+      .bank .del { border:none; cursor:pointer; background:transparent; color:var(--danger); font-size:18px; padding:4px 6px; }
+
+      /* Proof-of-payment uploader */
+      .proof { margin-top:4px; }
+      .proof-drop { display:flex; align-items:center; justify-content:center; gap:9px; width:100%; cursor:pointer;
+        border-radius:14px; padding:16px; background:var(--bg); color:var(--secondary); font:inherit; font-weight:600; font-size:14px;
+        box-shadow:inset 0 0 0 1.5px dashed var(--line); border:1.5px dashed color-mix(in srgb,var(--brand) 32%,var(--line));
+        transition:transform 150ms var(--ease-out), border-color 160ms var(--ease-out); }
+      .proof-drop:active { transform:scale(.99); }
+      .proof-thumb { position:relative; margin-top:2px; border-radius:14px; overflow:hidden; box-shadow:inset 0 0 0 1px var(--line); }
+      .proof-thumb img { width:100%; max-height:230px; object-fit:cover; display:block; }
+      .proof-thumb .rm { position:absolute; top:9px; right:9px; width:30px; height:30px; border:none; cursor:pointer;
+        border-radius:999px; background:rgba(0,0,0,.6); color:#fff; font-size:15px; display:grid; place-items:center; }
+      .proof-actions { display:flex; gap:9px; margin-top:9px; }
+      .proof-actions .mini { flex:1; border:none; cursor:pointer; background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
+        border-radius:12px; padding:11px; font:inherit; font-weight:650; font-size:13.5px; color:var(--ink);
+        transition:transform 150ms var(--ease-out); }
+      .proof-actions .mini:active { transform:scale(.97); }
+
+      /* Cash: change display */
+      .change { display:flex; justify-content:space-between; align-items:baseline; margin:12px 0 2px;
+        padding:13px 15px; border-radius:14px; background:var(--brand-soft); }
+      .change .cl { color:var(--brand-ink); font-weight:650; font-size:14px; }
+      .change .cv { font-weight:800; font-size:22px; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; color:var(--brand-ink); }
+      .chips { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+      .chips button { border:none; cursor:pointer; background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
+        border-radius:999px; padding:9px 14px; font:inherit; font-weight:650; font-size:13.5px; color:var(--ink);
+        transition:transform 150ms var(--ease-out); }
+      .chips button:active { transform:scale(.94); }
+      .pay-amt { text-align:center; font-weight:800; font-size:30px; letter-spacing:-0.02em; margin:2px 0 2px;
+        font-variant-numeric:tabular-nums; }
+      .pay-cap { text-align:center; color:var(--muted); font-size:12.5px; margin-bottom:16px; }
+
       @media (prefers-reduced-motion: reduce) {
         dialog, dialog::backdrop, .key, .icon-btn, .bar button, .qactions button, .save { transition:opacity 180ms ease !important; transform:none !important; }
       }
@@ -249,7 +311,7 @@
         <div class="totalrow"><span class="l">Total</span><span class="v" id="barTotal">Rp 0</span></div>
         <div class="actions">
           <button class="print" id="btnPrint" type="button" disabled>Struk</button>
-          <button class="qris" id="btnQris" type="button" disabled>Tampilkan QRIS</button>
+          <button class="qris" id="btnPay" type="button" disabled>Bayar</button>
         </div>
       </div>
     </div>
@@ -267,6 +329,67 @@
         <div class="qactions">
           <button class="pr" id="qPrint" type="button">Cetak struk</button>
           <button class="done" id="qDone" type="button">Selesai</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Payment method picker -->
+    <dialog id="methods">
+      <div class="grabber"></div>
+      <button class="close" id="mClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3>Metode bayar · <span id="mAmt">Rp 0</span></h3>
+        <button class="method" id="mQris" type="button">
+          <span class="mi">📱</span>
+          <span class="mt"><span class="ml">QRIS</span><span class="ms">GoPay, OVO, DANA, m-banking</span></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="method" id="mTransfer" type="button">
+          <span class="mi">🏦</span>
+          <span class="mt"><span class="ml">Transfer bank</span><span class="ms" id="mTransferSub">Ke rekeningmu</span></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="method" id="mCash" type="button">
+          <span class="mi">💵</span>
+          <span class="mt"><span class="ml">Tunai</span><span class="ms">Bayar cash + hitung kembalian</span></span>
+          <span class="chev">›</span>
+        </button>
+      </div>
+    </dialog>
+
+    <!-- Bank transfer -->
+    <dialog id="transfer">
+      <div class="grabber"></div>
+      <button class="close" id="tClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3>Transfer bank</h3>
+        <div class="pay-amt" id="tAmt">Rp 0</div>
+        <div class="pay-cap">Transfer nominal di atas ke salah satu rekening</div>
+        <div id="tBanks"></div>
+        <div class="sec">Bukti pembayaran</div>
+        <div class="proof" id="tProof"></div>
+        <div class="qactions" style="margin-top:16px">
+          <button class="pr" id="tPrint" type="button">Cetak struk</button>
+          <button class="done" id="tDone" type="button">Selesai</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Cash -->
+    <dialog id="cash">
+      <div class="grabber"></div>
+      <button class="close" id="cClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3>Tunai</h3>
+        <div class="pay-amt" id="cDue">Rp 0</div>
+        <div class="pay-cap">Total yang harus dibayar</div>
+        <div class="fld"><label>Uang diterima</label><input id="cReceived" inputmode="numeric" placeholder="0" /></div>
+        <div class="chips" id="cChips"></div>
+        <div class="change"><span class="cl">Kembalian</span><span class="cv" id="cChange">Rp 0</span></div>
+        <div class="proof" id="cProof" style="margin-top:14px"></div>
+        <div class="qactions" style="margin-top:16px">
+          <button class="pr" id="cPrint" type="button">Cetak struk</button>
+          <button class="done" id="cDone2" type="button">Selesai</button>
         </div>
       </div>
     </dialog>
@@ -289,6 +412,16 @@
           <textarea id="setQris" placeholder="00020101021126…6304XXXX"></textarea>
           <div class="hint">Tempel isi teks dari QRIS statis merchant-mu (scan QRIS-mu sekali pakai app pemindai untuk lihat teksnya, atau minta ke penyedia QRIS). Kalau diisi, kasir bikin <b>QRIS dinamis</b> otomatis dengan nominal + CRC yang benar. Kalau kosong, QRIS tampil sebagai kode nominal-saja (pelanggan ketik nominal manual).</div>
         </div>
+
+        <div class="sec">Rekening bank (transfer)</div>
+        <div id="setBanks"></div>
+        <div class="add-item" style="margin-top:2px">
+          <input id="bkBank" type="text" placeholder="Bank (mis. BCA)" style="flex:0 0 120px" />
+          <input id="bkNum" inputmode="numeric" placeholder="No. rekening" />
+          <button class="addbtn" id="bkAdd" type="button">+</button>
+        </div>
+        <div class="fld" style="margin-top:8px"><input id="bkHolder" type="text" placeholder="Atas nama (dipakai untuk rekening yang ditambah)" /></div>
+        <div class="hint">Rekeningmu ditampilkan ke pelanggan saat pilih <b>Transfer bank</b>, lengkap tombol salin. Semua tersimpan di HP ini saja.</div>
 
         <div class="sec">Struk</div>
         <div class="fld">
@@ -316,12 +449,17 @@
         address: "",
         footer: "Terima kasih! 🙏",
         qrisPayload: "",
+        banks: [],                  // [{ bank, number, holder }]
         paperWidth: 32, // chars: 32 (58mm) | 48 (80mm)
       };
       let settings = load();
       let mode = "amount";          // "amount" | "items"
       let amountDigits = "";        // typed rupiah string (integer)
       const items = [];             // { id, name, price, qty }
+      // Current sale payment state.
+      let payMethod = null;         // "QRIS" | "Transfer" | "Tunai"
+      let cashReceived = 0;         // rupiah, for Tunai
+      let proofUrl = null;          // data: URL of payment-proof photo (in memory)
 
       function load() {
         try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(LS_KEY)) || {}) }; }
@@ -411,7 +549,7 @@
       function renderBar() {
         const t = currentTotal();
         $("barTotal").textContent = fmt(t);
-        $("btnQris").disabled = t <= 0;
+        $("btnPay").disabled = t <= 0;
         $("btnPrint").disabled = t <= 0;
       }
       function refresh() { renderAmount(); renderItems(); renderBar(); }
@@ -456,9 +594,23 @@
       $("tabAmount").onclick = () => setMode("amount");
       $("tabItems").onclick = () => setMode("items");
 
+      // ═══════════════════════════ PAYMENT METHOD PICKER ═══════════════════════════
+      $("btnPay").onclick = () => {
+        if (currentTotal() <= 0) return;
+        $("mAmt").textContent = fmt(currentTotal());
+        $("mTransferSub").textContent = settings.banks.length
+          ? "Ke " + settings.banks.map((b) => b.bank).join(" / ")
+          : "Tambah rekening di ⚙︎ dulu";
+        $("methods").showModal();
+      };
+      $("mQris").onclick = () => { $("methods").close(); payMethod = "QRIS"; showQris(); };
+      $("mTransfer").onclick = () => { $("methods").close(); showTransfer(); };
+      $("mCash").onclick = () => { $("methods").close(); showCash(); };
+      $("mClose").onclick = () => $("methods").close();
+
       // ═══════════════════════════ QRIS MODAL ═══════════════════════════
-      $("btnQris").onclick = showQris;
       function showQris() {
+        payMethod = "QRIS";
         const total = currentTotal();
         if (total <= 0) return;
         $("qStore").textContent = settings.store;
@@ -487,14 +639,28 @@
         return qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
       }
       $("qClose").onclick = () => $("qris").close();
-      $("qDone").onclick = () => { $("qris").close(); resetSale(); toast("Transaksi selesai ✓"); };
+      $("qDone").onclick = () => { $("qris").close(); finishSale(); };
       $("qPrint").onclick = () => printReceipt();
-      function resetSale() { amountDigits = ""; items.length = 0; refresh(); }
+      function finishSale() { resetSale(); toast("Transaksi selesai ✓"); }
+      function resetSale() {
+        amountDigits = ""; items.length = 0;
+        payMethod = null; cashReceived = 0; proofUrl = null;
+        refresh();
+      }
 
       // ═══════════════════════════ RECEIPT ═══════════════════════════
+      function payLabel() {
+        if (payMethod === "Tunai") return "Tunai";
+        if (payMethod === "Transfer") return "Transfer";
+        return "QRIS";
+      }
       function receiptModel() {
         return { store: settings.store, address: settings.address, footer: settings.footer,
           lines: currentLines(), total: currentTotal(), width: settings.paperWidth,
+          method: payLabel(),
+          cashReceived: payMethod === "Tunai" ? cashReceived : 0,
+          change: payMethod === "Tunai" ? Math.max(0, cashReceived - currentTotal()) : 0,
+          proof: !!proofUrl,
           time: new Date().toLocaleString("id-ID", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }) };
       }
       // Plain-text receipt (used for the preview + the print() fallback).
@@ -514,7 +680,12 @@
         }
         out.push(rule);
         out.push(lr("TOTAL", fmt(m.total)));
-        out.push(lr("Bayar", "QRIS"));
+        out.push(lr("Bayar", m.method));
+        if (m.method === "Tunai" && m.cashReceived) {
+          out.push(lr("Tunai", fmt(m.cashReceived)));
+          out.push(lr("Kembalian", fmt(m.change)));
+        }
+        if (m.proof) out.push(lr("Bukti bayar", "terlampir"));
         out.push(rule);
         if (m.footer) m.footer.match(new RegExp(".{1," + W + "}", "g")).forEach((ln) => out.push(center(ln)));
         return out.join("\n");
@@ -544,7 +715,12 @@
         }
         line("-".repeat(W));
         raw(0x1b, 0x45, 0x01); line(lr("TOTAL", fmt(m.total))); raw(0x1b, 0x45, 0x00);
-        line(lr("Bayar", "QRIS"));
+        line(lr("Bayar", m.method));
+        if (m.method === "Tunai" && m.cashReceived) {
+          line(lr("Tunai", fmt(m.cashReceived)));
+          line(lr("Kembalian", fmt(m.change)));
+        }
+        if (m.proof) line(lr("Bukti bayar", "terlampir"));
         line("-".repeat(W));
         raw(0x1b, 0x61, 0x01);           // center
         if (m.footer) line(m.footer);
@@ -606,6 +782,122 @@
       }
       $("btnPrint").onclick = () => printReceipt();
 
+      // ═══════════════════════════ PAYMENT PROOF (foto bukti) ═══════════════════════════
+      function pickProof() {
+        const inp = document.createElement("input");
+        inp.type = "file"; inp.accept = "image/*"; inp.capture = "environment";
+        inp.onchange = () => {
+          const f = inp.files && inp.files[0];
+          if (!f) return;
+          const rd = new FileReader();
+          rd.onload = () => { proofUrl = rd.result; renderProofSlots(); toast("Bukti dilampirkan ✓"); };
+          rd.readAsDataURL(f);
+        };
+        inp.click();
+      }
+      function proofUI(container) {
+        if (!proofUrl) {
+          container.innerHTML = `<button class="proof-drop" type="button" data-proofpick>📷 Lampirkan foto bukti pembayaran</button>`;
+        } else {
+          container.innerHTML =
+            `<div class="proof-thumb"><img src="${proofUrl}" alt="Bukti pembayaran"><button class="rm" type="button" data-proofrm aria-label="Hapus">✕</button></div>` +
+            `<div class="proof-actions"><button class="mini" type="button" data-proofpick>Ganti foto</button><button class="mini" type="button" data-proofdl>Unduh bukti</button></div>`;
+        }
+      }
+      function renderProofSlots() {
+        if ($("transfer").open) proofUI($("tProof"));
+        if ($("cash").open) proofUI($("cProof"));
+      }
+      function downloadProof() {
+        if (!proofUrl) return;
+        const a = document.createElement("a");
+        a.href = proofUrl; a.download = "bukti-bayar-" + Date.now() + ".png"; a.click();
+      }
+      ["tProof", "cProof"].forEach((id) => $(id).addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        if (b.dataset.proofpick !== undefined) pickProof();
+        else if (b.dataset.proofrm !== undefined) { proofUrl = null; renderProofSlots(); }
+        else if (b.dataset.proofdl !== undefined) downloadProof();
+      }));
+
+      // ═══════════════════════════ TRANSFER BANK ═══════════════════════════
+      function showTransfer() {
+        payMethod = "Transfer";
+        $("tAmt").textContent = fmt(currentTotal());
+        const root = $("tBanks");
+        if (!settings.banks.length) {
+          root.innerHTML = `<div class="empty">Belum ada rekening. Tambah di ⚙︎ → Rekening bank.</div>`;
+        } else {
+          root.innerHTML = "";
+          for (const b of settings.banks) {
+            const el = document.createElement("div");
+            el.className = "bank";
+            el.innerHTML =
+              `<div class="binfo"><div class="bname">${esc(b.bank)}</div><div class="bnum">${esc(b.number)}</div><div class="bhold">a.n. ${esc(b.holder || "-")}</div></div>` +
+              `<button class="copy" type="button" data-copy="${esc(b.number)}">Salin</button>`;
+            root.appendChild(el);
+          }
+        }
+        proofUI($("tProof"));
+        $("transfer").showModal();
+      }
+      $("tBanks").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-copy]"); if (!b) return;
+        copyText(b.dataset.copy); toast("No. rekening disalin ✓");
+      });
+      $("tClose").onclick = () => $("transfer").close();
+      $("tDone").onclick = () => { $("transfer").close(); finishSale(); };
+      $("tPrint").onclick = () => printReceipt();
+
+      // ═══════════════════════════ TUNAI ═══════════════════════════
+      function showCash() {
+        payMethod = "Tunai"; cashReceived = 0;
+        const total = currentTotal();
+        $("cDue").textContent = fmt(total);
+        $("cReceived").value = ""; $("cChange").textContent = fmt(0);
+        renderCashChips(total);
+        proofUI($("cProof"));
+        $("cash").showModal();
+      }
+      function roundUps(total) {
+        const denoms = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
+        const out = new Set();
+        for (const d of denoms) { const up = Math.ceil(total / d) * d; if (up > total) out.add(up); }
+        return [...out].sort((a, b) => a - b).slice(0, 4);
+      }
+      function renderCashChips(total) {
+        const root = $("cChips"); root.innerHTML = "";
+        const opts = [{ l: "Uang pas", v: total }, ...roundUps(total).map((v) => ({ l: fmt(v), v }))];
+        for (const o of opts) {
+          const b = document.createElement("button");
+          b.type = "button"; b.textContent = o.l; b.dataset.cash = o.v;
+          root.appendChild(b);
+        }
+      }
+      function updateChange() {
+        cashReceived = Number(String($("cReceived").value).replace(/[^\d]/g, "")) || 0;
+        $("cChange").textContent = fmt(Math.max(0, cashReceived - currentTotal()));
+      }
+      $("cReceived").addEventListener("input", updateChange);
+      $("cChips").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-cash]"); if (!b) return;
+        $("cReceived").value = Number(b.dataset.cash).toLocaleString("id-ID");
+        updateChange();
+      });
+      $("cClose").onclick = () => $("cash").close();
+      $("cDone2").onclick = () => {
+        if (cashReceived < currentTotal()) { toast("Uang diterima kurang dari total"); return; }
+        $("cash").close(); finishSale();
+      };
+      $("cPrint").onclick = () => printReceipt();
+
+      function copyText(t) {
+        try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t); return; } } catch {}
+        const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch {}
+        ta.remove();
+      }
+
       // ═══════════════════════════ SETTINGS ═══════════════════════════
       $("openSettings").onclick = openSettings;
       function openSettings() {
@@ -613,10 +905,39 @@
         $("setAddr").value = settings.address;
         $("setFooter").value = settings.footer;
         $("setQris").value = settings.qrisPayload;
+        renderSetBanks();
         paperSegUI(settings.paperWidth);
         renderPreview();
         $("settings").showModal();
       }
+
+      // Bank accounts CRUD (own account numbers for transfer).
+      function renderSetBanks() {
+        const root = $("setBanks"); root.innerHTML = "";
+        if (!settings.banks.length) { root.innerHTML = `<div class="hint" style="margin:2px 0 8px">Belum ada rekening.</div>`; return; }
+        settings.banks.forEach((b, i) => {
+          const el = document.createElement("div");
+          el.className = "bank";
+          el.innerHTML =
+            `<div class="binfo"><div class="bname">${esc(b.bank)}</div><div class="bnum">${esc(b.number)}</div><div class="bhold">a.n. ${esc(b.holder || "-")}</div></div>` +
+            `<button class="del" type="button" data-delbank="${i}" aria-label="Hapus">🗑</button>`;
+          root.appendChild(el);
+        });
+      }
+      $("bkAdd").onclick = () => {
+        const bank = $("bkBank").value.trim();
+        const number = $("bkNum").value.trim().replace(/\s+/g, "");
+        const holder = $("bkHolder").value.trim();
+        if (!bank || !number) { toast("Isi bank & no. rekening"); return; }
+        settings.banks.push({ bank, number, holder }); persist();
+        $("bkBank").value = ""; $("bkNum").value = "";
+        renderSetBanks();
+        toast("Rekening ditambah ✓");
+      };
+      $("setBanks").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-delbank]"); if (!b) return;
+        settings.banks.splice(Number(b.dataset.delbank), 1); persist(); renderSetBanks();
+      });
       function paperSegUI(w) {
         for (const b of document.querySelectorAll("#paperSeg button")) b.setAttribute("aria-current", Number(b.dataset.w) === Number(w));
       }
@@ -633,7 +954,7 @@
       function renderPreview() {
         const d = draftFromForm();
         const sample = { store: d.store, address: d.address, footer: d.footer, width: d.paperWidth,
-          time: "01 Jan 2026, 09:41",
+          time: "01 Jan 2026, 09:41", method: payLabel(), cashReceived: 0, change: 0, proof: false,
           lines: (currentLines().length ? currentLines() : [{ name: "Kopi Susu", qty: 2, price: 22000 }, { name: "Croissant", qty: 1, price: 20000 }]),
           total: (currentTotal() || 64000) };
         $("rcptPreview").textContent = receiptText(sample);

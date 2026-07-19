@@ -553,8 +553,8 @@
         {
           "path": "SETUP.md",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/SETUP.md",
-          "digest": "sha256:d26372dbda1565c9e6644b817c9d7e36a436a3ae4c7944347e1f119be9e17f80",
-          "size": 5579
+          "digest": "sha256:5e1f0cf1c26214d9f1d94fb8e9013d1ecfd9530813f972f569efde43992a0fca",
+          "size": 6374
         },
         {
           "path": "index.html",
@@ -565,8 +565,8 @@
         {
           "path": "kasir.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/kasir.html",
-          "digest": "sha256:dc93e4b3a49bc3affb78d7476126912441deb66ce03472102bc5a759bd66a53f",
-          "size": 37639
+          "digest": "sha256:2af8c8237940cdd078463957cb97c476869466e954d492d20b28141a087a0d8a",
+          "size": 55683
         },
         {
           "path": "qrcode.vendor.js",

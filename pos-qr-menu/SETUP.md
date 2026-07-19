@@ -94,7 +94,21 @@ pesanan tidak pernah hilang diam-diam.
 ## Kasir — QRIS dinamis + cetak struk (`kasir.html`)
 
 Buka `kasir.html` di HP/tablet (Android Chrome disarankan untuk Bluetooth). Ada 2
-mode input: **Nominal** (keypad) atau **Barang** (daftar item). Lalu:
+mode input: **Nominal** (keypad) atau **Barang** (daftar item). Lalu tekan
+**Bayar** dan pilih metode: **QRIS**, **Transfer bank**, atau **Tunai**.
+
+**Transfer bank (nomor rekening sendiri).** Tambah rekeningmu di **⚙︎ → Rekening
+bank** (bank, no. rekening, atas nama — boleh lebih dari satu). Saat pilih
+Transfer, kasir menampilkan rekening-rekening itu + tombol **Salin** dan nominal
+yang harus ditransfer pelanggan.
+
+**Foto bukti pembayaran.** Di layar Transfer/Tunai ada **📷 Lampirkan foto bukti
+pembayaran** — potret struk transfer / layar sukses m-banking pelanggan. Bisa
+**diganti** atau **diunduh**, dan struk mencatat "Bukti bayar: terlampir". Foto
+disimpan di HP ini saja (tidak diunggah ke mana pun).
+
+**Tunai.** Masukkan uang yang diterima (atau tap pecahan cepat) → **kembalian**
+dihitung otomatis; struk mencantumkan Tunai + Kembalian.
 
 **Tampilkan QRIS.** Kasir menampilkan QR untuk dibayar pelanggan.
 - Buka **⚙︎ → QRIS**, tempel **payload QRIS statis** merchant-mu (teks di dalam
