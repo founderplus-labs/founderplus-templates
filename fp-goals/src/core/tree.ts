@@ -1,12 +1,15 @@
-// Alignment tree + rollup (spec 0012) — Operately Work Map. Build the hierarchy
-// from parentId, roll progress up (weighted, skipping unmeasured) and status up
-// (worst-wins). Health comes from each goal's denormalised lastUpdateStatus.
-import type { Goal, GoalTreeNode, Target } from "./types.ts";
+// Alignment tree + rollup (spec 0012, extended in 0014) — Operately Work Map.
+// Goals nest by parentId; projects hang off their goal as leaves. Progress rolls
+// up weighted (skipping unmeasured); status rolls up worst-wins.
+import type { Goal, GoalTreeNode, Milestone, Project, Target } from "./types.ts";
 import { computeGoalProgress } from "./progress.ts";
 import { goalHealth, worseStatus } from "./checkin.ts";
+import { computeProjectProgress, projectHealth } from "./projects.ts";
 
 export interface TreeContext {
   targetsByGoal: ReadonlyMap<string, Target[]>;
+  projectsByGoal?: ReadonlyMap<string, Project[]>;
+  milestonesByProject?: ReadonlyMap<string, Milestone[]>;
 }
 
 export function buildGoalTree(goals: Goal[], ctx: TreeContext): GoalTreeNode[] {
@@ -24,19 +27,36 @@ export function buildGoalTree(goals: Goal[], ctx: TreeContext): GoalTreeNode[] {
     }
   }
 
+  const buildProject = (project: Project): GoalTreeNode => {
+    const progress = computeProjectProgress(ctx.milestonesByProject?.get(project.id) ?? []);
+    const status = projectHealth(project);
+    return {
+      id: project.id,
+      kind: "project",
+      name: project.name,
+      status,
+      progress,
+      rollup: { progress, status, childCount: 0 },
+      parentId: project.goalId,
+      children: [],
+    };
+  };
+
   const build = (goal: Goal): GoalTreeNode => {
-    const targets = ctx.targetsByGoal.get(goal.id) ?? [];
-    const own = computeGoalProgress(targets); // number | null
+    const own = computeGoalProgress(ctx.targetsByGoal.get(goal.id) ?? []);
     const health = goalHealth(goal);
-    const children = (childrenOf.get(goal.id) ?? []).map(build);
+    const childGoals = (childrenOf.get(goal.id) ?? []).map(build);
+    const projectNodes = (ctx.projectsByGoal?.get(goal.id) ?? []).map(buildProject);
+    const children = [...childGoals, ...projectNodes];
 
     // Weighted mean of own progress (weight 1) + each child's rollup progress
-    // (weight = child goal weight). Unmeasured (null) skipped — never a false 0%.
+    // (child goal weight, or 1 for a project). Unmeasured (null) skipped.
     const contribs: Array<{ v: number; w: number }> = [];
     if (own !== null) contribs.push({ v: own, w: 1 });
     for (const c of children) {
       if (c.rollup.progress !== null) {
-        contribs.push({ v: c.rollup.progress, w: byId.get(c.id)?.weight ?? 1 });
+        const w = c.kind === "goal" ? byId.get(c.id)?.weight ?? 1 : 1;
+        contribs.push({ v: c.rollup.progress, w });
       }
     }
     const totalW = contribs.reduce((s, c) => s + c.w, 0);
@@ -50,6 +70,7 @@ export function buildGoalTree(goals: Goal[], ctx: TreeContext): GoalTreeNode[] {
 
     return {
       id: goal.id,
+      kind: "goal",
       name: goal.name,
       status: health,
       progress: own,

@@ -79,3 +79,42 @@ test("a goal whose parent is filtered out becomes a root", () => {
   assert.equal(tree.length, 1);
   assert.equal(tree[0]!.id, "B");
 });
+
+test("projects appear as leaves and contribute to the goal rollup", () => {
+  const goals = [g("G", null)]; // no own targets
+  const projectsByGoal = new Map([
+    [
+      "G",
+      [
+        {
+          id: "P1",
+          goalId: "G",
+          companyId: "co",
+          spaceId: "s",
+          name: "proj",
+          status: "active" as const,
+          championId: "c",
+          reviewerId: "r",
+          timeframe: tf,
+          lastCheckInStatus: "caution" as const,
+        },
+      ],
+    ],
+  ]);
+  const milestonesByProject = new Map([
+    [
+      "P1",
+      [
+        { id: "m1", projectId: "P1", title: "a", status: "done" as const, index: 0 },
+        { id: "m2", projectId: "P1", title: "b", status: "pending" as const, index: 1 },
+      ],
+    ],
+  ]);
+  const tree = buildGoalTree(goals, { targetsByGoal: new Map(), projectsByGoal, milestonesByProject });
+  const node = tree[0]!;
+  assert.equal(node.children.length, 1);
+  assert.equal(node.children[0]!.kind, "project");
+  assert.equal(node.children[0]!.progress, 50); // 1/2 milestones
+  assert.equal(node.rollup.progress, 50);
+  assert.equal(node.rollup.status, "caution"); // project health worst-wins
+});

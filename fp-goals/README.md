@@ -19,18 +19,19 @@ src/core/
   validate.ts     champion≠reviewer, timeframe, anti-siklus parent                    ← 0009
   checks.ts       checklist "checks" per goal (done/total)                            ← 0013
   permissions.ts  AccessLevel view/comment/edit/full + gate champion/reviewer         ← 0013
+  projects.ts     project progress (milestone done/total) + health                    ← 0014
   checkin.ts      penjadwalan (next_update), worst-wins, snapshot, gate off_track     ← 0011
-  tree.ts         buildGoalTree — rollup progres (berbobot) & status (worst-wins)     ← 0012
+  tree.ts         buildGoalTree — rollup goal + sub-goal + project (worst-wins)        ← 0012/0014
   service.ts      GoalsService in-memory: API contract + authz access-level + close FSM
-  *.test.ts       42 test membuktikan acceptance criteria spec
-src/demo.ts       skenario end-to-end (company → space → goal → check-in → tree + izin)
+  *.test.ts       49 test membuktikan acceptance criteria spec
+src/demo.ts       skenario end-to-end (goal → target → check-in → project/milestone → Work Map)
 ```
 
 ## Jalankan
 
 ```bash
 npm install                 # hanya devDeps (typescript + @types/node)
-npm test                    # node --test, 42 pass
+npm test                    # node --test, 49 pass
 npm run typecheck           # tsc --noEmit, bersih
 npm run demo                # cetak Work Map + izin + deteksi overdue
 ```
@@ -75,11 +76,14 @@ check-ins) — antarmuka methodnya tetap sama.
 | 0011 Check-in | status R/Y/G, snapshot target+check+timeframe, gate alasan, ack, penjadwalan/overdue | timeline UI, dispatch pengingat |
 | 0012 Tree | buildGoalTree, rollup progres+status, filter, orphan→root | peta interaktif, drill-down, a11y keyboard |
 | 0013 Permissions | access level view/comment/edit/full + role gates, checklist, reactions/comments, retrospective | tombol ber-permission, UI checklist/komentar |
+| 0014 Projects | project→goal, milestone done/total, project check-in health, daun Work Map + rollup | UI Work Map node project, halaman project/milestone |
 
-Model mengikuti source Operately (`app/lib/operately/goals` + `access`): Target
-`from/to/unit/value/index`, Update (check-in) dgn `state`/snapshot/`reactions`/
-`comments`, Goal `next_update_scheduled_at`/`last_update_status`/`closed_*`/
-`success_status`, Check `name/completed/index`, dan Access.Binding
+Model mengikuti source Operately (`app/lib/operately/goals` + `projects` +
+`access`): Target `from/to/unit/value/index`, Update (check-in) dgn
+`state`/snapshot/`reactions`/`comments`, Goal `next_update_scheduled_at`/
+`last_update_status`/`closed_*`/`success_status`, Check `name/completed/index`,
+Project `health`/`last_check_in_status`/`success_status` + Milestone
+`status:pending|done`/`completed_at`, dan Access.Binding
 `view=10/comment=40/edit=70/full=100`.
 
 Checkbox di tiap file spec dicentang persis untuk item yang **sudah terverifikasi**

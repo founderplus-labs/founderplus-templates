@@ -12,11 +12,15 @@ import {
   type GoalPermissions,
   type GoalSuccessStatus,
   type GoalTreeNode,
+  type Milestone,
+  type MilestoneStatus,
+  type Project,
   type Reaction,
   type Space,
   type Target,
   type Timeframe,
 } from "./types.ts";
+import { nextMilestoneIndex } from "./projects.ts";
 import {
   assertChampionReviewerDistinct,
   assertNoCycle,
@@ -77,6 +81,8 @@ export class GoalsService {
   private targets = new Map<string, Target>();
   private checks = new Map<string, GoalCheck>();
   private checkIns: CheckIn[] = [];
+  private projects = new Map<string, Project>();
+  private milestones = new Map<string, Milestone>();
   private now: () => Date;
   private idGen: () => string;
   private seq = 0;
@@ -365,7 +371,89 @@ export class GoalsService {
     return [...this.goals.values()].filter((g) => isCheckInOverdue(g, now));
   }
 
-  // ── alignment tree (spec 0012) ───────────────────────────────────────────
+  // ── projects & milestones (spec 0014, Operately Projects) ────────────────
+  private assertCanEditGoal(goalId: string, actorId: string): Goal {
+    const goal = this.requireGoal(goalId);
+    if (!this.perms(goal, actorId).canEdit)
+      throw new DomainError("forbidden", "butuh akses edit pada goal induk");
+    return goal;
+  }
+
+  /** Create a project under a goal (inherits its space/company). */
+  createProject(
+    actorId: string,
+    goalId: string,
+    input: { name: string; championId: string; reviewerId: string; timeframe?: Timeframe },
+  ): Project {
+    const goal = this.assertCanEditGoal(goalId, actorId);
+    const project: Project = {
+      id: this.idGen(),
+      goalId,
+      companyId: goal.companyId,
+      spaceId: goal.spaceId,
+      name: input.name,
+      status: "active",
+      championId: input.championId,
+      reviewerId: input.reviewerId,
+      timeframe: input.timeframe ?? goal.timeframe,
+    };
+    this.projects.set(project.id, project);
+    return project;
+  }
+
+  private requireProject(id: string): Project {
+    const p = this.projects.get(id);
+    if (!p) throw new DomainError("project_not_found", "project tidak ada");
+    return p;
+  }
+
+  addMilestone(actorId: string, projectId: string, title: string): Milestone {
+    const project = this.requireProject(projectId);
+    this.assertCanEditGoal(project.goalId, actorId);
+    const milestone: Milestone = {
+      id: this.idGen(),
+      projectId,
+      title,
+      status: "pending",
+      index: nextMilestoneIndex(this.milestonesFor(projectId)),
+    };
+    this.milestones.set(milestone.id, milestone);
+    return milestone;
+  }
+
+  setMilestoneStatus(actorId: string, milestoneId: string, status: MilestoneStatus): Milestone {
+    const milestone = this.milestones.get(milestoneId);
+    if (!milestone) throw new DomainError("milestone_not_found", "milestone tidak ada");
+    const project = this.requireProject(milestone.projectId);
+    this.assertCanEditGoal(project.goalId, actorId);
+    milestone.status = status;
+    milestone.completedAt = status === "done" ? this.now().toISOString() : undefined;
+    return milestone;
+  }
+
+  /** Project check-in — champion (or goal editor) sets health. */
+  projectCheckIn(actorId: string, projectId: string, status: CheckInStatus): Project {
+    const project = this.requireProject(projectId);
+    const goal = this.requireGoal(project.goalId);
+    const isChampion = actorId === project.championId;
+    if (!isChampion && !this.perms(goal, actorId).canEdit)
+      throw new DomainError("forbidden", "hanya champion project atau editor goal");
+    project.lastCheckInStatus = status;
+    project.nextCheckInScheduledAt = computeNextUpdateAt(this.now().toISOString(), 7);
+    return project;
+  }
+
+  projectsFor(goalId: string): Project[] {
+    return [...this.projects.values()].filter((p) => p.goalId === goalId);
+  }
+
+  milestonesFor(projectId: string): Milestone[] {
+    return [...this.milestones.values()]
+      .filter((m) => m.projectId === projectId)
+      .sort((a, b) => a.index - b.index);
+  }
+
+  // ── alignment tree (spec 0012 + 0014) ────────────────────────────────────
   getGoalTree(filter: TreeFilter = {}): GoalTreeNode[] {
     let goals = [...this.goals.values()];
     if (filter.spaceId) goals = goals.filter((g) => g.spaceId === filter.spaceId);
@@ -374,8 +462,15 @@ export class GoalsService {
       goals = goals.filter((g) => g.timeframe.type === filter.timeframeType);
 
     const targetsByGoal = new Map<string, Target[]>();
-    for (const g of goals) targetsByGoal.set(g.id, this.targetsFor(g.id));
-    return buildGoalTree(goals, { targetsByGoal });
+    const projectsByGoal = new Map<string, Project[]>();
+    const milestonesByProject = new Map<string, Milestone[]>();
+    for (const g of goals) {
+      targetsByGoal.set(g.id, this.targetsFor(g.id));
+      const projects = this.projectsFor(g.id);
+      projectsByGoal.set(g.id, projects);
+      for (const p of projects) milestonesByProject.set(p.id, this.milestonesFor(p.id));
+    }
+    return buildGoalTree(goals, { targetsByGoal, projectsByGoal, milestonesByProject });
   }
 
   getGoal(id: string): Goal | undefined {

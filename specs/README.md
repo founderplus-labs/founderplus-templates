@@ -146,6 +146,7 @@ validator JSON-Schema apa pun yang paham YAML terhadap `schema/spec.schema.json`
 | [0011](./0011-okr-check-in-review.spec.yaml) | **OKR** — Check-in bulanan (R/Y/G) & review | fp-goals | in_progress |
 | [0012](./0012-okr-alignment-tree.spec.yaml) | **OKR** — Pohon alignment & rollup | fp-goals | in_progress |
 | [0013](./0013-okr-permissions-collaboration.spec.yaml) | **OKR** — Permissions, checklist & kolaborasi | fp-goals | in_progress |
+| [0014](./0014-okr-projects-contribution.spec.yaml) | **OKR** — Projects & milestones berkontribusi ke Goal | fp-goals | in_progress |
 
 > Slice `0001–0007` mendokumentasikan perilaku yang **sudah ada** di template
 > (spec sebagai kebenaran hidup). `0008` adalah slice **yang direncanakan**
@@ -162,7 +163,8 @@ Empat slice yang saling menggantung membentuk sistem OKR lengkap:
   └─ 0010 Targets/KR     from → to → value (unit/index) → progres otomatis + rollup
        └─ 0011 Check-in  status R/Y/G + narasi + snapshot + ack reviewer + penjadwalan
             └─ 0012 Tree company → space → goal → sub-goal, rollup progres & status
-                 └─ 0013 Permissions (access level + role) · checklist · reactions/comments · retrospective
+                 ├─ 0013 Permissions (access level + role) · checklist · reactions/comments · retrospective
+                 └─ 0014 Projects → milestones menggantung di goal (daun Work Map, ikut rollup)
 ```
 
 Diperdalam dari studi source Operately (`app/lib/operately/goals` + `access`).

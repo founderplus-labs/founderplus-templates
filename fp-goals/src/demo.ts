@@ -51,6 +51,14 @@ const signups = svc.addTarget("lead", acq.id, { name: "New signups", unit: "numb
 const churn = svc.addTarget("eng", ret.id, { name: "Monthly churn", unit: "percent", from: 20, to: 5 });
 svc.addCheck("eng", ret.id, "Ship onboarding v2");
 
+// A project hangs off "Reduce churn" and contributes to its rollup.
+const proj = svc.createProject("eng", ret.id, { name: "Onboarding v2", championId: "eng", reviewerId: "lead" });
+svc.addMilestone("eng", proj.id, "Design");
+const build = svc.addMilestone("eng", proj.id, "Build");
+svc.addMilestone("eng", proj.id, "Ship");
+svc.setMilestoneStatus("eng", build.id, "done"); // 1/3 done
+svc.projectCheckIn("eng", proj.id, "off_track");
+
 // A month in: champions check in, reviewers acknowledge, teammates react.
 clock = new Date("2026-02-01T00:00:00Z");
 const ci1 = svc.createCheckIn("lead", acq.id, {

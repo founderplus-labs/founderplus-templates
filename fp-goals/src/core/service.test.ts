@@ -182,6 +182,36 @@ test("getGoalTree rolls up a hierarchy and filters", () => {
   assert.deepEqual(svc.getGoalTree({ championId: "nobody" }), []);
 });
 
+test("projects hang off a goal and contribute to its rollup", () => {
+  const { svc, base } = setup();
+  const goal = svc.createGoal("champ", { ...base, name: "Launch" }); // no targets → own unmeasured
+  const proj = svc.createProject("champ", goal.id, {
+    name: "Onboarding v2",
+    championId: "champ",
+    reviewerId: "rev",
+  });
+  svc.addMilestone("champ", proj.id, "design");
+  const m2 = svc.addMilestone("champ", proj.id, "build");
+  svc.setMilestoneStatus("champ", m2.id, "done"); // 1/2 = 50%
+  svc.projectCheckIn("champ", proj.id, "off_track");
+
+  const node = svc.getGoalTree({ spaceId: "growth" }).find((n) => n.id === goal.id)!;
+  const projNode = node.children.find((c) => c.kind === "project")!;
+  assert.equal(projNode.name, "Onboarding v2");
+  assert.equal(projNode.progress, 50);
+  assert.equal(node.rollup.progress, 50); // goal has no own targets → rollup = project
+  assert.equal(node.rollup.status, "off_track"); // project health rolls up worst-wins
+});
+
+test("project ops require edit access on the parent goal", () => {
+  const { svc, base } = setup();
+  const goal = svc.createGoal("champ", base);
+  assert.throws(
+    () => svc.createProject("viewer", goal.id, { name: "x", championId: "champ", reviewerId: "rev" }),
+    (e: unknown) => e instanceof DomainError && e.code === "forbidden",
+  );
+});
+
 test("getPermissions reflects roles", () => {
   const { svc, base } = setup();
   const goal = svc.createGoal("champ", base);

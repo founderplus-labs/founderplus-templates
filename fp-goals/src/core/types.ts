@@ -142,6 +142,39 @@ export interface CheckInMessage {
   needs: string;
 }
 
+// ── Projects & milestones (Operately Projects.Project/Milestone) ─────────────
+// A project belongs to a goal and hangs off it in the Work Map, contributing
+// its progress (milestones done/total) and health to the goal's rollup.
+export type MilestoneStatus = "pending" | "done";
+export type ProjectStatus = "active" | "paused" | "closed";
+
+export interface Milestone {
+  id: string;
+  projectId: string;
+  title: string;
+  status: MilestoneStatus;
+  completedAt?: string;
+  index: number;
+}
+
+export interface Project {
+  id: string;
+  goalId: string;
+  companyId: string;
+  spaceId: string;
+  name: string;
+  status: ProjectStatus;
+  championId: string;
+  reviewerId: string;
+  timeframe: Timeframe;
+  /** Denormalised latest check-in status (Operately last_check_in_status). */
+  lastCheckInStatus?: CheckInStatus;
+  nextCheckInScheduledAt?: string;
+  successStatus?: GoalSuccessStatus;
+  closedAt?: string;
+  closedById?: string;
+}
+
 // ── Access & permissions (Operately Access.Binding + Goals.Permissions) ───────
 export interface Space {
   id: string;
@@ -172,6 +205,8 @@ export interface GoalPermissions {
 // ── Alignment tree (Operately Work Map) ──────────────────────────────────────
 export interface GoalTreeNode {
   id: string;
+  /** "goal" or "project" — projects are leaves under their goal in the Work Map. */
+  kind: "goal" | "project";
   name: string;
   status: HealthStatus;
   progress: number | null; // own progress; null = unmeasured

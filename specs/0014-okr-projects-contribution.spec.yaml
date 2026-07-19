@@ -1,0 +1,191 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+# Diperdalam dari source Operately (app/lib/operately/projects).
+# Domain core-nya dibangun & diuji di ../fp-goals/ (checkbox logic/service ✔).
+id: "0014"
+slug: okr-projects-contribution
+title: "OKR — Projects & milestones berkontribusi ke Goal (Work Map)"
+app: fp-goals
+status: in_progress
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Seperti Operately: sebuah Project menggantung di bawah Goal dan menjadi daun di
+  Work Map. Progres project = milestone selesai / total, health = status check-in
+  terakhirnya — keduanya ikut rollup ke Goal induk, sehingga pekerjaan nyata
+  (proyek) tersambung ke tujuan (goal).
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika sebuah goal dikejar lewat proyek-proyek konkret,"
+    i_want: "aku ingin proyek & milestone-nya ikut mengukur kemajuan goal,"
+    so_that: "supaya rollup goal mencerminkan pekerjaan nyata, bukan hanya angka KR."
+    persona: champion
+    signal: "Progres/health project muncul di rollup goal induk; goal off-track terlihat dari proyek yang tersendat."
+
+personas:
+  - id: champion
+    label: "Champion goal / project"
+    context: "Membuat project di bawah goal, menandai milestone, check-in project."
+  - id: founder
+    label: "Founder"
+    context: "Melihat proyek sebagai daun Work Map di bawah goal."
+
+problem: >
+  Goal dan pekerjaan sering terpisah: KR numerik tak menangkap kemajuan proyek.
+  Tanpa proyek yang berkontribusi, Work Map tak menunjukkan penyebab goal tersendat.
+goals:
+  - "Project belongs_to Goal (inherit space/company); punya champion/reviewer/timeframe."
+  - "Milestone (pending|done, completed_at, index); progres project = done/total."
+  - "Project check-in menetapkan health (on_track|caution|off_track)."
+  - "Project jadi daun di Work Map & ikut rollup progres (weight 1) + status (worst-wins)."
+non_goals:
+  - "Task/kanban di dalam milestone, Gantt, key resources — iterasi lanjut."
+  - "Contributor multi-peran penuh (di sini cukup champion/reviewer project)."
+
+slice:
+  entry_points:
+    - "createProject(goalId), addMilestone, setMilestoneStatus, projectCheckIn."
+    - "getGoalTree menyertakan project + milestone."
+  ui:
+    - "Project sebagai node daun di Work Map (badge progres milestone + health)."
+    - "Daftar milestone dengan checkbox selesai di halaman project."
+  logic:
+    - "computeProjectProgress = milestone done/total; projectHealth = last check-in/paused/unmeasured."
+    - "Rollup goal menggabungkan target sendiri + sub-goal + project (unmeasured dilewati)."
+  data:
+    - "Entitas Project (goal_id, space, health/last_check_in_status, success_status, closed_*)."
+    - "Entitas Milestone (project_id, title, status, completed_at, index)."
+  integrations:
+    - "Goal (0009) sebagai induk; permissions (0013) via goal induk."
+
+user_stories:
+  - id: US-1
+    persona: champion
+    as_a: "champion"
+    i_want: "membuat project di bawah goal dan menandai milestone selesai"
+    so_that: "kemajuan proyek terukur"
+    priority: must
+    acceptance_criteria:
+      - text: "Given goal, when aku createProject lalu addMilestone×N, then progres project = milestone done/total (0% saat semua pending)."
+        done: true
+      - text: "Given milestone di-setStatus done, when dihitung, then progres project naik proporsional & completedAt terisi."
+        done: true
+      - text: "Given project tanpa milestone, when dihitung, then 'belum terukur' (null), bukan 0%."
+        done: true
+    tasks:
+      - text: "Entitas Project + Milestone; computeProjectProgress; nextMilestoneIndex."
+        done: true
+      - text: "createProject/addMilestone/setMilestoneStatus di service."
+        done: true
+      - text: "UI halaman project + daftar milestone."
+        done: false
+    edge_cases:
+      - "setStatus pending mengosongkan completedAt kembali."
+  - id: US-2
+    persona: founder
+    as_a: "founder"
+    i_want: "project muncul sebagai daun di Work Map dan ikut rollup goal"
+    so_that: "aku lihat proyek mana yang menyeret goal"
+    priority: must
+    acceptance_criteria:
+      - text: "Given goal punya project, when getGoalTree, then project jadi child node kind='project' dengan progres milestone-nya."
+        done: true
+      - text: "Given project off_track, when rollup status goal dihitung, then goal induk menampilkan status terparah (worst-wins)."
+        done: true
+      - text: "Given goal tanpa target sendiri, when hanya punya project, then rollup progres goal = progres project."
+        done: true
+    tasks:
+      - text: "buildGoalTree menyertakan projectsByGoal + milestonesByProject."
+        done: true
+      - text: "Rollup gabungan target + sub-goal + project (unmeasured dilewati)."
+        done: true
+      - text: "UI Work Map render node project (badge berbeda dari goal)."
+        done: false
+    edge_cases:
+      - "Project paused → health paused, dikecualikan dari worst-wins."
+  - id: US-3
+    persona: champion
+    as_a: "champion project"
+    i_want: "check-in project menetapkan health"
+    so_that: "kesehatan proyek terbaca di Work Map"
+    priority: should
+    acceptance_criteria:
+      - text: "Given aku champion project, when projectCheckIn(status), then lastCheckInStatus & jadwal berikutnya ter-update."
+        done: true
+      - text: "Given aku bukan champion project & bukan editor goal, when projectCheckIn, then ditolak (forbidden)."
+        done: true
+    tasks:
+      - text: "projectCheckIn + otorisasi (champion project atau editor goal)."
+        done: true
+    edge_cases:
+      - "Cadence project default mingguan (Operately next_check_in_scheduled_at)."
+
+contracts:
+  api:
+    - name: "createProject"
+      method: POST
+      path: "{FP_API}/goals/{goalId}/projects"
+      request: |
+        { "name", "championId", "reviewerId", "timeframe?" }
+      response: |
+        201 Project{ id, goalId, status:"active", health:"unmeasured" } | 403 forbidden
+    - name: "milestones"
+      method: POST
+      path: "{FP_API}/projects/{id}/milestones · PATCH {FP_API}/milestones/{id}"
+      response: |
+        Milestone{ id, title, status:"pending|done", completedAt?, index }
+    - name: "projectCheckIn"
+      method: POST
+      path: "{FP_API}/projects/{id}/check-ins"
+      request: |
+        { "status": "on_track|caution|off_track" }
+      response: |
+        200 { lastCheckInStatus, nextCheckInScheduledAt } | 403 forbidden
+
+security:
+  - "Kelola project/milestone butuh edit access pada goal induk (0013)."
+  - "Project check-in: champion project atau editor goal."
+telemetry:
+  - "project_created, milestone_toggled, project_checkin{status}."
+accessibility:
+  - "Node project di Work Map dibedakan dari goal (ikon+label, bukan warna saja)."
+
+test_plan:
+  - id: T-1
+    kind: unit
+    text: "computeProjectProgress done/total; kosong=null; projectHealth; nextMilestoneIndex."
+    done: true
+  - id: T-2
+    kind: unit
+    text: "buildGoalTree: project jadi daun, ikut rollup progres & worst-wins status."
+    done: true
+  - id: T-3
+    kind: integration
+    text: "Service: createProject+milestones+checkin → goal rollup benar; authz edit ditegakkan."
+    done: true
+  - id: T-4
+    kind: e2e
+    text: "UI: project muncul sebagai daun Work Map; halaman project + milestone."
+    done: false
+
+definition_of_done:
+  - text: "Project belongs_to goal; progres = milestone done/total (teruji)."
+    done: true
+  - text: "Project jadi daun Work Map & ikut rollup progres + worst-wins (teruji)."
+    done: true
+  - text: "Project check-in health + otorisasi champion/editor (teruji)."
+    done: true
+  - text: "Lapisan UI (Work Map project node + halaman project/milestone) terpasang."
+    done: false
+
+open_questions:
+  - "Task/kanban di dalam milestone (Operately Tasks) — slice terpisah?"
+  - "Bobot kontribusi project ke goal: tetap 1 atau bisa diatur seperti target weight?"
+
+links:
+  - label: "Operately — Projects (project/milestone/check_in)"
+    url: "https://github.com/operately/operately/tree/main/app/lib/operately/projects"
+  - label: "Implementasi + test"
+    url: "../fp-goals/"
