@@ -15,6 +15,20 @@ const tf = (o: Partial<Timeframe> = {}): Timeframe => ({
   ...o,
 });
 
+const mk = (id: string, parentId: string | null): Goal => ({
+  id,
+  name: id,
+  companyId: "co",
+  spaceId: "s",
+  parentId,
+  championId: "c",
+  reviewerId: "r",
+  creatorId: "c",
+  timeframe: tf(),
+  status: "active",
+  cadenceDays: 30,
+});
+
 test("champion === reviewer is rejected", () => {
   assert.throws(
     () => assertChampionReviewerDistinct("u1", "u1"),
@@ -36,19 +50,7 @@ test("timeframe must be valid & start before end", () => {
 });
 
 test("anti-cycle: self-parent and ancestor loops are detected", () => {
-  // a → b → c  (c child of b, b child of a)
   const goals = new Map<string, Goal>();
-  const mk = (id: string, parentId: string | null): Goal => ({
-    id,
-    name: id,
-    spaceId: "s",
-    championId: "c",
-    reviewerId: "r",
-    timeframe: tf(),
-    parentId,
-    status: "active",
-    cadenceDays: 30,
-  });
   goals.set("a", mk("a", null));
   goals.set("b", mk("b", "a"));
   goals.set("c", mk("c", "b"));

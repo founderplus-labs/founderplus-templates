@@ -1,0 +1,221 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+# Diperdalam dari studi source Operately (app/lib/operately/goals + access).
+# Domain core-nya sudah dibangun & diuji di ../fp-goals/ (checkbox logic/service ✔).
+id: "0013"
+slug: okr-permissions-collaboration
+title: "OKR — Permissions (access levels), checklist & kolaborasi check-in"
+app: fp-goals
+status: in_progress
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Lapisan yang membuat OKR aman & kolaboratif ala Operately: access level
+  berjenjang (view/comment/edit/full) + peran champion/reviewer yang membuka aksi
+  ritual; checklist kualitatif ("checks") berdampingan dengan Target numerik; dan
+  reaksi/komentar pada check-in plus retrospective saat penutupan.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika sebuah goal dilihat banyak orang dengan hak berbeda,"
+    i_want: "aku ingin mengatur siapa bisa lihat/komentar/edit/menjalankan ritual,"
+    so_that: "supaya data aman tapi kolaborasi tetap mengalir."
+    persona: admin
+    signal: "Aksi selalu tergating access level + peran; nol aksi tak berwenang lolos."
+  - id: JTBD-2
+    when: "Ketika sebagian hasil goal tak cocok diukur angka,"
+    i_want: "aku ingin checklist kualitatif berdampingan dengan Target,"
+    so_that: "supaya milestone non-numerik tetap terlacak."
+    persona: champion
+    signal: "Progres checklist (done/total) tampil bersama progres Target."
+
+personas:
+  - id: admin
+    label: "Admin / space admin"
+    context: "Mengatur akses anggota di space (Operately Access.Binding)."
+  - id: champion
+    label: "Champion"
+    context: "Kelola target & checklist, jalankan check-in."
+  - id: reviewer
+    label: "Reviewer"
+    context: "Acknowledge check-in, setujui penutupan."
+  - id: member
+    label: "Anggota (comment access)"
+    context: "Boleh komentar/reaksi, tidak boleh edit."
+
+problem: >
+  Tanpa model izin, semua orang bisa mengubah apa saja; tanpa checklist, hasil
+  non-numerik hilang; tanpa komentar/reaksi, check-in jadi papan sepi.
+goals:
+  - "Access level view(10)/comment(40)/edit(70)/full(100) + peran champion/reviewer."
+  - "Aksi ritual (check-in, acknowledge, request/approve close, kelola target/checklist) tergating."
+  - "Checklist 'checks' per goal (name/completed/index) + progres done/total."
+  - "Reaksi & komentar pada check-in (butuh comment access); retrospective + success_status saat close."
+non_goals:
+  - "Company-level access binding penuh & sharing eksternal (iterasi lanjut)."
+  - "Editor rich-text komentar (di sini konten teks sederhana)."
+
+slice:
+  entry_points:
+    - "GoalsService.getPermissions(personId, goalId); aksi ber-authz di tiap method."
+    - "addCheck/toggleCheck; commentOnCheckIn/reactToCheckIn; requestClose/approveClose."
+  ui:
+    - "Badge peran & tombol yang muncul/nonaktif sesuai permissions."
+    - "Checklist di halaman goal; komentar/reaksi di bawah tiap check-in."
+  logic:
+    - "goalPermissions(goal, personId, accessLevel) → set boolean izin."
+    - "accessLevelFor: level space member, champion/reviewer dipromosikan ≥ edit."
+  data:
+    - "Space.members[{personId, accessLevel}]; GoalCheck; CheckIn.reactions/comments; Goal.retrospective/successStatus."
+  integrations:
+    - "Model Operately Access.Binding + Goals.Permissions/Check/Update."
+
+user_stories:
+  - id: US-1
+    persona: admin
+    as_a: "admin"
+    i_want: "access level menentukan apa yang boleh dilakukan tiap orang"
+    so_that: "goal aman tapi tetap kolaboratif"
+    priority: must
+    acceptance_criteria:
+      - text: "Given level view, when dihitung, then canView true tapi comment/edit/full false."
+        done: true
+      - text: "Given champion, when dihitung, then canCheckIn & canRequestClose true, canApproveClose false."
+        done: true
+      - text: "Given reviewer, when dihitung, then canAcknowledgeCheckIn & canApproveClose true, canCheckIn false."
+        done: true
+      - text: "Given full access tanpa peran, when dihitung, then aksi ritual terbuka (admin override)."
+        done: true
+    tasks:
+      - text: "AccessLevel {NONE,VIEW,COMMENT,EDIT,FULL} + goalPermissions()."
+        done: true
+      - text: "accessLevelFor: level space + promosi champion/reviewer ≥ EDIT."
+        done: true
+      - text: "Enforce permissions di setiap method GoalsService."
+        done: true
+      - text: "UI: sembunyikan/nonaktifkan tombol sesuai permissions."
+        done: false
+    edge_cases:
+      - "Bukan anggota space → NONE → semua aksi ditolak."
+  - id: US-2
+    persona: champion
+    as_a: "champion"
+    i_want: "menambah checklist kualitatif pada goal & menandainya selesai"
+    so_that: "milestone non-numerik ikut terlacak"
+    priority: should
+    acceptance_criteria:
+      - text: "Given goal, when aku addCheck lalu toggleCheck selesai, then progres checklist = done/total."
+        done: true
+      - text: "Given non-manage access, when addCheck, then ditolak (forbidden)."
+        done: true
+    tasks:
+      - text: "Entitas GoalCheck (name/completed/completedAt/index) + computeChecksProgress."
+        done: true
+      - text: "UI checklist di halaman goal."
+        done: false
+    edge_cases:
+      - "Checklist kosong → 'belum terukur' (null), bukan 0%."
+  - id: US-3
+    persona: member
+    as_a: "anggota dengan comment access"
+    i_want: "berkomentar & bereaksi pada check-in"
+    so_that: "diskusi progres hidup"
+    priority: should
+    acceptance_criteria:
+      - text: "Given comment access, when commentOnCheckIn/reactToCheckIn, then komentar/reaksi menempel di check-in."
+        done: true
+      - text: "Given tanpa comment access, when mencoba komentar, then ditolak (forbidden)."
+        done: true
+    tasks:
+      - text: "CheckIn.reactions[]/comments[] + method ber-authz comment access."
+        done: true
+      - text: "UI komentar/reaksi di bawah check-in."
+        done: false
+    edge_cases:
+      - "Check-in snapshot timeframe+targets+checks immutable (histori tak berubah)."
+  - id: US-4
+    persona: reviewer
+    as_a: "reviewer"
+    i_want: "penutupan mencatat outcome & retrospective"
+    so_that: "pembelajaran terekam"
+    priority: should
+    acceptance_criteria:
+      - text: "Given champion requestClose(successStatus, success), when reviewer approveClose(retrospective), then goal closed dengan successStatus/closedAt/closedById/retrospective."
+        done: true
+    tasks:
+      - text: "successStatus :achieved|:missed + retrospective di approveClose."
+        done: true
+    edge_cases:
+      - "approveClose oleh non-reviewer → not_reviewer (403)."
+
+contracts:
+  config: |
+    // Access levels (Operately Access.Binding)
+    NONE=0 · VIEW=10 · COMMENT=40 · EDIT=70 · FULL=100
+  api:
+    - name: "getPermissions"
+      method: GET
+      path: "{FP_API}/goals/{id}/permissions"
+      response: |
+        { canView, canComment, canEdit, hasFullAccess,
+          canCheckIn, canAcknowledgeCheckIn, canRequestClose, canApproveClose,
+          canManageTargets, canManageChecks }
+    - name: "addCheck / toggleCheck"
+      method: POST
+      path: "{FP_API}/goals/{id}/checks · PATCH {FP_API}/checks/{id}"
+      response: |
+        GoalCheck { id, name, completed, completedAt?, index }
+    - name: "comment / react on check-in"
+      method: POST
+      path: "{FP_API}/check-ins/{id}/comments · /reactions"
+      response: |
+        201 Comment{author,content,createdAt} | Reaction{person,emoji} · 403 forbidden
+
+security:
+  - "Setiap aksi tergating access level + peran (champion/reviewer); default deny."
+  - "Histori check-in immutable — koreksi lewat check-in/komentar baru."
+telemetry:
+  - "permission_denied{action}, check_toggled, checkin_commented, checkin_reacted, goal_closed{successStatus}."
+accessibility:
+  - "Tombol nonaktif punya alasan terbaca; checklist & komentar dapat dioperasikan keyboard."
+
+test_plan:
+  - id: T-1
+    kind: unit
+    text: "goalPermissions: view/comment/edit/full + gate champion/reviewer + full override."
+    done: true
+  - id: T-2
+    kind: unit
+    text: "computeChecksProgress done/total; kosong = null; nextCheckIndex."
+    done: true
+  - id: T-3
+    kind: integration
+    text: "Service: non-anggota ditolak; checklist toggle; comment/react gating; close+retrospective."
+    done: true
+  - id: T-4
+    kind: e2e
+    text: "UI: tombol tampil/nonaktif sesuai permissions; checklist & komentar di layar."
+    done: false
+
+definition_of_done:
+  - text: "Access level + role gates dihitung & ditegakkan di semua method (teruji)."
+    done: true
+  - text: "Checklist 'checks' + progres done/total (teruji)."
+    done: true
+  - text: "Reaksi & komentar check-in ber-authz comment access (teruji)."
+    done: true
+  - text: "Close mencatat successStatus + retrospective + closedBy/At (teruji)."
+    done: true
+  - text: "Lapisan UI (tombol ber-permission, checklist, komentar) terpasang."
+    done: false
+
+open_questions:
+  - "Company-level access binding & sharing eksternal — slice terpisah?"
+  - "Komentar rich-text + mention/subscribe (Operately SubscriptionList) — kapan?"
+
+links:
+  - label: "Operately — Access.Binding & Goals.Permissions"
+    url: "https://github.com/operately/operately/tree/main/app/lib/operately"
+  - label: "Implementasi + test"
+    url: "../fp-goals/"

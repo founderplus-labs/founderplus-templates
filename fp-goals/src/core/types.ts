@@ -1,79 +1,118 @@
-// OKR domain types — the shape the specs 0009–0012 pin down.
-// Framework-agnostic. A TanStack Start (fp-fullstack) app imports this core;
-// the HTTP/UI layer is a thin wrapper over the pure functions + GoalsService.
+// OKR domain types — modelled closely on operately/operately
+// (app/lib/operately/goals/*.ex). Framework-agnostic; a TanStack Start
+// (fp-fullstack) app imports this core and wraps it in loaders/actions.
 
-/** Goal lifecycle (spec 0009). */
-export type GoalStatus =
-  | "draft"
-  | "active"
-  | "pending_close" // close requested by champion, awaiting reviewer
-  | "closed"
-  | "paused";
+// ── Goal ─────────────────────────────────────────────────────────────────────
+/** Goal lifecycle. Operately tracks this via closed_at + success_status. */
+export type GoalStatus = "draft" | "active" | "pending_close" | "closed" | "paused";
 
-/** Outcome recorded when a goal is closed (spec 0009). */
-export type GoalOutcome = "achieved" | "missed" | "dropped";
+/** Operately Goal.success_status is :achieved | :missed. */
+export type GoalSuccessStatus = "achieved" | "missed";
 
-/** Qualitative check-in status — the red/yellow/green of OKR (spec 0011). */
+/** Check-in status — Operately Update.valid_statuses(). */
 export type CheckInStatus = "on_track" | "caution" | "off_track";
 
-/**
- * Health status used in the alignment tree rollup (spec 0012). Superset of
- * CheckInStatus plus states a node can have without a check-in.
- */
+/** Health used in the alignment-tree rollup: check-in statuses + non-measured states. */
 export type HealthStatus = CheckInStatus | "paused" | "unmeasured";
 
-/** Target (key result) unit (spec 0010). */
-export type TargetUnit = "number" | "percent" | "currency" | "boolean";
+/** Operately Update.state — we model published/draft (scheduled is future-dated). */
+export type UpdateState = "draft" | "published" | "scheduled";
+
+/** Timeframe types mirror Operately.ContextualDates.Timeframe. */
+export type TimeframeType = "days" | "month" | "quarter" | "year";
 
 export interface Timeframe {
-  type: "quarter" | "year" | "custom";
+  type: TimeframeType;
   /** ISO date (YYYY-MM-DD). */
   startDate: string;
   /** ISO date (YYYY-MM-DD). */
   endDate: string;
 }
 
+/** Target (key result) — Operately Goals.Target: from/to/unit/value/index. */
 export interface Target {
   id: string;
   goalId: string;
   name: string;
-  unit: TargetUnit;
-  fromValue: number;
-  toValue: number;
-  currentValue: number;
-  /** Rollup weight among sibling targets (spec 0010). Default 1. */
+  unit: string; // "number" | "percent" | "currency" | "boolean" | free text
+  from: number;
+  to: number;
+  /** Current value (Operately: `value`). Starts at `from`. */
+  value: number;
+  /** Display/order index within the goal. */
+  index: number;
+  /** Rollup weight among sibling targets. Default 1. */
   weight?: number;
+}
+
+/** Goal checklist item — Operately Goals.Check: name/completed/index. */
+export interface GoalCheck {
+  id: string;
+  goalId: string;
+  creatorId: string;
+  name: string;
+  completed: boolean;
+  completedAt?: string;
+  index: number;
 }
 
 export interface Goal {
   id: string;
   name: string;
   description?: string;
+  companyId: string;
+  /** Operately calls the space a "group". */
   spaceId: string;
+  parentId?: string | null;
   championId: string;
   reviewerId: string;
+  creatorId: string;
   timeframe: Timeframe;
-  parentId?: string | null;
   status: GoalStatus;
-  outcome?: GoalOutcome;
-  /** Rollup weight among sibling goals in the alignment tree (spec 0012). Default 1. */
+  /** Rollup weight among sibling goals in the alignment tree. Default 1. */
   weight?: number;
-  /** Check-in cadence in days (spec 0011). Default 30 (monthly). */
+  /** Check-in cadence in days. Default 30 (monthly). */
   cadenceDays: number;
-  /** ISO datetime the goal became active — cadence anchor. */
   activatedAt?: string;
+  /** Denormalised latest check-in status (Operately: last_update_status). */
+  lastUpdateStatus?: CheckInStatus;
+  /** When the next check-in is due (Operately: next_update_scheduled_at). */
+  nextUpdateScheduledAt?: string;
+  // Close (Operately: closed_at/closed_by/success/success_status).
+  closedAt?: string;
+  closedById?: string;
+  success?: string;
+  successStatus?: GoalSuccessStatus;
+  /** Retrospective text captured at close. */
+  retrospective?: string;
 }
 
-export interface CheckInNarrative {
-  wins: string;
-  obstacles: string;
-  needs: string;
+// ── Check-in (Operately Goals.Update) ────────────────────────────────────────
+export interface Reaction {
+  id: string;
+  personId: string;
+  emoji: string;
 }
 
+export interface Comment {
+  id: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+}
+
+/** Immutable snapshots embedded in a check-in (Operately embeds_many). */
 export interface TargetSnapshot {
   targetId: string;
-  currentValue: number;
+  name: string;
+  value: number;
   progress: number;
+}
+
+export interface CheckSnapshot {
+  checkId: string;
+  name: string;
+  completed: boolean;
 }
 
 export interface CheckIn {
@@ -81,32 +120,63 @@ export interface CheckIn {
   goalId: string;
   authorId: string;
   status: CheckInStatus;
-  narrative: CheckInNarrative;
-  targetSnapshots: TargetSnapshot[];
-  /** ISO datetime. */
-  createdAt: string;
-  acknowledgedBy?: string;
+  /** Rich message (wins/obstacles/needs or freeform). */
+  message: CheckInMessage;
+  state: UpdateState;
+  publishedAt?: string;
+  scheduledAt?: string;
   acknowledgedAt?: string;
-  reviewerComment?: string;
+  acknowledgedById?: string;
+  /** Snapshots taken at publish time. */
+  timeframe: Timeframe;
+  targets: TargetSnapshot[];
+  checks: CheckSnapshot[];
+  reactions: Reaction[];
+  comments: Comment[];
+  createdAt: string;
 }
 
+export interface CheckInMessage {
+  wins: string;
+  obstacles: string;
+  needs: string;
+}
+
+// ── Access & permissions (Operately Access.Binding + Goals.Permissions) ───────
 export interface Space {
   id: string;
+  companyId: string;
   name: string;
-  memberIds: string[];
+  members: SpaceMember[];
 }
 
-/** Node emitted by getGoalTree (spec 0012 API contract). */
+export interface SpaceMember {
+  personId: string;
+  /** Access level constant (see permissions.ts AccessLevel). */
+  accessLevel: number;
+}
+
+export interface GoalPermissions {
+  canView: boolean;
+  canComment: boolean;
+  canEdit: boolean;
+  hasFullAccess: boolean;
+  canCheckIn: boolean;
+  canAcknowledgeCheckIn: boolean;
+  canRequestClose: boolean;
+  canApproveClose: boolean;
+  canManageTargets: boolean;
+  canManageChecks: boolean;
+}
+
+// ── Alignment tree (Operately Work Map) ──────────────────────────────────────
 export interface GoalTreeNode {
   id: string;
   name: string;
   status: HealthStatus;
-  /** Own progress from this goal's targets; null = unmeasured. */
-  progress: number | null;
+  progress: number | null; // own progress; null = unmeasured
   rollup: {
-    /** Aggregate progress over the subtree (self + descendants); null if all unmeasured. */
     progress: number | null;
-    /** Worst-wins status over the subtree. */
     status: HealthStatus;
     childCount: number;
   };
@@ -114,7 +184,7 @@ export interface GoalTreeNode {
   children: GoalTreeNode[];
 }
 
-/** Typed domain error so the HTTP layer can map to 4xx codes (spec contracts). */
+/** Typed domain error so the HTTP layer can map to 4xx codes. */
 export class DomainError extends Error {
   code: string;
   constructor(code: string, message?: string) {

@@ -13,23 +13,26 @@ merekomendasikan Next.js.)
 
 ```
 src/core/
-  types.ts       Tipe domain (Goal, Target, CheckIn, GoalTreeNode, …)
-  progress.ts    computeTargetProgress (naik/turun/clamp/no-div0) + rollup goal   ← spec 0010
-  validate.ts    champion≠reviewer, timeframe, anti-siklus parent                 ← spec 0009
-  checkin.ts     cadence/overdue, worst-wins, snapshot, gate alasan off_track     ← spec 0011
-  tree.ts        buildGoalTree — rollup progres (berbobot) & status (worst-wins)  ← spec 0012
-  service.ts     GoalsService in-memory: API contract + otorisasi + close FSM
-  *.test.ts      29 test membuktikan acceptance criteria spec
-src/demo.ts      skenario end-to-end (company → space → goal → check-in → tree)
+  types.ts        Tipe domain setia Operately (Goal, Target from/to/value/index,
+                  GoalCheck, CheckIn dgn snapshot+reactions+comments, Space/members)
+  progress.ts     target progress (naik/turun/clamp/no-div0) + rollup + format_value ← 0010
+  validate.ts     champion≠reviewer, timeframe, anti-siklus parent                    ← 0009
+  checks.ts       checklist "checks" per goal (done/total)                            ← 0013
+  permissions.ts  AccessLevel view/comment/edit/full + gate champion/reviewer         ← 0013
+  checkin.ts      penjadwalan (next_update), worst-wins, snapshot, gate off_track     ← 0011
+  tree.ts         buildGoalTree — rollup progres (berbobot) & status (worst-wins)     ← 0012
+  service.ts      GoalsService in-memory: API contract + authz access-level + close FSM
+  *.test.ts       42 test membuktikan acceptance criteria spec
+src/demo.ts       skenario end-to-end (company → space → goal → check-in → tree + izin)
 ```
 
 ## Jalankan
 
 ```bash
 npm install                 # hanya devDeps (typescript + @types/node)
-npm test                    # node --test, 29 pass
+npm test                    # node --test, 42 pass
 npm run typecheck           # tsc --noEmit, bersih
-npm run demo                # cetak Work Map + deteksi overdue
+npm run demo                # cetak Work Map + izin + deteksi overdue
 ```
 
 Butuh Node ≥ 22.6 (memakai `--experimental-strip-types` untuk menjalankan `.ts`
@@ -68,9 +71,16 @@ check-ins) — antarmuka methodnya tetap sama.
 | Spec | Diimplementasikan | Belum (butuh lapisan UI/HTTP app) |
 |------|-------------------|-----------------------------------|
 | 0009 Goal | validasi, CRUD, parent anti-siklus, close FSM, otorisasi | form React, halaman detail |
-| 0010 Targets | progres naik/turun/clamp/no-div0, rollup berbobot, unit | progress bar UI, editor nilai |
-| 0011 Check-in | status R/Y/G, snapshot, gate alasan, ack reviewer, cadence/overdue | timeline UI, pengingat terjadwal |
+| 0010 Targets | progres naik/turun/clamp/no-div0, rollup berbobot, format_value | progress bar UI, editor nilai |
+| 0011 Check-in | status R/Y/G, snapshot target+check+timeframe, gate alasan, ack, penjadwalan/overdue | timeline UI, dispatch pengingat |
 | 0012 Tree | buildGoalTree, rollup progres+status, filter, orphan→root | peta interaktif, drill-down, a11y keyboard |
+| 0013 Permissions | access level view/comment/edit/full + role gates, checklist, reactions/comments, retrospective | tombol ber-permission, UI checklist/komentar |
+
+Model mengikuti source Operately (`app/lib/operately/goals` + `access`): Target
+`from/to/unit/value/index`, Update (check-in) dgn `state`/snapshot/`reactions`/
+`comments`, Goal `next_update_scheduled_at`/`last_update_status`/`closed_*`/
+`success_status`, Check `name/completed/index`, dan Access.Binding
+`view=10/comment=40/edit=70/full=100`.
 
 Checkbox di tiap file spec dicentang persis untuk item yang **sudah terverifikasi**
 oleh test di sini; item UI/e2e dibiarkan terbuka.
