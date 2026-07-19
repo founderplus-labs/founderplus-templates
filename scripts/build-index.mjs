@@ -80,14 +80,15 @@ const META = {
     securityDoc: 'SECURITY.md'
   },
   'pos-qr-menu': {
-    title: 'POS QR-Menu (scan meja → pesan)',
+    title: 'POS QR-Menu + Kasir (QRIS · struk Bluetooth)',
     description:
-      'No-build QR ordering for dine-in POS: customer scans a per-table QR, sees the menu, and orders from their phone with the table number attached. Orders route to WhatsApp today, or to the Founder+ POS backend when configured. Ships an offline QR print tool (tables.html). Deploy index.html with fp sites publish.',
+      'No-build dine-in POS suite. Customers scan a per-table QR, see the menu, and order from their phone with the table number attached (WhatsApp today, Founder+ POS backend when configured). Cashier (kasir.html): enter an amount or itemized bill, show a dynamic QRIS (built from the merchant static payload with a correct EMVCo CRC), and print an ESC/POS receipt to a Bluetooth thermal printer — customizable (store info, footer, 58/80mm), with a window.print fallback. Plus an offline per-table QR print tool (tables.html).',
     runtime: 'static',
-    stack: ['html', 'no-build', 'pos', 'qr'],
+    stack: ['html', 'no-build', 'pos', 'qr', 'qris', 'bluetooth'],
     postInstall: [
       'Edit CONFIG + MENU in index.html (store, WhatsApp, items)',
       'fp sites publish index.html',
+      'Open kasir.html to take payments (paste your QRIS payload in Settings)',
       'Open tables.html in a browser to print per-table QR codes'
     ],
     setupDoc: 'SETUP.md'

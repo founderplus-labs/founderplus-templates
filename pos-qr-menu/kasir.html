@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Kasir — Warung Kopi Founder+</title>
+    <meta name="description" content="Kasir POS: input nominal/barang, tampilkan QRIS, cetak struk Bluetooth." />
+    <meta name="theme-color" content="#faf9fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141019" media="(prefers-color-scheme: dark)" />
+    <style>
+      /* Grounded in real cashier + QR-pay patterns (Mobbin: Universe/Cash App
+         keypad, Binance/ShopBack "show code to pay"). Motion/materials follow
+         emil-design-eng + apple-design, consistent with index.html. */
+      :root {
+        --brand: #8b5cf6; --brand-ink: #6d28d9; --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+        --ink: #1a1420; --secondary: #524b5e; --muted: #857e91;
+        --line: #ece8f1; --bg: #faf9fb; --card: #ffffff;
+        --ok: #17984e; --ok-ink: #0f7a3d; --danger: #c2410c;
+        --r-card: 18px; --r-ctl: 12px;
+        --shadow-card: 0 1px 2px rgba(26,20,32,.04), 0 4px 14px rgba(26,20,32,.05);
+        --shadow-ctl: 0 2px 8px rgba(26,20,32,.14), 0 0 0 1px rgba(26,20,32,.04);
+        --shadow-pop: 0 1px 1px rgba(26,20,32,.05), 0 -8px 40px rgba(26,20,32,.14);
+        --ease-out: cubic-bezier(0.23,1,0.32,1); --ease-drawer: cubic-bezier(0.32,0.72,0,1);
+        --safe-b: env(safe-area-inset-bottom, 0px); --safe-t: env(safe-area-inset-top, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root { --ink:#f4eefc; --secondary:#b8b0c6; --muted:#8b8399; --line:#2a2436; --bg:#131019; --card:#1c1626;
+          --brand:#a78bfa; --brand-ink:#c4b5fd;
+          --shadow-card:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.35);
+          --shadow-ctl:0 3px 10px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06);
+          --shadow-pop:0 1px 1px rgba(0,0,0,.4),0 -8px 44px rgba(0,0,0,.55); }
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body { margin: 0; }
+      body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; font-optical-sizing:auto;
+        color:var(--ink); background:var(--bg); line-height:1.5; -webkit-font-smoothing:antialiased;
+        padding-bottom: calc(150px + var(--safe-b)); }
+
+      header { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:10px;
+        padding: calc(14px + var(--safe-t)) 16px 13px;
+        background: color-mix(in srgb, var(--card) 72%, transparent);
+        backdrop-filter:saturate(1.8) blur(20px); -webkit-backdrop-filter:saturate(1.8) blur(20px);
+        box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 60%, transparent); }
+      header .store { font-size:18px; font-weight:700; letter-spacing:-0.02em; flex:1; min-width:0;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      header .tag { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+        color:var(--brand-ink); background:var(--brand-soft); padding:3px 9px; border-radius:999px; }
+      .icon-btn { width:38px; height:38px; border:none; border-radius:999px; cursor:pointer;
+        background:var(--card); box-shadow:inset 0 0 0 1px var(--line); color:var(--ink); font-size:17px;
+        display:grid; place-items:center; transition:transform 150ms var(--ease-out); }
+      .icon-btn:active { transform:scale(.9); }
+
+      main { max-width:520px; margin:0 auto; padding:14px 16px 8px; }
+
+      .seg { display:flex; gap:4px; padding:4px; background:var(--card); border-radius:999px;
+        box-shadow:inset 0 0 0 1px var(--line); margin-bottom:18px; }
+      .seg button { flex:1; border:none; background:transparent; cursor:pointer; font:inherit; font-weight:650;
+        font-size:14px; color:var(--secondary); padding:9px; border-radius:999px;
+        transition:color 160ms var(--ease-out), background 160ms var(--ease-out); }
+      .seg button[aria-current="true"] { background:var(--ink); color:var(--card); }
+
+      /* Amount display — big, centered (Universe/Cash App pattern) */
+      .amount { text-align:center; font-weight:800; letter-spacing:-0.03em; line-height:1;
+        font-size:clamp(40px, 13vw, 58px); font-variant-numeric:tabular-nums; margin:14px 0 4px; }
+      .amount .z { color:var(--muted); }
+      .amount-cap { text-align:center; color:var(--muted); font-size:13px; margin-bottom:18px; }
+
+      /* Keypad */
+      .keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+      .key { border:none; cursor:pointer; background:var(--card); box-shadow:var(--shadow-card);
+        font:inherit; font-size:24px; font-weight:600; color:var(--ink); padding:16px 0; border-radius:16px;
+        transition:transform 130ms var(--ease-out), background 160ms var(--ease-out); }
+      .key:active { transform:scale(.95); background:var(--brand-soft); }
+      .key.wide { grid-column:span 1; }
+
+      /* Item mode */
+      .items { display:flex; flex-direction:column; gap:9px; margin-bottom:14px; }
+      .irow { display:flex; align-items:center; gap:11px; background:var(--card); border-radius:var(--r-card);
+        padding:12px 13px; box-shadow:var(--shadow-card); }
+      .irow .info { flex:1; min-width:0; }
+      .irow .nm { font-weight:640; font-size:15px; letter-spacing:-0.01em; white-space:nowrap;
+        overflow:hidden; text-overflow:ellipsis; }
+      .irow .pr { font-size:12.5px; color:var(--muted); margin-top:2px; font-variant-numeric:tabular-nums; }
+      .irow .stp { display:inline-flex; align-items:center; gap:2px; background:var(--bg); border-radius:999px;
+        padding:0 3px; box-shadow:inset 0 0 0 1px var(--line); }
+      .irow .stp button { width:28px; height:28px; border:none; background:transparent; cursor:pointer;
+        color:var(--brand-ink); font-size:17px; border-radius:999px; transition:transform 150ms var(--ease-out); }
+      .irow .stp button:active { transform:scale(.86); }
+      .irow .stp .q { min-width:18px; text-align:center; font-weight:700; font-size:14px; font-variant-numeric:tabular-nums; }
+      .add-item { display:flex; gap:8px; }
+      .add-item input { flex:1; min-width:0; border:none; box-shadow:inset 0 0 0 1px var(--line);
+        border-radius:var(--r-ctl); padding:12px 13px; font:inherit; background:var(--card); color:var(--ink);
+        transition:box-shadow 160ms var(--ease-out); }
+      .add-item input.price { flex:0 0 118px; text-align:right; font-variant-numeric:tabular-nums; }
+      .add-item input:focus { outline:none; box-shadow:inset 0 0 0 2px var(--brand); }
+      .add-item .addbtn { border:none; cursor:pointer; background:var(--brand); color:#fff; font:inherit;
+        font-weight:700; padding:0 16px; border-radius:var(--r-ctl); box-shadow:0 2px 8px color-mix(in srgb,var(--brand) 34%,transparent);
+        transition:transform 150ms var(--ease-out); }
+      .add-item .addbtn:active { transform:scale(.94); }
+      .empty { text-align:center; color:var(--muted); font-size:14px; padding:22px 10px; }
+
+      /* Persistent action bar */
+      .bar { position:fixed; left:0; right:0; bottom:0; z-index:10; padding:12px 16px calc(12px + var(--safe-b));
+        background:color-mix(in srgb, var(--card) 82%, transparent);
+        backdrop-filter:saturate(1.8) blur(20px); -webkit-backdrop-filter:saturate(1.8) blur(20px);
+        box-shadow:0 -1px 0 color-mix(in srgb, var(--line) 70%, transparent); }
+      .bar .in { max-width:520px; margin:0 auto; }
+      .bar .totalrow { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+      .bar .totalrow .l { color:var(--muted); font-size:13px; }
+      .bar .totalrow .v { font-weight:800; font-size:22px; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+      .bar .actions { display:flex; gap:10px; }
+      .bar button { flex:1; border:none; cursor:pointer; font:inherit; font-weight:700; font-size:15px;
+        padding:15px; border-radius:14px; transition:transform 150ms var(--ease-out), opacity 160ms var(--ease-out); }
+      .bar button:active { transform:scale(.98); }
+      .bar button[disabled] { opacity:.4; }
+      .bar .qris { background:var(--ink); color:var(--card); box-shadow:0 4px 16px rgba(26,20,32,.18); }
+      .bar .print { background:var(--card); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); flex:0 0 46%; }
+
+      /* Dialogs (QRIS + settings) */
+      dialog { border:none; padding:0; width:100%; max-width:520px; color:var(--ink); background:var(--card);
+        box-shadow:var(--shadow-pop); }
+      dialog::backdrop { background:rgba(16,10,26,0); backdrop-filter:blur(0);
+        transition:background 420ms var(--ease-out), backdrop-filter 420ms var(--ease-out),
+          overlay 420ms allow-discrete, display 420ms allow-discrete; }
+      dialog[open]::backdrop { background:rgba(16,10,26,.55); backdrop-filter:blur(2px); }
+      @starting-style { dialog[open]::backdrop { background:rgba(16,10,26,0); backdrop-filter:blur(0); } }
+
+      /* QRIS modal: centered card */
+      dialog#qris { margin:auto; border-radius:24px; max-width:400px;
+        transform:scale(.94); opacity:0;
+        transition:transform 300ms var(--ease-out), opacity 220ms var(--ease-out),
+          overlay 300ms allow-discrete, display 300ms allow-discrete; }
+      dialog#qris[open] { transform:scale(1); opacity:1; }
+      @starting-style { dialog#qris[open] { transform:scale(.94); opacity:0; } }
+      .qwrap { padding:22px 22px calc(20px + var(--safe-b)); text-align:center; }
+      .qwrap .qtitle { font-weight:700; font-size:16px; letter-spacing:-0.01em; }
+      .qwrap .qamt { font-weight:800; font-size:30px; letter-spacing:-0.02em; margin:2px 0 2px; font-variant-numeric:tabular-nums; }
+      .qwrap .qsub { color:var(--muted); font-size:12.5px; margin-bottom:16px; }
+      .qbox { background:#fff; border-radius:18px; padding:16px; width:min(260px,72vw); margin:0 auto 14px;
+        box-shadow:inset 0 0 0 1px var(--line); }
+      .qbox svg { width:100%; height:auto; display:block; }
+      .qlogo { display:flex; align-items:center; justify-content:center; gap:6px; color:var(--secondary);
+        font-size:12px; font-weight:600; margin-bottom:16px; }
+      .qnote { background:color-mix(in srgb,var(--brand) 7%,var(--card)); color:var(--secondary);
+        font-size:12px; border-radius:12px; padding:10px 12px; margin-bottom:16px; line-height:1.45; }
+      .qactions { display:flex; gap:10px; }
+      .qactions button { flex:1; border:none; cursor:pointer; font:inherit; font-weight:700; font-size:15px;
+        padding:14px; border-radius:14px; transition:transform 150ms var(--ease-out); }
+      .qactions button:active { transform:scale(.97); }
+      .qactions .done { background:var(--ok); color:#fff; box-shadow:0 4px 16px color-mix(in srgb,var(--ok) 30%,transparent); }
+      .qactions .pr { background:var(--card); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); }
+
+      /* Settings sheet (bottom drawer) */
+      dialog#settings { margin:auto auto 0; border-radius:24px 24px 0 0; max-height:90vh;
+        transform:translateY(100%); transition:transform 440ms var(--ease-drawer),
+          overlay 440ms allow-discrete, display 440ms allow-discrete; }
+      dialog#settings[open] { transform:translateY(0); }
+      @starting-style { dialog#settings[open] { transform:translateY(100%); } }
+      .grabber { width:38px; height:5px; border-radius:3px; background:var(--line); margin:10px auto 0; }
+      .sin { padding:8px 18px calc(22px + var(--safe-b)); overflow-y:auto; }
+      .sin h3 { font-size:18px; letter-spacing:-0.015em; margin:6px 0 14px; }
+      .sec { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted);
+        margin:18px 0 8px; }
+      .fld { margin-bottom:11px; }
+      .fld label { display:block; font-size:12.5px; color:var(--secondary); margin-bottom:5px; font-weight:600; }
+      .fld input, .fld textarea, .fld select { width:100%; border:none; box-shadow:inset 0 0 0 1px var(--line);
+        border-radius:var(--r-ctl); padding:11px 12px; font:inherit; background:var(--bg); color:var(--ink);
+        transition:box-shadow 160ms var(--ease-out); }
+      .fld input:focus, .fld textarea:focus, .fld select:focus { outline:none; box-shadow:inset 0 0 0 2px var(--brand); }
+      .fld textarea { resize:vertical; min-height:64px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; }
+      .hint { font-size:11.5px; color:var(--muted); margin-top:5px; line-height:1.45; }
+      .seg2 { display:flex; gap:6px; }
+      .seg2 button { flex:1; border:none; cursor:pointer; font:inherit; font-weight:650; font-size:13.5px;
+        padding:10px; border-radius:var(--r-ctl); background:var(--bg); color:var(--secondary);
+        box-shadow:inset 0 0 0 1px var(--line); transition:all 150ms var(--ease-out); }
+      .seg2 button[aria-current="true"] { background:var(--ink); color:var(--card); box-shadow:none; }
+
+      /* Receipt preview */
+      .rcpt { background:#fff; color:#111; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px;
+        line-height:1.5; white-space:pre; padding:14px; border-radius:12px; box-shadow:inset 0 0 0 1px var(--line);
+        overflow-x:auto; margin-top:8px; }
+
+      .save { width:100%; margin-top:18px; border:none; cursor:pointer; background:var(--brand); color:#fff;
+        font:inherit; font-weight:700; font-size:15px; padding:14px; border-radius:14px;
+        box-shadow:0 4px 16px color-mix(in srgb,var(--brand) 30%,transparent); transition:transform 150ms var(--ease-out); }
+      .save:active { transform:scale(.98); }
+      .close { position:absolute; top:14px; right:16px; width:30px; height:30px; display:grid; place-items:center;
+        border:none; border-radius:999px; background:var(--bg); color:var(--muted); font-size:16px; cursor:pointer;
+        transition:transform 150ms var(--ease-out); }
+      .close:active { transform:scale(.9); }
+      .toast { position:fixed; left:50%; bottom:calc(160px + var(--safe-b)); transform:translateX(-50%) translateY(10px);
+        background:var(--ink); color:var(--card); padding:11px 16px; border-radius:999px; font-size:13.5px; font-weight:600;
+        box-shadow:0 8px 30px rgba(0,0,0,.28); opacity:0; pointer-events:none; z-index:30;
+        transition:opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+      .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+      @media (prefers-reduced-motion: reduce) {
+        dialog, dialog::backdrop, .key, .icon-btn, .bar button, .qactions button, .save { transition:opacity 180ms ease !important; transform:none !important; }
+      }
+
+      /* Print-only receipt (fallback when no Bluetooth) */
+      @media print {
+        body > *:not(#printArea) { display:none !important; }
+        #printArea { display:block !important; }
+      }
+      #printArea { display:none; }
+      #printArea .paper { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; white-space:pre;
+        color:#000; width:100%; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="store" id="hStore">Warung Kopi Founder+</div>
+      <span class="tag">Kasir</span>
+      <button class="icon-btn" id="openSettings" aria-label="Pengaturan">⚙︎</button>
+    </header>
+
+    <main>
+      <div class="seg" role="tablist">
+        <button id="tabAmount" aria-current="true" type="button">Nominal</button>
+        <button id="tabItems" type="button">Barang</button>
+      </div>
+
+      <!-- Nominal mode -->
+      <section id="paneAmount">
+        <div class="amount" id="amountDisplay"><span class="z">Rp 0</span></div>
+        <div class="amount-cap">Ketik nominal yang harus dibayar</div>
+        <div class="keypad" id="keypad">
+          <button class="key" data-k="1">1</button><button class="key" data-k="2">2</button><button class="key" data-k="3">3</button>
+          <button class="key" data-k="4">4</button><button class="key" data-k="5">5</button><button class="key" data-k="6">6</button>
+          <button class="key" data-k="7">7</button><button class="key" data-k="8">8</button><button class="key" data-k="9">9</button>
+          <button class="key" data-k="000">000</button><button class="key" data-k="0">0</button><button class="key" data-k="del">⌫</button>
+        </div>
+      </section>
+
+      <!-- Items mode -->
+      <section id="paneItems" hidden>
+        <div class="items" id="itemList"></div>
+        <div class="add-item">
+          <input id="inName" type="text" placeholder="Nama barang" />
+          <input id="inPrice" class="price" inputmode="numeric" placeholder="Harga" />
+          <button class="addbtn" id="addItem" type="button">Tambah</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="bar">
+      <div class="in">
+        <div class="totalrow"><span class="l">Total</span><span class="v" id="barTotal">Rp 0</span></div>
+        <div class="actions">
+          <button class="print" id="btnPrint" type="button" disabled>Struk</button>
+          <button class="qris" id="btnQris" type="button" disabled>Tampilkan QRIS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QRIS modal -->
+    <dialog id="qris">
+      <button class="close" id="qClose" aria-label="Tutup">✕</button>
+      <div class="qwrap">
+        <div class="qtitle" id="qStore">Warung Kopi Founder+</div>
+        <div class="qamt" id="qAmt">Rp 0</div>
+        <div class="qsub">Scan untuk bayar</div>
+        <div class="qbox" id="qBox"></div>
+        <div class="qlogo">QRIS · GoPay · OVO · DANA · ShopeePay · m-banking</div>
+        <div class="qnote" id="qNote"></div>
+        <div class="qactions">
+          <button class="pr" id="qPrint" type="button">Cetak struk</button>
+          <button class="done" id="qDone" type="button">Selesai</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Settings sheet -->
+    <dialog id="settings">
+      <div class="grabber"></div>
+      <button class="close" id="sClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3>Pengaturan</h3>
+
+        <div class="sec">Info toko</div>
+        <div class="fld"><label>Nama toko</label><input id="setStore" type="text" /></div>
+        <div class="fld"><label>Alamat / telepon (struk)</label><input id="setAddr" type="text" placeholder="Jl. … · 0812…" /></div>
+        <div class="fld"><label>Catatan bawah struk</label><input id="setFooter" type="text" placeholder="Terima kasih! Sampai jumpa lagi 🙏" /></div>
+
+        <div class="sec">QRIS</div>
+        <div class="fld">
+          <label>Payload QRIS statis (opsional)</label>
+          <textarea id="setQris" placeholder="00020101021126…6304XXXX"></textarea>
+          <div class="hint">Tempel isi teks dari QRIS statis merchant-mu (scan QRIS-mu sekali pakai app pemindai untuk lihat teksnya, atau minta ke penyedia QRIS). Kalau diisi, kasir bikin <b>QRIS dinamis</b> otomatis dengan nominal + CRC yang benar. Kalau kosong, QRIS tampil sebagai kode nominal-saja (pelanggan ketik nominal manual).</div>
+        </div>
+
+        <div class="sec">Struk</div>
+        <div class="fld">
+          <label>Lebar kertas</label>
+          <div class="seg2" id="paperSeg">
+            <button data-w="32" type="button">58 mm</button>
+            <button data-w="48" type="button">80 mm</button>
+          </div>
+        </div>
+        <div class="fld"><label>Pratinjau struk</label><div class="rcpt" id="rcptPreview"></div></div>
+
+        <button class="save" id="saveSettings" type="button">Simpan</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast"></div>
+    <div id="printArea"><div class="paper" id="printPaper"></div></div>
+
+    <script src="qrcode.vendor.js"></script>
+    <script>
+      // ═══════════════════════════ STATE ═══════════════════════════
+      const LS_KEY = "fp_kasir_settings_v1";
+      const DEFAULTS = {
+        store: "Warung Kopi Founder+",
+        address: "",
+        footer: "Terima kasih! 🙏",
+        qrisPayload: "",
+        paperWidth: 32, // chars: 32 (58mm) | 48 (80mm)
+      };
+      let settings = load();
+      let mode = "amount";          // "amount" | "items"
+      let amountDigits = "";        // typed rupiah string (integer)
+      const items = [];             // { id, name, price, qty }
+
+      function load() {
+        try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(LS_KEY)) || {}) }; }
+        catch { return { ...DEFAULTS }; }
+      }
+      function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(settings)); } catch {} }
+
+      const fmt = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+      // ═══════════════════════════ QRIS ═══════════════════════════
+      // CRC16-CCITT (False) over UTF-8 bytes — verified against the EMVCo test
+      // vector (…6304A13A). QRIS uses this exact CRC.
+      const UTF8 = new TextEncoder();
+      function crc16(str) {
+        const bytes = UTF8.encode(str);
+        let crc = 0xffff;
+        for (const b of bytes) {
+          crc ^= b << 8;
+          for (let j = 0; j < 8; j++) { crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1); crc &= 0xffff; }
+        }
+        return crc.toString(16).toUpperCase().padStart(4, "0");
+      }
+      function parseTLV(s) {
+        const out = []; let i = 0;
+        while (i + 4 <= s.length) {
+          const tag = s.slice(i, i + 2);
+          const len = parseInt(s.slice(i + 2, i + 4), 10);
+          if (Number.isNaN(len)) break;
+          out.push({ tag, value: s.slice(i + 4, i + 4 + len) });
+          i += 4 + len;
+        }
+        return out;
+      }
+      const emv = (tag, v) => tag + String(v.length).padStart(2, "0") + v;
+      // Static merchant QRIS → dynamic with amount. Genuinely payable because it
+      // derives from the merchant's real static payload (same account); we only
+      // flip the dynamic flag, inject the amount, and recompute the CRC.
+      function toDynamicQris(staticPayload, amountInt) {
+        const clean = staticPayload.replace(/\s+/g, "");
+        const tlv = parseTLV(clean).filter((t) => t.tag !== "63");
+        if (!tlv.some((t) => t.tag === "00")) return null; // not a QRIS payload
+        const map = new Map(tlv.map((t) => [t.tag, t.value]));
+        map.set("01", "12");
+        map.set("54", String(amountInt));
+        const tags = [...map.keys()].sort((a, b) => Number(a) - Number(b));
+        let body = tags.map((t) => emv(t, map.get(t))).join("") + "6304";
+        return body + crc16(body);
+      }
+
+      // ═══════════════════════════ TOTALS ═══════════════════════════
+      function currentTotal() {
+        if (mode === "amount") return Number(amountDigits || 0);
+        return items.reduce((s, it) => s + it.price * it.qty, 0);
+      }
+      function currentLines() {
+        if (mode === "amount") {
+          const t = currentTotal();
+          return t > 0 ? [{ name: "Pembayaran", qty: 1, price: t }] : [];
+        }
+        return items.map((it) => ({ name: it.name, qty: it.qty, price: it.price }));
+      }
+
+      // ═══════════════════════════ RENDER ═══════════════════════════
+      function renderAmount() {
+        const t = Number(amountDigits || 0);
+        $("amountDisplay").innerHTML = t > 0 ? esc(fmt(t)) : `<span class="z">Rp 0</span>`;
+      }
+      function renderItems() {
+        const root = $("itemList");
+        root.innerHTML = "";
+        if (items.length === 0) { root.innerHTML = `<div class="empty">Belum ada barang. Tambah di bawah 👇</div>`; return; }
+        for (const it of items) {
+          const el = document.createElement("div");
+          el.className = "irow";
+          el.innerHTML = `
+            <div class="info"><div class="nm">${esc(it.name)}</div><div class="pr">${esc(fmt(it.price))} × ${it.qty} = ${esc(fmt(it.price*it.qty))}</div></div>
+            <div class="stp">
+              <button type="button" data-dec="${it.id}" aria-label="Kurangi">−</button>
+              <span class="q">${it.qty}</span>
+              <button type="button" data-inc="${it.id}" aria-label="Tambah">+</button>
+            </div>`;
+          root.appendChild(el);
+        }
+      }
+      function renderBar() {
+        const t = currentTotal();
+        $("barTotal").textContent = fmt(t);
+        $("btnQris").disabled = t <= 0;
+        $("btnPrint").disabled = t <= 0;
+      }
+      function refresh() { renderAmount(); renderItems(); renderBar(); }
+
+      // ═══════════════════════════ INPUT ═══════════════════════════
+      $("keypad").addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        const k = b.dataset.k;
+        if (k === "del") amountDigits = amountDigits.slice(0, -1);
+        else if (k === "000") { if (amountDigits) amountDigits += "000"; }
+        else amountDigits = (amountDigits + k).replace(/^0+/, "").slice(0, 12);
+        refresh();
+      });
+      $("addItem").addEventListener("click", addItemFromForm);
+      $("inPrice").addEventListener("keydown", (e) => { if (e.key === "Enter") addItemFromForm(); });
+      function addItemFromForm() {
+        const name = $("inName").value.trim();
+        const price = Number(String($("inPrice").value).replace(/[^\d]/g, ""));
+        if (!name || !(price > 0)) { toast("Isi nama & harga barang"); return; }
+        items.push({ id: "i" + Date.now() + Math.round(performance.now()), name, price, qty: 1 });
+        $("inName").value = ""; $("inPrice").value = ""; $("inName").focus();
+        refresh();
+      }
+      $("itemList").addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        const id = b.dataset.inc || b.dataset.dec;
+        const it = items.find((x) => x.id === id); if (!it) return;
+        it.qty += b.dataset.inc ? 1 : -1;
+        if (it.qty <= 0) items.splice(items.indexOf(it), 1);
+        refresh();
+      });
+
+      // Tabs
+      function setMode(m) {
+        mode = m;
+        $("tabAmount").setAttribute("aria-current", m === "amount");
+        $("tabItems").setAttribute("aria-current", m === "items");
+        $("paneAmount").hidden = m !== "amount";
+        $("paneItems").hidden = m !== "items";
+        refresh();
+      }
+      $("tabAmount").onclick = () => setMode("amount");
+      $("tabItems").onclick = () => setMode("items");
+
+      // ═══════════════════════════ QRIS MODAL ═══════════════════════════
+      $("btnQris").onclick = showQris;
+      function showQris() {
+        const total = currentTotal();
+        if (total <= 0) return;
+        $("qStore").textContent = settings.store;
+        $("qAmt").textContent = fmt(total);
+        const box = $("qBox");
+        let payload = null, dynamic = false;
+        if (settings.qrisPayload.trim()) {
+          payload = toDynamicQris(settings.qrisPayload, total);
+          dynamic = !!payload;
+        }
+        if (payload) {
+          box.innerHTML = qrSvg(payload);
+          $("qNote").innerHTML = "QRIS dinamis — nominal <b>" + esc(fmt(total)) + "</b> sudah termasuk. Pelanggan tinggal scan & konfirmasi.";
+        } else {
+          // No merchant payload: encode a human-payable note (amount only). This
+          // is NOT a valid QRIS — we say so plainly instead of faking one.
+          box.innerHTML = qrSvg(`Tagihan ${settings.store}: ${fmt(total)}`);
+          $("qNote").innerHTML = "Belum ada payload QRIS di Pengaturan, jadi ini <b>bukan QRIS</b>. Tampilkan QRIS statis tokomu ke pelanggan lalu minta ketik nominal <b>" + esc(fmt(total)) + "</b>. Isi payload QRIS di ⚙︎ untuk QRIS dinamis otomatis.";
+        }
+        $("qris").showModal();
+      }
+      function qrSvg(text) {
+        const qr = qrcode(0, "M");
+        qr.addData(text);
+        qr.make();
+        return qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
+      }
+      $("qClose").onclick = () => $("qris").close();
+      $("qDone").onclick = () => { $("qris").close(); resetSale(); toast("Transaksi selesai ✓"); };
+      $("qPrint").onclick = () => printReceipt();
+      function resetSale() { amountDigits = ""; items.length = 0; refresh(); }
+
+      // ═══════════════════════════ RECEIPT ═══════════════════════════
+      function receiptModel() {
+        return { store: settings.store, address: settings.address, footer: settings.footer,
+          lines: currentLines(), total: currentTotal(), width: settings.paperWidth,
+          time: new Date().toLocaleString("id-ID", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }) };
+      }
+      // Plain-text receipt (used for the preview + the print() fallback).
+      function receiptText(m) {
+        const W = m.width;
+        const center = (s) => { s = s.slice(0, W); const pad = Math.max(0, Math.floor((W - s.length) / 2)); return " ".repeat(pad) + s; };
+        const lr = (l, r) => { l = String(l); r = String(r); const room = W - r.length - 1; if (l.length > room) l = l.slice(0, room - 1) + "…"; return l + " ".repeat(Math.max(1, W - l.length - r.length)) + r; };
+        const rule = "-".repeat(W);
+        const out = [];
+        out.push(center(m.store));
+        if (m.address) m.address.match(new RegExp(".{1," + W + "}", "g")).forEach((ln) => out.push(center(ln)));
+        out.push(center(m.time));
+        out.push(rule);
+        for (const it of m.lines) {
+          out.push(lr(it.name, ""));
+          out.push(lr(`  ${it.qty} x ${fmt(it.price)}`, fmt(it.price * it.qty)));
+        }
+        out.push(rule);
+        out.push(lr("TOTAL", fmt(m.total)));
+        out.push(lr("Bayar", "QRIS"));
+        out.push(rule);
+        if (m.footer) m.footer.match(new RegExp(".{1," + W + "}", "g")).forEach((ln) => out.push(center(ln)));
+        return out.join("\n");
+      }
+
+      // ESC/POS byte stream for a Bluetooth thermal printer.
+      function escposBytes(m) {
+        const bytes = [];
+        const raw = (...b) => bytes.push(...b);
+        const txt = (s) => { for (const b of UTF8.encode(s)) bytes.push(b); };
+        const line = (s = "") => { txt(s); raw(0x0a); };
+        const W = m.width;
+        const lr = (l, r) => { l = String(l); r = String(r); const room = W - r.length - 1; if (l.length > room) l = l.slice(0, room - 1) + "…"; return l + " ".repeat(Math.max(1, W - l.length - r.length)) + r; };
+        raw(0x1b, 0x40);                 // init
+        raw(0x1b, 0x61, 0x01);           // center
+        raw(0x1d, 0x21, 0x11);           // double width+height
+        raw(0x1b, 0x45, 0x01);           // bold on
+        line(m.store);
+        raw(0x1d, 0x21, 0x00); raw(0x1b, 0x45, 0x00); // normal, bold off
+        if (m.address) line(m.address);
+        line(m.time);
+        raw(0x1b, 0x61, 0x00);           // left
+        line("-".repeat(W));
+        for (const it of m.lines) {
+          line(it.name);
+          line(lr(`  ${it.qty} x ${fmt(it.price)}`, fmt(it.price * it.qty)));
+        }
+        line("-".repeat(W));
+        raw(0x1b, 0x45, 0x01); line(lr("TOTAL", fmt(m.total))); raw(0x1b, 0x45, 0x00);
+        line(lr("Bayar", "QRIS"));
+        line("-".repeat(W));
+        raw(0x1b, 0x61, 0x01);           // center
+        if (m.footer) line(m.footer);
+        raw(0x0a, 0x0a, 0x0a);           // feed
+        raw(0x1d, 0x56, 0x42, 0x00);     // partial cut (GS V B 0)
+        return new Uint8Array(bytes);
+      }
+
+      // Common BLE thermal-printer service UUIDs (varies by model).
+      const PRINTER_SERVICES = [
+        0x18f0, 0xff00, 0xffe0,
+        "000018f0-0000-1000-8000-00805f9b34fb",
+        "0000ff00-0000-1000-8000-00805f9b34fb",
+        "0000ffe0-0000-1000-8000-00805f9b34fb",
+        "49535343-fe7d-4ae5-8fa9-9fafd205e455",
+      ];
+      async function printBluetooth(bytes) {
+        const device = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: PRINTER_SERVICES });
+        const server = await device.gatt.connect();
+        const services = await server.getPrimaryServices();
+        let ch = null;
+        for (const s of services) {
+          for (const c of await s.getCharacteristics()) {
+            if (c.properties.write || c.properties.writeWithoutResponse) { ch = c; break; }
+          }
+          if (ch) break;
+        }
+        if (!ch) throw new Error("Printer tidak punya karakteristik tulis yang dikenal.");
+        const CHUNK = 180;
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+          const part = bytes.slice(i, i + CHUNK);
+          if (ch.properties.writeWithoutResponse) await ch.writeValueWithoutResponse(part);
+          else await ch.writeValue(part);
+          await new Promise((r) => setTimeout(r, 24));
+        }
+        try { server.disconnect(); } catch {}
+      }
+
+      async function printReceipt() {
+        if (currentTotal() <= 0) return;
+        const m = receiptModel();
+        if ("bluetooth" in navigator) {
+          try {
+            toast("Pilih printer…");
+            await printBluetooth(escposBytes(m));
+            toast("Struk tercetak ✓");
+            return;
+          } catch (err) {
+            if (err && err.name === "NotFoundError") { toast("Batal pilih printer"); return; }
+            toast("Bluetooth gagal — pakai print biasa");
+            // fall through to print() fallback
+          }
+        } else {
+          toast("Web Bluetooth tak didukung — pakai print biasa");
+        }
+        // Fallback: OS print dialog (works on iOS/desktop; can hit AirPrint / PDF).
+        $("printPaper").textContent = receiptText(m);
+        window.print();
+      }
+      $("btnPrint").onclick = () => printReceipt();
+
+      // ═══════════════════════════ SETTINGS ═══════════════════════════
+      $("openSettings").onclick = openSettings;
+      function openSettings() {
+        $("setStore").value = settings.store;
+        $("setAddr").value = settings.address;
+        $("setFooter").value = settings.footer;
+        $("setQris").value = settings.qrisPayload;
+        paperSegUI(settings.paperWidth);
+        renderPreview();
+        $("settings").showModal();
+      }
+      function paperSegUI(w) {
+        for (const b of document.querySelectorAll("#paperSeg button")) b.setAttribute("aria-current", Number(b.dataset.w) === Number(w));
+      }
+      document.getElementById("paperSeg").addEventListener("click", (e) => {
+        const b = e.target.closest("button"); if (!b) return;
+        paperSegUI(Number(b.dataset.w)); renderPreview();
+      });
+      ["setStore","setAddr","setFooter","setQris"].forEach((id) => $(id).addEventListener("input", renderPreview));
+      function draftFromForm() {
+        const w = Number(document.querySelector('#paperSeg button[aria-current="true"]')?.dataset.w || settings.paperWidth);
+        return { store: $("setStore").value.trim() || "Toko", address: $("setAddr").value.trim(),
+          footer: $("setFooter").value.trim(), qrisPayload: $("setQris").value.trim(), paperWidth: w };
+      }
+      function renderPreview() {
+        const d = draftFromForm();
+        const sample = { store: d.store, address: d.address, footer: d.footer, width: d.paperWidth,
+          time: "01 Jan 2026, 09:41",
+          lines: (currentLines().length ? currentLines() : [{ name: "Kopi Susu", qty: 2, price: 22000 }, { name: "Croissant", qty: 1, price: 20000 }]),
+          total: (currentTotal() || 64000) };
+        $("rcptPreview").textContent = receiptText(sample);
+      }
+      $("saveSettings").onclick = () => {
+        settings = { ...settings, ...draftFromForm() };
+        persist();
+        applyChrome();
+        $("settings").close();
+        toast("Pengaturan tersimpan ✓");
+      };
+      $("sClose").onclick = () => $("settings").close();
+      document.querySelectorAll("dialog").forEach((d) => d.addEventListener("click", (e) => { if (e.target === d) d.close(); }));
+
+      function applyChrome() {
+        $("hStore").textContent = settings.store;
+        document.title = "Kasir — " + settings.store;
+      }
+
+      // ═══════════════════════════ TOAST ═══════════════════════════
+      let toastT;
+      function toast(msg) {
+        const el = $("toast"); el.textContent = msg; el.classList.add("show");
+        clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 2200);
+      }
+
+      // ═══════════════════════════ BOOT ═══════════════════════════
+      applyChrome();
+      setMode("amount");
+      refresh();
+    </script>
+  </body>
+</html>

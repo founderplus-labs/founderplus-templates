@@ -531,18 +531,21 @@
     },
     {
       "name": "pos-qr-menu",
-      "title": "POS QR-Menu (scan meja → pesan)",
-      "description": "No-build QR ordering for dine-in POS: customer scans a per-table QR, sees the menu, and orders from their phone with the table number attached. Orders route to WhatsApp today, or to the Founder+ POS backend when configured. Ships an offline QR print tool (tables.html). Deploy index.html with fp sites publish.",
+      "title": "POS QR-Menu + Kasir (QRIS · struk Bluetooth)",
+      "description": "No-build dine-in POS suite. Customers scan a per-table QR, see the menu, and order from their phone with the table number attached (WhatsApp today, Founder+ POS backend when configured). Cashier (kasir.html): enter an amount or itemized bill, show a dynamic QRIS (built from the merchant static payload with a correct EMVCo CRC), and print an ESC/POS receipt to a Bluetooth thermal printer — customizable (store info, footer, 58/80mm), with a window.print fallback. Plus an offline per-table QR print tool (tables.html).",
       "runtime": "static",
       "stack": [
         "html",
         "no-build",
         "pos",
-        "qr"
+        "qr",
+        "qris",
+        "bluetooth"
       ],
       "postInstall": [
         "Edit CONFIG + MENU in index.html (store, WhatsApp, items)",
         "fp sites publish index.html",
+        "Open kasir.html to take payments (paste your QRIS payload in Settings)",
         "Open tables.html in a browser to print per-table QR codes"
       ],
       "setupDoc": "SETUP.md",
@@ -550,14 +553,20 @@
         {
           "path": "SETUP.md",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/SETUP.md",
-          "digest": "sha256:effd33eedb9040416f54f4a41eb00e3112de77513185a52b38e13ef3b7128875",
-          "size": 3807
+          "digest": "sha256:d26372dbda1565c9e6644b817c9d7e36a436a3ae4c7944347e1f119be9e17f80",
+          "size": 5579
         },
         {
           "path": "index.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/index.html",
           "digest": "sha256:2ff7c3cc62a9fba84deaf67389edebc14d1435195aa0e3a14ff096151f07cdee",
           "size": 32442
+        },
+        {
+          "path": "kasir.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/kasir.html",
+          "digest": "sha256:dc93e4b3a49bc3affb78d7476126912441deb66ce03472102bc5a759bd66a53f",
+          "size": 37639
         },
         {
           "path": "qrcode.vendor.js",

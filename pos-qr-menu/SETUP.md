@@ -14,8 +14,9 @@ satu file HTML.
 | File | Untuk siapa | Fungsi |
 |------|-------------|--------|
 | `index.html` | **Pelanggan** | Halaman menu + keranjang + kirim pesanan. Baca nomor meja dari URL (`?meja=A1`). |
+| `kasir.html` | **Kamu (owner)** | Kasir: input nominal/barang → **tampilkan QRIS dinamis** ke pelanggan → **cetak struk ke printer Bluetooth** (bisa dikustom). |
 | `tables.html` | **Kamu (owner)** | Generate + print QR untuk tiap meja. Buka di browser, klik Print/PDF, potong, tempel di meja. |
-| `qrcode.vendor.js` | — | Encoder QR offline (MIT, tanpa CDN pihak ketiga). Dipakai `tables.html`. |
+| `qrcode.vendor.js` | — | Encoder QR offline (MIT, tanpa CDN pihak ketiga). Dipakai `kasir.html` + `tables.html`. |
 
 ## 3 langkah
 
@@ -89,6 +90,34 @@ pesanan tidak pernah hilang diam-diam.
 
 > Environment mengikuti CLI: production `api.founderplus.id`, dev
 > `ops.founderplus.id`. Ganti host `posApi` sesuai environment yang kamu pakai.
+
+## Kasir — QRIS dinamis + cetak struk (`kasir.html`)
+
+Buka `kasir.html` di HP/tablet (Android Chrome disarankan untuk Bluetooth). Ada 2
+mode input: **Nominal** (keypad) atau **Barang** (daftar item). Lalu:
+
+**Tampilkan QRIS.** Kasir menampilkan QR untuk dibayar pelanggan.
+- Buka **⚙︎ → QRIS**, tempel **payload QRIS statis** merchant-mu (teks di dalam
+  QRIS statis — scan QRIS-mu sekali pakai app pemindai untuk melihat teksnya,
+  atau minta ke penyedia QRIS: GoPay Merchant, OVO, bank, dll).
+- Kasir mengubahnya jadi **QRIS dinamis**: nominal ikut tertanam + **CRC16
+  dihitung ulang dengan benar** (diverifikasi terhadap test vector EMVCo). QR
+  ini valid dibayar karena berasal dari akun QRIS aslimu.
+- Kalau payload belum diisi, kasir jujur bilang itu **bukan QRIS** — tampilkan
+  QRIS statismu dan minta pelanggan ketik nominalnya. Kami tidak pernah memalsukan
+  QRIS yang tidak bisa dibayar.
+
+**Cetak struk (Bluetooth).** Tombol **Struk** mencetak ke printer termal Bluetooth
+(ESC/POS).
+- Jalan di **Android Chrome / desktop Chrome** (Web Bluetooth). **iOS Safari tidak
+  mendukung Web Bluetooth** — di situ otomatis fallback ke dialog **print biasa**
+  (AirPrint / simpan PDF), jadi tetap bisa cetak.
+- Kustomisasi di **⚙︎ → Struk**: nama toko, alamat/telepon, catatan bawah, dan
+  **lebar kertas 58/80 mm** — lengkap dengan **pratinjau struk** langsung.
+- Semua pengaturan tersimpan di browser (localStorage) — tak ada yang dikirim keluar.
+
+> QRIS statis→dinamis + struk dibuat 100% di browser. Tidak ada data transaksi yang
+> dikirim ke pihak ketiga.
 
 ## Catatan
 

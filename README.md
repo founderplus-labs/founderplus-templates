@@ -12,7 +12,7 @@ and checkout; your app just gates content by product ownership.
 | Name | Stack | What you get |
 |------|-------|--------------|
 | **`static-landing`** | HTML · no-build | One-file sell page + funnel-tracker buy button. Zero server. Lowest friction — deploy with `fp sites publish`. |
-| **`pos-qr-menu`** | HTML · no-build | Dine-in **POS QR ordering**: customer scans a per-table QR → menu → orders from their phone with the table number attached. WhatsApp today, Founder+ POS backend when ready. Includes an offline QR print tool. |
+| **`pos-qr-menu`** | HTML · no-build | Dine-in **POS suite**: customers scan a per-table QR → menu → order (table attached). Plus a **cashier** (`kasir.html`) — enter amount/items → show **dynamic QRIS** → print an **ESC/POS Bluetooth receipt** (customizable) — and an offline per-table QR print tool. |
 | **`ai-studio`** | Google AI Studio · static · CDN | Product-specific prompts → Gemini generates a static selling page wired to the Founder+ CDN checkout. |
 | **`fp-fullstack`** | TanStack Start · Cloudflare · Tailwind · React 19 | Login + product gate + checkout + tracking. Full app. |
 | **`astro`** | Astro SSR · Cloudflare | Login + gate + checkout. Content + interactive islands. |
