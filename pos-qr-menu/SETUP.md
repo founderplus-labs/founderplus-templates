@@ -14,7 +14,7 @@ satu file HTML.
 | File | Untuk siapa | Fungsi |
 |------|-------------|--------|
 | `index.html` | **Pelanggan** | Halaman menu + keranjang + kirim pesanan. Baca nomor meja dari URL (`?meja=A1`). |
-| `kasir.html` | **Kamu (owner)** | Kasir: input nominal/barang → **tampilkan QRIS dinamis** ke pelanggan → **cetak struk ke printer Bluetooth** (bisa dikustom). |
+| `kasir.html` | **Kamu (owner)** | Kasir: input nominal/barang → metode bayar (QRIS/transfer/tunai) + bukti → **cetak struk Bluetooth** (bisa dikustom). |
 | `tables.html` | **Kamu (owner)** | Generate + print QR untuk tiap meja. Buka di browser, klik Print/PDF, potong, tempel di meja. |
 | `qrcode.vendor.js` | — | Encoder QR offline (MIT, tanpa CDN pihak ketiga). Dipakai `kasir.html` + `tables.html`. |
 
@@ -34,17 +34,17 @@ const CONFIG = {
 
 const MENU = [
   { id: "kopi-susu", name: "Kopi Susu", desc: "…", price: 22000, category: "Kopi",
-    available: true, image: "https://…/kopi.jpg", emoji: "☕️" },
+    available: true, image: "https://…/kopi.jpg", icon: "coffee" },
   // set available:false untuk item habis
 ];
 ```
 
 - `price` = angka rupiah polos (tanpa titik/koma). `id` harus unik.
 - `image` (opsional) = URL foto produk. Kalau kosong, tampil **placeholder
-  gradient + emoji** otomatis — menu tetap rapi sebelum kamu pasang foto.
+  gradient + ikon** otomatis — menu tetap rapi sebelum kamu pasang foto.
   Foto asli sangat disarankan: pelanggan memilih lewat gambar.
-- `emoji` (opsional) = emoji placeholder per item; default ikut kategori
-  (atur di `CONFIG.categoryEmoji`).
+- `icon` (opsional) = ikon placeholder per item: `coffee` | `cup` | `food`
+  (default ikut kategori di `CONFIG.categoryIcon`). Ikon SVG line, bukan emoji.
 
 ### 2. Publish halaman menu
 ```bash
@@ -97,12 +97,12 @@ Buka `kasir.html` di HP/tablet (Android Chrome disarankan untuk Bluetooth). Ada 
 mode input: **Nominal** (keypad) atau **Barang** (daftar item). Lalu tekan
 **Bayar** dan pilih metode: **QRIS**, **Transfer bank**, atau **Tunai**.
 
-**Transfer bank (nomor rekening sendiri).** Tambah rekeningmu di **⚙︎ → Rekening
+**Transfer bank (nomor rekening sendiri).** Tambah rekeningmu di **Pengaturan → Rekening
 bank** (bank, no. rekening, atas nama — boleh lebih dari satu). Saat pilih
 Transfer, kasir menampilkan rekening-rekening itu + tombol **Salin** dan nominal
 yang harus ditransfer pelanggan.
 
-**Foto bukti pembayaran.** Di layar Transfer/Tunai ada **📷 Lampirkan foto bukti
+**Foto bukti pembayaran.** Di layar Transfer/Tunai ada **Lampirkan foto bukti
 pembayaran** — potret struk transfer / layar sukses m-banking pelanggan. Bisa
 **diganti** atau **diunduh**, dan struk mencatat "Bukti bayar: terlampir". Foto
 disimpan di HP ini saja (tidak diunggah ke mana pun).
@@ -111,7 +111,7 @@ disimpan di HP ini saja (tidak diunggah ke mana pun).
 dihitung otomatis; struk mencantumkan Tunai + Kembalian.
 
 **Tampilkan QRIS.** Kasir menampilkan QR untuk dibayar pelanggan.
-- Buka **⚙︎ → QRIS**, tempel **payload QRIS statis** merchant-mu (teks di dalam
+- Buka **Pengaturan → QRIS**, tempel **payload QRIS statis** merchant-mu (teks di dalam
   QRIS statis — scan QRIS-mu sekali pakai app pemindai untuk melihat teksnya,
   atau minta ke penyedia QRIS: GoPay Merchant, OVO, bank, dll).
 - Kasir mengubahnya jadi **QRIS dinamis**: nominal ikut tertanam + **CRC16
@@ -126,7 +126,7 @@ dihitung otomatis; struk mencantumkan Tunai + Kembalian.
 - Jalan di **Android Chrome / desktop Chrome** (Web Bluetooth). **iOS Safari tidak
   mendukung Web Bluetooth** — di situ otomatis fallback ke dialog **print biasa**
   (AirPrint / simpan PDF), jadi tetap bisa cetak.
-- Kustomisasi di **⚙︎ → Struk**: nama toko, alamat/telepon, catatan bawah, dan
+- Kustomisasi di **Pengaturan → Struk**: nama toko, alamat/telepon, catatan bawah, dan
   **lebar kertas 58/80 mm** — lengkap dengan **pratinjau struk** langsung.
 - Semua pengaturan tersimpan di browser (localStorage) — tak ada yang dikirim keluar.
 

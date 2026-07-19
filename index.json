@@ -553,20 +553,20 @@
         {
           "path": "SETUP.md",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/SETUP.md",
-          "digest": "sha256:5e1f0cf1c26214d9f1d94fb8e9013d1ecfd9530813f972f569efde43992a0fca",
-          "size": 6374
+          "digest": "sha256:24679cab9e182cd441ec633afc44fe1c239466da3774e3e591f842ea917d2394",
+          "size": 6417
         },
         {
           "path": "index.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/index.html",
-          "digest": "sha256:2ff7c3cc62a9fba84deaf67389edebc14d1435195aa0e3a14ff096151f07cdee",
-          "size": 32442
+          "digest": "sha256:16dee48dfcc96e79c6642947211e22e1719f9d3682707806eef152a211fc64cf",
+          "size": 34147
         },
         {
           "path": "kasir.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/kasir.html",
-          "digest": "sha256:2af8c8237940cdd078463957cb97c476869466e954d492d20b28141a087a0d8a",
-          "size": 55683
+          "digest": "sha256:c824c60a74e8958c9286da2cb64028f76ba742e650130ae0c91289447954d3d3",
+          "size": 58351
         },
         {
           "path": "qrcode.vendor.js",

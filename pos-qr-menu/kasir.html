@@ -49,6 +49,10 @@
         background:var(--card); box-shadow:inset 0 0 0 1px var(--line); color:var(--ink); font-size:17px;
         display:grid; place-items:center; transition:transform 150ms var(--ease-out); }
       .icon-btn:active { transform:scale(.9); }
+      .icon-btn svg { width:19px; height:19px; }
+      .method .mi svg { width:23px; height:23px; }
+      .proof-drop svg { width:18px; height:18px; }
+      .bank .del svg { width:18px; height:18px; }
 
       main { max-width:520px; margin:0 auto; padding:14px 16px 8px; }
 
@@ -205,7 +209,7 @@
         margin-bottom:10px; text-align:left; font:inherit; color:var(--ink);
         transition:transform 150ms var(--ease-out), box-shadow 160ms var(--ease-out); }
       .method:active { transform:scale(.985); }
-      .method .mi { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-size:21px; flex:0 0 44px;
+      .method .mi { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; color:var(--brand-ink); flex:0 0 44px;
         background:var(--brand-soft); }
       .method .mt { flex:1; min-width:0; }
       .method .mt .ml { display:block; font-weight:650; font-size:15.5px; letter-spacing:-0.01em; }
@@ -274,7 +278,7 @@
     <header>
       <div class="store" id="hStore">Warung Kopi Founder+</div>
       <span class="tag">Kasir</span>
-      <button class="icon-btn" id="openSettings" aria-label="Pengaturan">⚙︎</button>
+      <button class="icon-btn" id="openSettings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </header>
 
     <main>
@@ -340,17 +344,17 @@
       <div class="sin">
         <h3>Metode bayar · <span id="mAmt">Rp 0</span></h3>
         <button class="method" id="mQris" type="button">
-          <span class="mi">📱</span>
+          <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></span>
           <span class="mt"><span class="ml">QRIS</span><span class="ms">GoPay, OVO, DANA, m-banking</span></span>
           <span class="chev">›</span>
         </button>
         <button class="method" id="mTransfer" type="button">
-          <span class="mi">🏦</span>
+          <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span>
           <span class="mt"><span class="ml">Transfer bank</span><span class="ms" id="mTransferSub">Ke rekeningmu</span></span>
           <span class="chev">›</span>
         </button>
         <button class="method" id="mCash" type="button">
-          <span class="mi">💵</span>
+          <span class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></span>
           <span class="mt"><span class="ml">Tunai</span><span class="ms">Bayar cash + hitung kembalian</span></span>
           <span class="chev">›</span>
         </button>
@@ -404,7 +408,7 @@
         <div class="sec">Info toko</div>
         <div class="fld"><label>Nama toko</label><input id="setStore" type="text" /></div>
         <div class="fld"><label>Alamat / telepon (struk)</label><input id="setAddr" type="text" placeholder="Jl. … · 0812…" /></div>
-        <div class="fld"><label>Catatan bawah struk</label><input id="setFooter" type="text" placeholder="Terima kasih! Sampai jumpa lagi 🙏" /></div>
+        <div class="fld"><label>Catatan bawah struk</label><input id="setFooter" type="text" placeholder="Terima kasih! Sampai jumpa lagi" /></div>
 
         <div class="sec">QRIS</div>
         <div class="fld">
@@ -447,7 +451,7 @@
       const DEFAULTS = {
         store: "Warung Kopi Founder+",
         address: "",
-        footer: "Terima kasih! 🙏",
+        footer: "Terima kasih!",
         qrisPayload: "",
         banks: [],                  // [{ bank, number, holder }]
         paperWidth: 32, // chars: 32 (58mm) | 48 (80mm)
@@ -470,6 +474,12 @@
       const fmt = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
       const $ = (id) => document.getElementById(id);
       const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+      // Inline line icons (monochrome, currentColor) — no emoji.
+      const IC = {
+        camera: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`,
+        trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>`,
+      };
 
       // ═══════════════════════════ QRIS ═══════════════════════════
       // CRC16-CCITT (False) over UTF-8 bytes — verified against the EMVCo test
@@ -532,7 +542,7 @@
       function renderItems() {
         const root = $("itemList");
         root.innerHTML = "";
-        if (items.length === 0) { root.innerHTML = `<div class="empty">Belum ada barang. Tambah di bawah 👇</div>`; return; }
+        if (items.length === 0) { root.innerHTML = `<div class="empty">Belum ada barang. Tambah di bawah</div>`; return; }
         for (const it of items) {
           const el = document.createElement("div");
           el.className = "irow";
@@ -600,7 +610,7 @@
         $("mAmt").textContent = fmt(currentTotal());
         $("mTransferSub").textContent = settings.banks.length
           ? "Ke " + settings.banks.map((b) => b.bank).join(" / ")
-          : "Tambah rekening di ⚙︎ dulu";
+          : "Tambah rekening di Pengaturan dulu";
         $("methods").showModal();
       };
       $("mQris").onclick = () => { $("methods").close(); payMethod = "QRIS"; showQris(); };
@@ -628,7 +638,7 @@
           // No merchant payload: encode a human-payable note (amount only). This
           // is NOT a valid QRIS — we say so plainly instead of faking one.
           box.innerHTML = qrSvg(`Tagihan ${settings.store}: ${fmt(total)}`);
-          $("qNote").innerHTML = "Belum ada payload QRIS di Pengaturan, jadi ini <b>bukan QRIS</b>. Tampilkan QRIS statis tokomu ke pelanggan lalu minta ketik nominal <b>" + esc(fmt(total)) + "</b>. Isi payload QRIS di ⚙︎ untuk QRIS dinamis otomatis.";
+          $("qNote").innerHTML = "Belum ada payload QRIS di Pengaturan, jadi ini <b>bukan QRIS</b>. Tampilkan QRIS statis tokomu ke pelanggan lalu minta ketik nominal <b>" + esc(fmt(total)) + "</b>. Isi payload QRIS di Pengaturan untuk QRIS dinamis otomatis.";
         }
         $("qris").showModal();
       }
@@ -641,7 +651,7 @@
       $("qClose").onclick = () => $("qris").close();
       $("qDone").onclick = () => { $("qris").close(); finishSale(); };
       $("qPrint").onclick = () => printReceipt();
-      function finishSale() { resetSale(); toast("Transaksi selesai ✓"); }
+      function finishSale() { resetSale(); toast("Transaksi selesai"); }
       function resetSale() {
         amountDigits = ""; items.length = 0;
         payMethod = null; cashReceived = 0; proofUrl = null;
@@ -766,7 +776,7 @@
           try {
             toast("Pilih printer…");
             await printBluetooth(escposBytes(m));
-            toast("Struk tercetak ✓");
+            toast("Struk tercetak");
             return;
           } catch (err) {
             if (err && err.name === "NotFoundError") { toast("Batal pilih printer"); return; }
@@ -790,14 +800,14 @@
           const f = inp.files && inp.files[0];
           if (!f) return;
           const rd = new FileReader();
-          rd.onload = () => { proofUrl = rd.result; renderProofSlots(); toast("Bukti dilampirkan ✓"); };
+          rd.onload = () => { proofUrl = rd.result; renderProofSlots(); toast("Bukti dilampirkan"); };
           rd.readAsDataURL(f);
         };
         inp.click();
       }
       function proofUI(container) {
         if (!proofUrl) {
-          container.innerHTML = `<button class="proof-drop" type="button" data-proofpick>📷 Lampirkan foto bukti pembayaran</button>`;
+          container.innerHTML = `<button class="proof-drop" type="button" data-proofpick>${IC.camera} Lampirkan foto bukti pembayaran</button>`;
         } else {
           container.innerHTML =
             `<div class="proof-thumb"><img src="${proofUrl}" alt="Bukti pembayaran"><button class="rm" type="button" data-proofrm aria-label="Hapus">✕</button></div>` +
@@ -826,7 +836,7 @@
         $("tAmt").textContent = fmt(currentTotal());
         const root = $("tBanks");
         if (!settings.banks.length) {
-          root.innerHTML = `<div class="empty">Belum ada rekening. Tambah di ⚙︎ → Rekening bank.</div>`;
+          root.innerHTML = `<div class="empty">Belum ada rekening. Tambah di Pengaturan → Rekening bank.</div>`;
         } else {
           root.innerHTML = "";
           for (const b of settings.banks) {
@@ -843,7 +853,7 @@
       }
       $("tBanks").addEventListener("click", (e) => {
         const b = e.target.closest("[data-copy]"); if (!b) return;
-        copyText(b.dataset.copy); toast("No. rekening disalin ✓");
+        copyText(b.dataset.copy); toast("No. rekening disalin");
       });
       $("tClose").onclick = () => $("transfer").close();
       $("tDone").onclick = () => { $("transfer").close(); finishSale(); };
@@ -920,7 +930,7 @@
           el.className = "bank";
           el.innerHTML =
             `<div class="binfo"><div class="bname">${esc(b.bank)}</div><div class="bnum">${esc(b.number)}</div><div class="bhold">a.n. ${esc(b.holder || "-")}</div></div>` +
-            `<button class="del" type="button" data-delbank="${i}" aria-label="Hapus">🗑</button>`;
+            `<button class="del" type="button" data-delbank="${i}" aria-label="Hapus">${IC.trash}</button>`;
           root.appendChild(el);
         });
       }
@@ -932,7 +942,7 @@
         settings.banks.push({ bank, number, holder }); persist();
         $("bkBank").value = ""; $("bkNum").value = "";
         renderSetBanks();
-        toast("Rekening ditambah ✓");
+        toast("Rekening ditambah");
       };
       $("setBanks").addEventListener("click", (e) => {
         const b = e.target.closest("[data-delbank]"); if (!b) return;
@@ -964,7 +974,7 @@
         persist();
         applyChrome();
         $("settings").close();
-        toast("Pengaturan tersimpan ✓");
+        toast("Pengaturan tersimpan");
       };
       $("sClose").onclick = () => $("settings").close();
       document.querySelectorAll("dialog").forEach((d) => d.addEventListener("click", (e) => { if (e.target === d) d.close(); }));

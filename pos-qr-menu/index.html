@@ -83,6 +83,7 @@
         color: var(--brand-ink); background: var(--brand-soft);
         padding: 4px 11px; border-radius: 999px;
       }
+      .table-pill svg { width: 13px; height: 13px; }
 
       main { max-width: 560px; margin: 0 auto; padding: 4px 14px 24px; }
 
@@ -139,7 +140,8 @@
       .thumb, .thumb-ph {
         width: 92px; height: 92px; border-radius: 14px; object-fit: cover; display: block;
       }
-      .thumb-ph { display: grid; place-items: center; font-size: 34px; }
+      .thumb-ph { display: grid; place-items: center; color: color-mix(in srgb, var(--ink) 30%, transparent); }
+      .thumb-ph svg { width: 40px; height: 40px; }
       .control {
         position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%);
       }
@@ -231,8 +233,10 @@
       .cline:last-of-type { border-bottom: none; }
       .cline .cthumb, .cline .cthumb-ph {
         width: 46px; height: 46px; border-radius: 11px; object-fit: cover; flex: 0 0 46px;
-        display: grid; place-items: center; font-size: 20px;
+        display: grid; place-items: center;
       }
+      .cline .cthumb-ph { color: color-mix(in srgb, var(--ink) 32%, transparent); }
+      .cline .cthumb-ph svg { width: 22px; height: 22px; }
       .cline .cinfo { flex: 1; min-width: 0; }
       .cline .cname { font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -297,7 +301,7 @@
     -->
     <header>
       <div class="store" id="storeName">Warung Kopi Founder+</div>
-      <span class="table-pill" id="tablePill" hidden>🍽️ Meja <span id="tableId"></span></span>
+      <span class="table-pill" id="tablePill" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg> Meja <span id="tableId"></span></span>
     </header>
 
     <main>
@@ -345,23 +349,32 @@
         posApi: null, // mis. "https://api.founderplus.id/creator/pos/orders"
         // Param URL yang dipakai untuk nomor meja (dukung beberapa alias).
         tableParams: ["meja", "table", "t"],
-        // Emoji placeholder per kategori — dipakai kalau item belum punya foto.
-        categoryEmoji: { Kopi: "☕️", "Non-Kopi": "🍵", Makanan: "🍽️" },
+        // Ikon placeholder per kategori (dipakai kalau item belum punya foto).
+        // Nilai = key dari ICONS: "coffee" | "cup" | "food".
+        categoryIcon: { Kopi: "coffee", "Non-Kopi": "cup", Makanan: "food" },
+      };
+
+      // Ikon line monokrom (currentColor) untuk placeholder — bukan emoji.
+      const ICONS = {
+        coffee: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2M14 2v2M6 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/></svg>`,
+        cup: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14l-1.3 15.2a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8L5 3Z"/><path d="M5.6 9h12.8"/></svg>`,
+        food: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>`,
+        photo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>`,
       };
 
       // ══════════════════════════ MENU ══════════════════════════
       // Satu sumber kebenaran menu. price = angka rupiah (tanpa titik/koma).
       //   available:false → sold out.   category → grup tampilan.
       //   image:"https://…/foto.jpg" (opsional) → foto produk. Kalau kosong,
-      //   tampil placeholder gradient + emoji (kategori / field `emoji`).
+      //   tampil placeholder gradient + ikon (kategori, atau field `icon`).
       const MENU = [
         { id: "kopi-susu", name: "Kopi Susu Gula Aren", desc: "Espresso, susu segar, gula aren cair", price: 22000, category: "Kopi", available: true },
         { id: "americano", name: "Americano", desc: "Double shot, air, tanpa gula", price: 18000, category: "Kopi", available: true },
         { id: "latte", name: "Cafe Latte", desc: "Espresso + steamed milk", price: 25000, category: "Kopi", available: true },
-        { id: "matcha", name: "Matcha Latte", desc: "Matcha premium, susu", price: 27000, category: "Non-Kopi", available: true, emoji: "🍵" },
-        { id: "coklat", name: "Coklat Panas", desc: "Dark chocolate, susu", price: 24000, category: "Non-Kopi", available: false, emoji: "🍫" },
-        { id: "croissant", name: "Butter Croissant", desc: "Panggang, mentega Prancis", price: 20000, category: "Makanan", available: true, emoji: "🥐" },
-        { id: "nasi-ayam", name: "Nasi Ayam Sambal Matah", desc: "Ayam goreng, sambal matah, nasi hangat", price: 32000, category: "Makanan", available: true, emoji: "🍛" },
+        { id: "matcha", name: "Matcha Latte", desc: "Matcha premium, susu", price: 27000, category: "Non-Kopi", available: true },
+        { id: "coklat", name: "Coklat Panas", desc: "Dark chocolate, susu", price: 24000, category: "Non-Kopi", available: false },
+        { id: "croissant", name: "Butter Croissant", desc: "Panggang, mentega Prancis", price: 20000, category: "Makanan", available: true },
+        { id: "nasi-ayam", name: "Nasi Ayam Sambal Matah", desc: "Ayam goreng, sambal matah, nasi hangat", price: 32000, category: "Makanan", available: true },
       ];
       // ═════════════════════════════════════════════════════════════
 
@@ -382,7 +395,7 @@
       const TABLE = readTable();
       const cart = new Map(); // id -> qty
       const itemById = (id) => MENU.find((m) => m.id === id);
-      const emojiFor = (it) => it.emoji || CONFIG.categoryEmoji[it.category] || "🍽️";
+      const iconFor = (it) => ICONS[it.icon || CONFIG.categoryIcon[it.category]] || ICONS.food;
 
       // Deterministic soft gradient from the item id — a tasteful placeholder so
       // the menu looks intentional out of the box (owners add real photos later).
@@ -457,7 +470,7 @@
 
       function thumbHtml(it) {
         if (it.image) return `<img class="thumb" src="${escapeAttr(it.image)}" alt="" loading="lazy" />`;
-        return `<div class="thumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${emojiFor(it)}</div>`;
+        return `<div class="thumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${iconFor(it)}</div>`;
       }
 
       function itemEl(it, idx) {
@@ -515,7 +528,7 @@
 
       function cthumbHtml(it) {
         if (it.image) return `<img class="cthumb" src="${escapeAttr(it.image)}" alt="" />`;
-        return `<div class="cthumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${emojiFor(it)}</div>`;
+        return `<div class="cthumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${iconFor(it)}</div>`;
       }
 
       function renderSheet() {
