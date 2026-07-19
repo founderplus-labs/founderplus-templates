@@ -531,8 +531,8 @@
     },
     {
       "name": "pos-qr-menu",
-      "title": "POS QR-Menu + Kasir (QRIS · struk Bluetooth)",
-      "description": "No-build dine-in POS suite. Customers scan a per-table QR, see the menu, and order from their phone with the table number attached (WhatsApp today, Founder+ POS backend when configured). Cashier (kasir.html): enter an amount or itemized bill, show a dynamic QRIS (built from the merchant static payload with a correct EMVCo CRC), and print an ESC/POS receipt to a Bluetooth thermal printer — customizable (store info, footer, 58/80mm), with a window.print fallback. Plus an offline per-table QR print tool (tables.html).",
+      "title": "POS QR-Menu + Kasir + Meja + Servis",
+      "description": "No-build POS suite for cafes/restaurants/service businesses. Customers scan a per-table QR, see the menu, and order from their phone with the table number attached (WhatsApp today, Founder+ POS backend when configured). Cashier (kasir.html): amount/itemized bill -> pay by dynamic QRIS (built from the merchant static payload with a correct EMVCo CRC), bank transfer (own accounts), or cash with change; attach a payment-proof photo; print an ESC/POS Bluetooth receipt (customizable, window.print fallback); plus transaction history + daily close-out report + CSV. Table management (meja.html): table status + reservations. Service management (servis.html): job tickets with a status pipeline. Owner tools run locally (localStorage), no server. Plus an offline per-table QR print tool (tables.html).",
       "runtime": "static",
       "stack": [
         "html",
@@ -540,12 +540,15 @@
         "pos",
         "qr",
         "qris",
-        "bluetooth"
+        "bluetooth",
+        "reservations",
+        "service"
       ],
       "postInstall": [
         "Edit CONFIG + MENU in index.html (store, WhatsApp, items)",
         "fp sites publish index.html",
         "Open kasir.html to take payments (paste your QRIS payload in Settings)",
+        "Open meja.html for table status + reservations, servis.html for service tickets",
         "Open tables.html in a browser to print per-table QR codes"
       ],
       "setupDoc": "SETUP.md",
@@ -553,8 +556,8 @@
         {
           "path": "SETUP.md",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/SETUP.md",
-          "digest": "sha256:24679cab9e182cd441ec633afc44fe1c239466da3774e3e591f842ea917d2394",
-          "size": 6417
+          "digest": "sha256:dab5848134adfbad4f94ca9c053277f55a80aaa6627e648d16140bfe926d57e0",
+          "size": 8013
         },
         {
           "path": "index.html",
@@ -565,14 +568,26 @@
         {
           "path": "kasir.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/kasir.html",
-          "digest": "sha256:f279ad23cf8f7a5c086eb73c0a8d8cc7ffdc34f70037beb8bef382cf9f1af1fa",
-          "size": 60769
+          "digest": "sha256:15540e617779125fc3c769f560fd98fba2c611693c78e5dc08b76aaef5bf9c8a",
+          "size": 69619
+        },
+        {
+          "path": "meja.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/meja.html",
+          "digest": "sha256:fb9898b4c5e8d061416365c2ac03811c469cd8aa32e41fe784a9459e55517bd1",
+          "size": 24668
         },
         {
           "path": "qrcode.vendor.js",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/qrcode.vendor.js",
           "digest": "sha256:0fa64f99bcc06acf3eb27e28a2c4916f51c4eb235a6c132e36a51733141e79bd",
           "size": 56989
+        },
+        {
+          "path": "servis.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/servis.html",
+          "digest": "sha256:26a62a3da82e483d10a5b81883897ad0dd54c4f1c04d5431faf33eb152dc3e13",
+          "size": 23314
         },
         {
           "path": "tables.html",

@@ -174,11 +174,36 @@
       .qactions .pr { background:var(--card); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); }
 
       /* Settings sheet (bottom drawer) */
-      dialog#settings { margin:auto auto 0; border-radius:24px 24px 0 0; max-height:90vh;
+      dialog#settings, dialog#history { margin:auto auto 0; border-radius:24px 24px 0 0; max-height:90vh;
         transform:translateY(100%); transition:transform 440ms var(--ease-drawer),
           overlay 440ms allow-discrete, display 440ms allow-discrete; }
-      dialog#settings[open] { transform:translateY(0); }
-      @starting-style { dialog#settings[open] { transform:translateY(100%); } }
+      dialog#settings[open], dialog#history[open] { transform:translateY(0); }
+      @starting-style { dialog#settings[open], dialog#history[open] { transform:translateY(100%); } }
+
+      /* Riwayat / rekap */
+      .rekap { background:color-mix(in srgb, var(--ink) 5%, var(--card)); border-radius:16px; padding:15px; margin-bottom:12px; }
+      .rekap-total { display:flex; justify-content:space-between; align-items:baseline; }
+      .rekap-total .rl { color:var(--secondary); font-size:13.5px; font-weight:600; }
+      .rekap-total .rv { font-weight:800; font-size:24px; letter-spacing:-0.02em; font-variant-numeric:tabular-nums; }
+      .rekap-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+      .rekap-grid .cell { background:var(--card); border-radius:11px; padding:9px 10px; box-shadow:inset 0 0 0 1px var(--line); }
+      .rekap-grid .cell .k { font-size:11px; color:var(--muted); font-weight:600; }
+      .rekap-grid .cell .n { font-size:13.5px; font-weight:700; letter-spacing:-0.01em; margin-top:2px; font-variant-numeric:tabular-nums; }
+      .rekap-grid .cell .c { font-size:10.5px; color:var(--muted); }
+      .rekap-actions { display:flex; gap:8px; }
+      .rekap-actions .mini { flex:1; border:none; cursor:pointer; background:var(--card); box-shadow:inset 0 0 0 1px var(--line);
+        border-radius:12px; padding:11px 8px; font:inherit; font-weight:650; font-size:13px; color:var(--ink);
+        transition:transform 150ms var(--ease-out); }
+      .rekap-actions .mini:active { transform:scale(.96); }
+      .rekap-actions .mini.danger { color:var(--danger); }
+      .txn { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
+      .txn:last-child { border-bottom:none; }
+      .txn .tm { flex:1; min-width:0; }
+      .txn .tm .t1 { font-weight:640; font-size:14.5px; letter-spacing:-0.01em; }
+      .txn .tm .t2 { font-size:12px; color:var(--muted); margin-top:1px; }
+      .txn .tv { font-weight:700; font-size:14.5px; font-variant-numeric:tabular-nums; }
+      .txn .mtag { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--secondary);
+        background:color-mix(in srgb, var(--ink) 7%, var(--card)); padding:2px 7px; border-radius:999px; }
       .grabber { width:38px; height:5px; border-radius:3px; background:var(--line); margin:10px auto 0; }
       .sin { padding:8px 18px calc(22px + var(--safe-b)); overflow-y:auto; }
       .sin h3 { font-size:18px; letter-spacing:-0.015em; margin:6px 0 14px; }
@@ -297,6 +322,7 @@
     <header>
       <div class="store" id="hStore">Warung Kopi Founder+</div>
       <span class="tag">Kasir</span>
+      <button class="icon-btn" id="openHistory" aria-label="Riwayat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg></button>
       <button class="icon-btn" id="openSettings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </header>
 
@@ -470,6 +496,26 @@
         <div class="fld"><label>Pratinjau struk</label><div class="rcpt" id="rcptPreview"></div></div>
 
         <button class="save" id="saveSettings" type="button">Simpan</button>
+      </div>
+    </dialog>
+
+    <!-- Riwayat + rekap harian -->
+    <dialog id="history">
+      <div class="grabber"></div>
+      <button class="close" id="hClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3>Riwayat · <span id="hToday">hari ini</span></h3>
+        <div class="rekap">
+          <div class="rekap-total"><span class="rl">Total hari ini</span><span class="rv" id="rTotal">Rp 0</span></div>
+          <div class="rekap-grid" id="rBreak"></div>
+        </div>
+        <div class="rekap-actions">
+          <button class="mini" id="rPrint" type="button">Cetak rekap</button>
+          <button class="mini" id="rCsv" type="button">Export CSV</button>
+          <button class="mini danger" id="rClear" type="button">Hapus semua</button>
+        </div>
+        <div class="sec">Transaksi</div>
+        <div id="rList"></div>
       </div>
     </dialog>
 
@@ -686,10 +732,106 @@
       // Clean success confirmation; the sale stays intact (so the receipt can
       // print) until the success sheet closes, which resets for the next order.
       function finishSale() {
+        recordSale();
         $("okAmt").textContent = fmt(currentTotal());
         $("okMethod").textContent = payLabel() + (proofUrl ? " · bukti terlampir" : "");
         $("success").showModal();
       }
+
+      // ═══════════════════════════ RIWAYAT (localStorage) ═══════════════════════════
+      const TXN_KEY = "fp_kasir_txns_v1";
+      const loadTxns = () => { try { return JSON.parse(localStorage.getItem(TXN_KEY)) || []; } catch { return []; } };
+      const saveTxns = (a) => { try { localStorage.setItem(TXN_KEY, JSON.stringify(a.slice(0, 1000))); } catch {} };
+      function recordSale() {
+        const d = new Date();
+        const txn = {
+          id: "t" + d.getTime(),
+          ts: d.toISOString(),
+          method: payLabel(),
+          total: currentTotal(),
+          cashReceived: payMethod === "Tunai" ? cashReceived : 0,
+          change: payMethod === "Tunai" ? Math.max(0, cashReceived - currentTotal()) : 0,
+          proof: !!proofUrl,
+          items: currentLines().map((l) => ({ name: l.name, qty: l.qty, price: l.price })),
+        };
+        const all = loadTxns(); all.unshift(txn); saveTxns(all);
+      }
+      const sameDay = (iso, ref) => { const a = new Date(iso), b = ref;
+        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); };
+      const todayTxns = () => { const now = new Date(); return loadTxns().filter((t) => sameDay(t.ts, now)); };
+
+      function renderHistory() {
+        const today = todayTxns();
+        $("hToday").textContent = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+        const total = today.reduce((s, t) => s + t.total, 0);
+        $("rTotal").textContent = fmt(total);
+        // Per-method breakdown.
+        const methods = ["QRIS", "Transfer", "Tunai"];
+        $("rBreak").innerHTML = methods.map((m) => {
+          const rows = today.filter((t) => t.method === m);
+          const sum = rows.reduce((s, t) => s + t.total, 0);
+          return `<div class="cell"><div class="k">${m}</div><div class="n">${esc(fmt(sum))}</div><div class="c">${rows.length} transaksi</div></div>`;
+        }).join("");
+        // List.
+        const list = $("rList");
+        if (!today.length) { list.innerHTML = `<div class="empty">Belum ada transaksi hari ini.</div>`; return; }
+        list.innerHTML = "";
+        for (const t of today) {
+          const time = new Date(t.ts).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+          const desc = t.items.length === 1 && t.items[0].name === "Pembayaran"
+            ? "Nominal" : t.items.map((i) => `${i.qty}× ${i.name}`).join(", ");
+          const el = document.createElement("div");
+          el.className = "txn";
+          el.innerHTML =
+            `<div class="tm"><div class="t1">${esc(fmt(t.total))}</div><div class="t2">${time} · ${esc(desc)}${t.proof ? " · bukti" : ""}</div></div>` +
+            `<span class="mtag">${esc(t.method)}</span>`;
+          list.appendChild(el);
+        }
+      }
+
+      $("openHistory").onclick = () => { renderHistory(); $("history").showModal(); };
+      $("hClose").onclick = () => $("history").close();
+
+      function exportCsv() {
+        const all = loadTxns();
+        if (!all.length) { toast("Belum ada transaksi"); return; }
+        const head = ["waktu", "metode", "total", "uang_diterima", "kembalian", "bukti", "items"];
+        const rows = all.map((t) => [
+          new Date(t.ts).toLocaleString("id-ID"), t.method, t.total, t.cashReceived, t.change,
+          t.proof ? "ya" : "", t.items.map((i) => `${i.qty}x ${i.name}`).join(" | "),
+        ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","));
+        const csv = [head.join(","), ...rows].join("\n");
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+        a.download = "riwayat-kasir-" + new Date().toISOString().slice(0, 10) + ".csv";
+        a.click(); URL.revokeObjectURL(a.href);
+      }
+      $("rCsv").onclick = exportCsv;
+
+      // Close-out (tutup kasir): print a daily summary using the receipt printer/fallback.
+      function printRekap() {
+        const today = todayTxns();
+        const W = settings.paperWidth;
+        const lr = (l, r) => { l = String(l); r = String(r); const room = W - r.length - 1; if (l.length > room) l = l.slice(0, room - 1) + "…"; return l + " ".repeat(Math.max(1, W - l.length - r.length)) + r; };
+        const center = (s) => { s = s.slice(0, W); return " ".repeat(Math.max(0, Math.floor((W - s.length) / 2))) + s; };
+        const total = today.reduce((s, t) => s + t.total, 0);
+        const out = [center(settings.store), center("REKAP HARIAN"),
+          center(new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })), "-".repeat(W)];
+        for (const m of ["QRIS", "Transfer", "Tunai"]) {
+          const rows = today.filter((t) => t.method === m);
+          out.push(lr(`${m} (${rows.length})`, fmt(rows.reduce((s, t) => s + t.total, 0))));
+        }
+        out.push("-".repeat(W), lr(`TOTAL (${today.length})`, fmt(total)), "-".repeat(W));
+        $("printPaper").textContent = out.join("\n");
+        window.print();
+      }
+      $("rPrint").onclick = printRekap;
+
+      $("rClear").onclick = () => {
+        if (!loadTxns().length) { toast("Riwayat kosong"); return; }
+        if (!confirm("Hapus semua riwayat transaksi? Tindakan ini tidak bisa dibatalkan.")) return;
+        saveTxns([]); renderHistory(); toast("Riwayat dihapus");
+      };
       $("okPrint").onclick = () => printReceipt();
       $("okNew").onclick = () => $("success").close();
       $("success").addEventListener("close", resetSale);

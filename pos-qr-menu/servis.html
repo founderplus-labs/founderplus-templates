@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Servis — Founder+</title>
+    <meta name="description" content="Manajemen servis: tiket, jadwal, status pengerjaan." />
+    <meta name="theme-color" content="#faf9fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141019" media="(prefers-color-scheme: dark)" />
+    <style>
+      :root {
+        --brand:#8b5cf6; --brand-ink:#6d28d9; --brand-soft:color-mix(in srgb, var(--brand) 12%, transparent);
+        --ink:#1a1420; --secondary:#524b5e; --muted:#857e91;
+        --line:#ece8f1; --bg:#faf9fb; --card:#ffffff;
+        --ok:#17984e; --warn:#b45309; --info:#1d4ed8; --danger:#c2410c;
+        --r-card:18px; --r-ctl:12px;
+        --shadow-card:0 1px 2px rgba(26,20,32,.04), 0 4px 14px rgba(26,20,32,.05);
+        --shadow-ctl:0 2px 8px rgba(26,20,32,.14), 0 0 0 1px rgba(26,20,32,.04);
+        --shadow-pop:0 1px 1px rgba(26,20,32,.05), 0 -8px 40px rgba(26,20,32,.14);
+        --ease-out:cubic-bezier(0.23,1,0.32,1); --ease-drawer:cubic-bezier(0.32,0.72,0,1);
+        --safe-b:env(safe-area-inset-bottom, 0px); --safe-t:env(safe-area-inset-top, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root { --ink:#f4eefc; --secondary:#b8b0c6; --muted:#8b8399; --line:#2a2436; --bg:#131019; --card:#1c1626;
+          --brand:#a78bfa; --brand-ink:#c4b5fd; --ok:#34d399; --warn:#fbbf24; --info:#93c5fd; --danger:#fb7185;
+          --shadow-card:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.35);
+          --shadow-ctl:0 3px 10px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.06);
+          --shadow-pop:0 1px 1px rgba(0,0,0,.4),0 -8px 44px rgba(0,0,0,.55); }
+      }
+      * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+      [hidden] { display:none !important; }
+      html, body { margin:0; }
+      body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; font-optical-sizing:auto;
+        color:var(--ink); background:var(--bg); line-height:1.5; -webkit-font-smoothing:antialiased;
+        padding-bottom:calc(90px + var(--safe-b)); }
+      header { position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:10px;
+        padding:calc(14px + var(--safe-t)) 16px 13px;
+        background:color-mix(in srgb, var(--card) 72%, transparent);
+        backdrop-filter:saturate(1.8) blur(20px); -webkit-backdrop-filter:saturate(1.8) blur(20px);
+        box-shadow:0 1px 0 color-mix(in srgb, var(--line) 60%, transparent); }
+      header .store { font-size:18px; font-weight:700; letter-spacing:-0.02em; flex:1; min-width:0;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      header .tag { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+        color:var(--brand-ink); background:var(--brand-soft); padding:3px 9px; border-radius:999px; }
+      .icon-btn { width:38px; height:38px; border:none; border-radius:999px; cursor:pointer;
+        background:var(--card); box-shadow:inset 0 0 0 1px var(--line); color:var(--ink);
+        display:grid; place-items:center; transition:transform 150ms var(--ease-out); }
+      .icon-btn:active { transform:scale(.9); } .icon-btn svg { width:19px; height:19px; }
+      main { max-width:560px; margin:0 auto; padding:12px 16px 8px; }
+
+      .filters { display:flex; gap:8px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none; }
+      .filters::-webkit-scrollbar { display:none; }
+      .filters button { flex:0 0 auto; border:none; cursor:pointer; background:var(--card); color:var(--secondary);
+        font:inherit; font-weight:600; font-size:13.5px; padding:8px 14px; border-radius:999px; white-space:nowrap;
+        box-shadow:inset 0 0 0 1px var(--line); transition:all 160ms var(--ease-out); }
+      .filters button[aria-current="true"] { background:var(--ink); color:var(--card); box-shadow:inset 0 0 0 1px var(--ink); }
+      .filters .n { font-variant-numeric:tabular-nums; opacity:.6; }
+
+      .ticket { display:flex; gap:12px; align-items:flex-start; background:var(--card); border-radius:var(--r-card);
+        padding:14px 15px; box-shadow:var(--shadow-card); margin-bottom:10px; cursor:pointer;
+        transition:transform 150ms var(--ease-out); }
+      .ticket:active { transform:scale(.99); }
+      .ticket.prio { box-shadow:var(--shadow-card), inset 3px 0 0 var(--danger); }
+      .ticket .body { flex:1; min-width:0; }
+      .ticket .code { font-size:11.5px; font-weight:700; color:var(--muted); letter-spacing:.03em; }
+      .ticket .ttl { font-weight:650; font-size:15.5px; letter-spacing:-0.01em; margin-top:1px;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .ticket .cust { font-size:13px; color:var(--secondary); margin-top:2px; }
+      .ticket .foot { display:flex; align-items:center; gap:8px; margin-top:9px; flex-wrap:wrap; }
+      .ticket .price { font-weight:700; font-size:14px; font-variant-numeric:tabular-nums; }
+      .ticket .sched { font-size:12px; color:var(--muted); }
+      .stag { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:3px 8px; border-radius:999px; }
+      .stag.new { color:var(--secondary); background:color-mix(in srgb, var(--ink) 8%, transparent); }
+      .stag.scheduled { color:var(--info); background:color-mix(in srgb, var(--info) 13%, transparent); }
+      .stag.in_progress { color:var(--warn); background:color-mix(in srgb, var(--warn) 15%, transparent); }
+      .stag.done { color:var(--ok); background:color-mix(in srgb, var(--ok) 14%, transparent); }
+      .stag.cancelled { color:var(--danger); background:color-mix(in srgb, var(--danger) 12%, transparent); }
+      .empty { text-align:center; color:var(--muted); font-size:14px; padding:44px 20px; }
+
+      .fab { position:fixed; right:18px; bottom:calc(20px + var(--safe-b)); z-index:9;
+        height:52px; padding:0 20px; border:none; cursor:pointer; border-radius:999px;
+        background:var(--ink); color:var(--card); font:inherit; font-weight:700; font-size:15px;
+        box-shadow:0 8px 24px rgba(26,20,32,.28); display:inline-flex; align-items:center; gap:8px;
+        transition:transform 150ms var(--ease-out); }
+      .fab:active { transform:scale(.96); } .fab svg { width:18px; height:18px; }
+
+      dialog { border:none; padding:0; width:100%; max-width:520px; color:var(--ink); background:var(--card);
+        box-shadow:var(--shadow-pop); margin:auto auto 0; border-radius:24px 24px 0 0; max-height:92vh;
+        transform:translateY(100%); transition:transform 440ms var(--ease-drawer),
+          overlay 440ms allow-discrete, display 440ms allow-discrete; }
+      dialog[open] { transform:translateY(0); }
+      @starting-style { dialog[open] { transform:translateY(100%); } }
+      dialog::backdrop { background:rgba(16,10,26,0); backdrop-filter:blur(0);
+        transition:background 440ms var(--ease-out), backdrop-filter 440ms var(--ease-out),
+          overlay 440ms allow-discrete, display 440ms allow-discrete; }
+      dialog[open]::backdrop { background:rgba(16,10,26,.5); backdrop-filter:blur(2px); }
+      @starting-style { dialog[open]::backdrop { background:rgba(16,10,26,0); backdrop-filter:blur(0); } }
+      .grabber { width:38px; height:5px; border-radius:3px; background:var(--line); margin:10px auto 0; }
+      .sin { padding:8px 18px calc(22px + var(--safe-b)); overflow-y:auto; }
+      .sin h3 { font-size:18px; letter-spacing:-0.015em; margin:6px 0 2px; }
+      .sin .sub { color:var(--muted); font-size:13px; margin-bottom:14px; }
+      .sec { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:16px 0 8px; }
+      .close { position:absolute; top:14px; right:16px; width:30px; height:30px; display:grid; place-items:center;
+        border:none; border-radius:999px; background:var(--bg); color:var(--muted); font-size:16px; cursor:pointer;
+        transition:transform 150ms var(--ease-out); } .close:active { transform:scale(.9); }
+      .fld { margin-bottom:11px; } .fld label { display:block; font-size:12.5px; color:var(--secondary); margin-bottom:5px; font-weight:600; }
+      .fld input, .fld textarea { width:100%; border:none; box-shadow:inset 0 0 0 1px var(--line); border-radius:var(--r-ctl);
+        padding:11px 12px; font:inherit; background:var(--bg); color:var(--ink); transition:box-shadow 160ms var(--ease-out); }
+      .fld input:focus, .fld textarea:focus { outline:none; box-shadow:inset 0 0 0 2px var(--brand); }
+      .fld textarea { resize:vertical; min-height:56px; }
+      .row2 { display:flex; gap:10px; } .row2 > * { flex:1; }
+      .check { display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:var(--r-ctl);
+        box-shadow:inset 0 0 0 1px var(--line); background:var(--bg); cursor:pointer; font-weight:600; font-size:14px; }
+      .check input { width:18px; height:18px; accent-color:var(--danger); }
+      .save { width:100%; margin-top:14px; border:none; cursor:pointer; background:var(--brand); color:#fff;
+        font:inherit; font-weight:700; font-size:15px; padding:14px; border-radius:14px;
+        box-shadow:0 4px 16px color-mix(in srgb,var(--brand) 30%,transparent); transition:transform 150ms var(--ease-out); }
+      .save:active { transform:scale(.98); }
+      /* Status pipeline chips (detail sheet) */
+      .pipe { display:flex; gap:7px; flex-wrap:wrap; }
+      .pipe button { border:none; cursor:pointer; font:inherit; font-weight:650; font-size:13px; padding:9px 13px;
+        border-radius:999px; background:var(--card); color:var(--secondary); box-shadow:inset 0 0 0 1px var(--line);
+        transition:all 150ms var(--ease-out); } .pipe button:active { transform:scale(.95); }
+      .pipe button[aria-current="true"] { background:var(--ink); color:var(--card); box-shadow:none; }
+      .detail-row { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px; }
+      .detail-row:last-of-type { border-bottom:none; } .detail-row .k { color:var(--muted); }
+      .detail-actions { display:flex; gap:9px; margin-top:16px; }
+      .detail-actions button { flex:1; border:none; cursor:pointer; font:inherit; font-weight:650; font-size:14px; padding:12px;
+        border-radius:12px; box-shadow:inset 0 0 0 1px var(--line); background:var(--card); color:var(--ink);
+        transition:transform 150ms var(--ease-out); } .detail-actions button:active { transform:scale(.97); }
+      .detail-actions .del { color:var(--danger); }
+      .toast { position:fixed; left:50%; bottom:calc(90px + var(--safe-b)); transform:translateX(-50%) translateY(10px);
+        background:var(--ink); color:var(--card); padding:11px 16px; border-radius:999px; font-size:13.5px; font-weight:600;
+        box-shadow:0 8px 30px rgba(0,0,0,.28); opacity:0; pointer-events:none; z-index:30;
+        transition:opacity 220ms var(--ease-out), transform 220ms var(--ease-out); }
+      .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+      @media (prefers-reduced-motion: reduce) {
+        dialog, dialog::backdrop, .ticket, .fab, .icon-btn, .pipe button, .save, .filters button { transition:opacity 180ms ease !important; transform:none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="store" id="hStore">Founder+ Servis</div>
+      <span class="tag">Servis</span>
+      <button class="icon-btn" id="openSettings" aria-label="Pengaturan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </header>
+
+    <main>
+      <div class="filters" id="filters"></div>
+      <div id="list"></div>
+    </main>
+
+    <button class="fab" id="fab" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Servis
+    </button>
+
+    <!-- New / edit ticket -->
+    <dialog id="form">
+      <div class="grabber"></div>
+      <button class="close" id="fClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3 id="fTitle">Servis baru</h3>
+        <div class="fld"><label>Jenis servis / pekerjaan</label><input id="fJob" type="text" placeholder="mis. Ganti oli, Potong rambut, Cuci AC" /></div>
+        <div class="row2">
+          <div class="fld"><label>Nama pelanggan</label><input id="fCust" type="text" autocomplete="name" /></div>
+          <div class="fld"><label>No. HP</label><input id="fHp" inputmode="tel" placeholder="0812…" /></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label>Harga (Rp)</label><input id="fPrice" inputmode="numeric" placeholder="0" /></div>
+          <div class="fld"><label>Jadwal (opsional)</label><input id="fWhen" type="datetime-local" /></div>
+        </div>
+        <div class="fld"><label>Catatan (opsional)</label><textarea id="fNote" rows="2" placeholder="Keluhan / detail pekerjaan"></textarea></div>
+        <label class="check"><input id="fPrio" type="checkbox" /> Tandai prioritas</label>
+        <button class="save" id="fSave" type="button">Simpan tiket</button>
+      </div>
+    </dialog>
+
+    <!-- Ticket detail -->
+    <dialog id="detail">
+      <div class="grabber"></div>
+      <button class="close" id="dClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3 id="dJob">—</h3>
+        <div class="sub" id="dCode">—</div>
+        <div class="sec">Status</div>
+        <div class="pipe" id="dPipe"></div>
+        <div class="sec">Detail</div>
+        <div id="dRows"></div>
+        <div class="detail-actions">
+          <button id="dEdit" type="button">Ubah</button>
+          <button id="dDelete" class="del" type="button">Hapus</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Settings -->
+    <dialog id="settings">
+      <div class="grabber"></div>
+      <button class="close" id="sClose" aria-label="Tutup">✕</button>
+      <div class="sin">
+        <h3>Pengaturan</h3>
+        <div class="fld"><label>Nama usaha</label><input id="sStore" type="text" /></div>
+        <button class="save" id="sSave" type="button">Simpan</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const LS = "fp_servis_v1";
+      const DEF = { store: "Founder+ Servis", seq: 0, tickets: [] };
+      let db = load();
+      function load() { try { return { ...DEF, ...(JSON.parse(localStorage.getItem(LS)) || {}) }; } catch { return { ...DEF }; } }
+      function persist() { try { localStorage.setItem(LS, JSON.stringify(db)); } catch {} }
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      const fmt = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
+
+      const STATUSES = [
+        { key: "new", label: "Baru" },
+        { key: "scheduled", label: "Dijadwalkan" },
+        { key: "in_progress", label: "Dikerjakan" },
+        { key: "done", label: "Selesai" },
+        { key: "cancelled", label: "Batal" },
+      ];
+      const stLabel = (k) => (STATUSES.find((s) => s.key === k) || STATUSES[0]).label;
+      const FILTERS = [
+        { key: "all", label: "Semua", match: () => true },
+        { key: "open", label: "Aktif", match: (t) => ["new", "scheduled", "in_progress"].includes(t.status) },
+        { key: "in_progress", label: "Dikerjakan", match: (t) => t.status === "in_progress" },
+        { key: "done", label: "Selesai", match: (t) => t.status === "done" },
+      ];
+      let filter = "open";
+
+      function whenText(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        return d.toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+      }
+
+      function renderFilters() {
+        $("filters").innerHTML = FILTERS.map((f) => {
+          const n = db.tickets.filter(f.match).length;
+          return `<button type="button" data-f="${f.key}" ${f.key === filter ? 'aria-current="true"' : ""}>${f.label} <span class="n">${n}</span></button>`;
+        }).join("");
+      }
+      $("filters").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-f]"); if (!b) return;
+        filter = b.dataset.f; renderFilters(); renderList();
+      });
+
+      function renderList() {
+        const f = FILTERS.find((x) => x.key === filter);
+        const items = db.tickets.filter(f.match).sort((a, b) => {
+          if (a.priority !== b.priority) return a.priority ? -1 : 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+        const list = $("list");
+        if (!items.length) { list.innerHTML = `<div class="empty">Tidak ada tiket di sini. Tap + Servis untuk buat baru.</div>`; return; }
+        list.innerHTML = "";
+        for (const t of items) {
+          const el = document.createElement("div");
+          el.className = "ticket" + (t.priority && t.status !== "done" && t.status !== "cancelled" ? " prio" : "");
+          el.dataset.id = t.id;
+          el.innerHTML =
+            `<div class="body">
+               <div class="code">${esc(t.code)}</div>
+               <div class="ttl">${esc(t.title)}</div>
+               <div class="cust">${esc(t.customerName || "—")}${t.phone ? " · " + esc(t.phone) : ""}</div>
+               <div class="foot">
+                 <span class="stag ${t.status}">${stLabel(t.status)}</span>
+                 ${t.price ? `<span class="price">${esc(fmt(t.price))}</span>` : ""}
+                 ${t.scheduledAt ? `<span class="sched">${esc(whenText(t.scheduledAt))}</span>` : ""}
+               </div>
+             </div>`;
+          list.appendChild(el);
+        }
+      }
+      $("list").addEventListener("click", (e) => {
+        const el = e.target.closest(".ticket"); if (!el) return;
+        openDetail(db.tickets.find((t) => t.id === el.dataset.id));
+      });
+
+      // ── Detail + status pipeline ──
+      let activeId = null;
+      function openDetail(t) {
+        activeId = t.id;
+        $("dJob").textContent = t.title;
+        $("dCode").textContent = t.code + (t.priority ? " · Prioritas" : "");
+        $("dPipe").innerHTML = STATUSES.map((s) =>
+          `<button type="button" data-st="${s.key}" ${s.key === t.status ? 'aria-current="true"' : ""}>${s.label}</button>`
+        ).join("");
+        const rows = [
+          ["Pelanggan", t.customerName || "—"],
+          ["No. HP", t.phone || "—"],
+          ["Harga", t.price ? fmt(t.price) : "—"],
+          ["Jadwal", t.scheduledAt ? whenText(t.scheduledAt) : "—"],
+          ["Dibuat", whenText(t.createdAt)],
+        ];
+        if (t.note) rows.push(["Catatan", t.note]);
+        $("dRows").innerHTML = rows.map(([k, v]) => `<div class="detail-row"><span class="k">${k}</span><span>${esc(v)}</span></div>`).join("");
+        $("detail").showModal();
+      }
+      $("dPipe").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-st]"); if (!b) return;
+        const t = db.tickets.find((x) => x.id === activeId); if (!t) return;
+        t.status = b.dataset.st; persist();
+        openDetail(t); renderFilters(); renderList(); toast(t.code + " → " + stLabel(t.status));
+      });
+      $("dClose").onclick = () => $("detail").close();
+      $("dDelete").onclick = () => {
+        if (!confirm("Hapus tiket ini?")) return;
+        db.tickets = db.tickets.filter((x) => x.id !== activeId); persist();
+        $("detail").close(); renderFilters(); renderList(); toast("Tiket dihapus");
+      };
+      $("dEdit").onclick = () => { const t = db.tickets.find((x) => x.id === activeId); $("detail").close(); openForm(t); };
+
+      // ── Form ──
+      let editingId = null;
+      function openForm(t) {
+        editingId = t ? t.id : null;
+        $("fTitle").textContent = t ? "Ubah servis" : "Servis baru";
+        $("fJob").value = t ? t.title : "";
+        $("fCust").value = t ? (t.customerName || "") : "";
+        $("fHp").value = t ? (t.phone || "") : "";
+        $("fPrice").value = t && t.price ? t.price : "";
+        $("fWhen").value = t && t.scheduledAt ? isoToLocal(t.scheduledAt) : "";
+        $("fNote").value = t ? (t.note || "") : "";
+        $("fPrio").checked = t ? !!t.priority : false;
+        $("form").showModal();
+      }
+      function isoToLocal(iso) { const d = new Date(iso); const p = (n) => String(n).padStart(2, "0");
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
+      $("fSave").onclick = () => {
+        const title = $("fJob").value.trim();
+        if (!title) { toast("Isi jenis servis"); return; }
+        const data = {
+          title,
+          customerName: $("fCust").value.trim(),
+          phone: $("fHp").value.trim(),
+          price: Number(String($("fPrice").value).replace(/[^\d]/g, "")) || 0,
+          scheduledAt: $("fWhen").value ? new Date($("fWhen").value).toISOString() : null,
+          note: $("fNote").value.trim(),
+          priority: $("fPrio").checked,
+        };
+        if (editingId) {
+          Object.assign(db.tickets.find((x) => x.id === editingId), data);
+        } else {
+          db.seq += 1;
+          db.tickets.push({ id: "s" + Date.now(), code: "S-" + String(db.seq).padStart(3, "0"),
+            status: data.scheduledAt ? "scheduled" : "new", createdAt: new Date().toISOString(), ...data });
+        }
+        persist(); renderFilters(); renderList();
+        $("form").close(); toast(editingId ? "Tiket diperbarui" : "Tiket dibuat");
+      };
+      $("fClose").onclick = () => $("form").close();
+      $("fab").onclick = () => openForm(null);
+
+      // ── Settings ──
+      $("openSettings").onclick = () => { $("sStore").value = db.store; $("settings").showModal(); };
+      $("sSave").onclick = () => { db.store = $("sStore").value.trim() || "Servis"; persist(); applyChrome(); $("settings").close(); toast("Tersimpan"); };
+      $("sClose").onclick = () => $("settings").close();
+      document.querySelectorAll("dialog").forEach((d) => d.addEventListener("click", (e) => { if (e.target === d) d.close(); }));
+
+      function applyChrome() { $("hStore").textContent = db.store; document.title = "Servis — " + db.store; }
+      let toastT;
+      function toast(m) { const el = $("toast"); el.textContent = m; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 2200); }
+
+      applyChrome(); renderFilters(); renderList();
+    </script>
+  </body>
+</html>

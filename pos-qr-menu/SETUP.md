@@ -14,9 +14,15 @@ satu file HTML.
 | File | Untuk siapa | Fungsi |
 |------|-------------|--------|
 | `index.html` | **Pelanggan** | Halaman menu + keranjang + kirim pesanan. Baca nomor meja dari URL (`?meja=A1`). |
-| `kasir.html` | **Kamu (owner)** | Kasir: input nominal/barang → metode bayar (QRIS/transfer/tunai) + bukti → **cetak struk Bluetooth** (bisa dikustom). |
+| `kasir.html` | **Kamu (owner)** | Kasir: input nominal/barang → bayar (QRIS/transfer/tunai) + bukti → struk Bluetooth. Plus **riwayat + rekap harian**. |
+| `meja.html` | **Kamu (owner)** | **Status meja** (kosong/terisi/reserved/bersihin) + **reservasi** (booking meja). |
+| `servis.html` | **Kamu (owner)** | **Manajemen servis**: tiket kerjaan, jadwal, status pengerjaan — untuk usaha jasa apa pun. |
 | `tables.html` | **Kamu (owner)** | Generate + print QR untuk tiap meja. Buka di browser, klik Print/PDF, potong, tempel di meja. |
 | `qrcode.vendor.js` | — | Encoder QR offline (MIT, tanpa CDN pihak ketiga). Dipakai `kasir.html` + `tables.html`. |
+
+> Semua tool owner (`kasir`/`meja`/`servis`) **jalan lokal di HP/tablet, tanpa server** — datanya
+> tersimpan di browser perangkat itu (localStorage). Sinkronisasi multi-perangkat menyusul
+> lewat backend POS Founder+.
 
 ## 3 langkah
 
@@ -132,6 +138,26 @@ dihitung otomatis; struk mencantumkan Tunai + Kembalian.
 
 > QRIS statis→dinamis + struk dibuat 100% di browser. Tidak ada data transaksi yang
 > dikirim ke pihak ketiga.
+
+**Riwayat + rekap harian.** Ikon jam di kasir membuka **Riwayat**: total hari ini,
+rincian per metode (QRIS/Transfer/Tunai), daftar transaksi, **cetak rekap** (tutup
+kasir), **export CSV**, dan hapus. Setiap pembayaran yang selesai otomatis tercatat.
+
+## Status meja + reservasi (`meja.html`)
+
+Buka `meja.html`. Tab **Meja**: grid meja dengan status (kosong/terisi/reserved/
+bersihin) — tap meja untuk ubah status. Tab **Reservasi**: tambah booking (nama, HP,
+jumlah orang, tanggal-jam, meja) dan ubah statusnya (booking → duduk → selesai /
+no-show / batal); booking yang dikaitkan ke meja otomatis menandai meja itu
+reserved/terisi. Atur jumlah & prefix meja lewat ikon ⚙.
+
+## Manajemen servis (`servis.html`)
+
+Buka `servis.html` — untuk usaha jasa (bengkel, salon, laundry, servis elektronik,
+dll). Tap **+ Servis** untuk buat tiket (jenis kerjaan, pelanggan, HP, harga, jadwal,
+catatan, tandai prioritas). Tiap tiket punya kode (S-001…) dan alur status: Baru →
+Dijadwalkan → Dikerjakan → Selesai (atau Batal). Filter cepat (Semua/Aktif/Dikerjakan/
+Selesai) dan ubah status langsung dari detail tiket.
 
 ## Catatan
 

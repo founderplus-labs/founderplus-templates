@@ -80,15 +80,16 @@ const META = {
     securityDoc: 'SECURITY.md'
   },
   'pos-qr-menu': {
-    title: 'POS QR-Menu + Kasir (QRIS · struk Bluetooth)',
+    title: 'POS QR-Menu + Kasir + Meja + Servis',
     description:
-      'No-build dine-in POS suite. Customers scan a per-table QR, see the menu, and order from their phone with the table number attached (WhatsApp today, Founder+ POS backend when configured). Cashier (kasir.html): enter an amount or itemized bill, show a dynamic QRIS (built from the merchant static payload with a correct EMVCo CRC), and print an ESC/POS receipt to a Bluetooth thermal printer — customizable (store info, footer, 58/80mm), with a window.print fallback. Plus an offline per-table QR print tool (tables.html).',
+      'No-build POS suite for cafes/restaurants/service businesses. Customers scan a per-table QR, see the menu, and order from their phone with the table number attached (WhatsApp today, Founder+ POS backend when configured). Cashier (kasir.html): amount/itemized bill -> pay by dynamic QRIS (built from the merchant static payload with a correct EMVCo CRC), bank transfer (own accounts), or cash with change; attach a payment-proof photo; print an ESC/POS Bluetooth receipt (customizable, window.print fallback); plus transaction history + daily close-out report + CSV. Table management (meja.html): table status + reservations. Service management (servis.html): job tickets with a status pipeline. Owner tools run locally (localStorage), no server. Plus an offline per-table QR print tool (tables.html).',
     runtime: 'static',
-    stack: ['html', 'no-build', 'pos', 'qr', 'qris', 'bluetooth'],
+    stack: ['html', 'no-build', 'pos', 'qr', 'qris', 'bluetooth', 'reservations', 'service'],
     postInstall: [
       'Edit CONFIG + MENU in index.html (store, WhatsApp, items)',
       'fp sites publish index.html',
       'Open kasir.html to take payments (paste your QRIS payload in Settings)',
+      'Open meja.html for table status + reservations, servis.html for service tickets',
       'Open tables.html in a browser to print per-table QR codes'
     ],
     setupDoc: 'SETUP.md'
