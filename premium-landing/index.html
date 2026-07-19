@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- TODO: ganti judul + deskripsi -->
+    <title>Template Premium — Selamat datang</title>
+    <meta name="description" content="Landing page premium, gelap, dan cepat. Ganti teks & warna, publish." />
+    <meta name="theme-color" content="#0a0a0c" />
+    <style>
+      /* ─────────────────────────────────────────────────────────────
+         Template landing premium — desain orisinal, self-contained.
+         Tanpa aset pihak ketiga: ikon = inline SVG, "gambar" = CSS.
+         Motion: reveal saat scroll (IntersectionObserver + transition),
+         easing kustom, hormati prefers-reduced-motion.
+         Ganti WARNA lewat token --accent di :root.
+         ───────────────────────────────────────────────────────────── */
+      :root {
+        --bg: #0a0a0c;
+        --panel: #131317;
+        --panel-2: #17171c;
+        --ink: #f4f4f6;
+        --muted: #a2a2ad;
+        --faint: #6c6c78;
+        --line: rgba(255, 255, 255, 0.09);
+        --line-2: rgba(255, 255, 255, 0.06);
+        --accent: #8b5cf6;        /* ← ganti warna brand di sini */
+        --accent-ink: #c4b5fd;
+        --sand: #d7d0c0;          /* aksen hangat (kartu terang) */
+        --r: 20px;
+        --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        --maxw: 1140px;
+        --safe-t: env(safe-area-inset-top, 0px);
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0; background: var(--bg); color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Inter, sans-serif;
+        font-optical-sizing: auto; line-height: 1.5; -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      a { color: inherit; text-decoration: none; }
+      .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+      .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600;
+        letter-spacing: 0.02em; color: var(--accent-ink);
+        background: color-mix(in srgb, var(--accent) 14%, transparent);
+        padding: 6px 12px; border-radius: 999px; }
+      .btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none; font: inherit;
+        font-weight: 600; font-size: 15px; padding: 12px 20px; border-radius: 12px;
+        transition: transform 150ms var(--ease-out), background 180ms var(--ease-out), opacity 180ms var(--ease-out); }
+      .btn:active { transform: scale(0.97); }
+      .btn-primary { background: var(--ink); color: #0b0b0d; }
+      .btn-primary:hover { background: #fff; }
+      .btn-ghost { background: rgba(255,255,255,0.07); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+      .btn-ghost:hover { background: rgba(255,255,255,0.12); }
+      .btn-accent { background: var(--accent); color: #fff; }
+      .btn-accent:hover { background: color-mix(in srgb, var(--accent) 84%, #fff); }
+      svg { display: block; }
+      .ico { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.7;
+        stroke-linecap: round; stroke-linejoin: round; }
+
+      /* ── Reveal-on-scroll ── */
+      .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+      .reveal.in { opacity: 1; transform: none; }
+      .reveal[data-d="1"] { transition-delay: 0.08s; }
+      .reveal[data-d="2"] { transition-delay: 0.16s; }
+      .reveal[data-d="3"] { transition-delay: 0.24s; }
+      .reveal[data-d="4"] { transition-delay: 0.32s; }
+      /* Hero rises on load */
+      .rise { opacity: 0; transform: translateY(20px); animation: rise 0.9s var(--ease) forwards; }
+      @keyframes rise { to { opacity: 1; transform: none; } }
+
+      /* ── Header ── */
+      header { position: sticky; top: 0; z-index: 40; padding: calc(14px + var(--safe-t)) 0 14px;
+        background: color-mix(in srgb, var(--bg) 72%, transparent);
+        backdrop-filter: saturate(1.4) blur(16px); -webkit-backdrop-filter: saturate(1.4) blur(16px);
+        border-bottom: 1px solid var(--line-2); }
+      header .row { display: flex; align-items: center; gap: 22px; }
+      .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em; font-size: 16px; }
+      .brand .mark { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+        background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 50%, #f97316)); color: #fff; }
+      nav.main { display: none; gap: 26px; margin-left: 26px; }
+      nav.main a { font-size: 14.5px; color: var(--muted); transition: color 160ms var(--ease-out); }
+      nav.main a:hover, nav.main a.active { color: var(--ink); }
+      header .cta { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+      .burger { margin-left: auto; display: inline-grid; gap: 5px; background: none; border: none; cursor: pointer; padding: 8px; }
+      .burger span { width: 22px; height: 2px; background: var(--ink); border-radius: 2px; }
+      @media (min-width: 860px) { nav.main { display: flex; } .burger, .m-only { display: none; } }
+      @media (max-width: 859px) { .cta .btn-desktop { display: none; } }
+
+      /* Mobile menu */
+      #menu { position: fixed; inset: 0; z-index: 60; background: var(--bg); padding: 22px; display: none; flex-direction: column; }
+      #menu.open { display: flex; }
+      #menu .top { display: flex; align-items: center; justify-content: space-between; }
+      #menu nav { display: flex; flex-direction: column; gap: 4px; margin-top: 32px; }
+      #menu nav a { font-size: 26px; font-weight: 600; padding: 12px 0; border-bottom: 1px solid var(--line-2); }
+      .x { background: none; border: none; color: var(--ink); font-size: 30px; line-height: 1; cursor: pointer; }
+
+      /* ── Hero ── */
+      .hero { position: relative; text-align: center; padding: 84px 0 40px; }
+      .hero::before { content: ""; position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+        width: 720px; height: 520px; max-width: 120vw; z-index: 0; pointer-events: none;
+        background: radial-gradient(50% 50% at 50% 40%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%);
+        filter: blur(30px); opacity: 0.8; }
+      .hero > * { position: relative; z-index: 1; }
+      .hero h1 { font-size: clamp(38px, 8vw, 76px); line-height: 1.03; letter-spacing: -0.03em; font-weight: 600;
+        margin: 22px auto 0; max-width: 15ch; }
+      .hero p.sub { font-size: clamp(16px, 2.2vw, 21px); color: var(--muted); max-width: 56ch; margin: 20px auto 0; }
+      .hero .actions { display: flex; gap: 12px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+      .hero .note { color: var(--faint); font-size: 13px; margin-top: 16px; }
+
+      /* Product mock (pure CSS — no external image) */
+      .mock { margin: 54px auto 0; max-width: 1000px; border-radius: 22px; overflow: hidden;
+        background: var(--panel); box-shadow: 0 40px 120px -40px rgba(0,0,0,0.8), inset 0 0 0 1px var(--line); }
+      .mock .bar { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line-2); }
+      .mock .dots { display: flex; gap: 7px; }
+      .mock .dots i { width: 11px; height: 11px; border-radius: 999px; background: #3a3a42; }
+      .mock .tools { margin-left: auto; display: flex; gap: 8px; }
+      .mock .tools i { width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px var(--line-2); }
+      .mock .body { display: grid; grid-template-columns: 200px 1fr; min-height: 300px; }
+      .mock .side { border-right: 1px solid var(--line-2); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+      .mock .side .item { height: 38px; border-radius: 10px; background: rgba(255,255,255,0.035); box-shadow: inset 0 0 0 1px var(--line-2); }
+      .mock .side .item.active { background: color-mix(in srgb, var(--accent) 20%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent); }
+      .mock .canvas { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 116px; gap: 14px; }
+      .mock .tile { border-radius: 14px; }
+      .mock .tile.sand { background: linear-gradient(135deg, var(--sand), #bcb4a0); }
+      .mock .tile.g1 { background: linear-gradient(135deg, #232329, #17171c); box-shadow: inset 0 0 0 1px var(--line-2); }
+      .mock .tile.g2 { background: radial-gradient(120% 120% at 0% 0%, color-mix(in srgb, var(--accent) 40%, transparent), #17171c 60%); }
+      .mock .tile.wide { grid-column: span 2; background: linear-gradient(135deg, #1c1c22, #141418); box-shadow: inset 0 0 0 1px var(--line-2); }
+      @media (max-width: 720px) { .mock .body { grid-template-columns: 1fr; } .mock .side { flex-direction: row; overflow: auto; } .mock .side .item { min-width: 90px; } }
+
+      /* ── Section shell ── */
+      section { padding: 96px 0; }
+      .sec-head { display: flex; flex-wrap: wrap; gap: 20px; align-items: end; justify-content: space-between; margin-bottom: 44px; }
+      .sec-head h2 { font-size: clamp(28px, 4.5vw, 44px); letter-spacing: -0.02em; font-weight: 600; margin: 12px 0 0; max-width: 20ch; }
+      .sec-head .lead { color: var(--muted); font-size: 16px; max-width: 42ch; }
+
+      /* ── Features ── */
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+      .card { background: var(--panel); border-radius: var(--r); padding: 26px; box-shadow: inset 0 0 0 1px var(--line); }
+      .card .ficon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: var(--ink);
+        background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px var(--line); margin-bottom: 18px; }
+      .card h3 { font-size: 20px; letter-spacing: -0.01em; margin: 0 0 8px; font-weight: 600; }
+      .card p { color: var(--muted); font-size: 14.5px; margin: 0; }
+
+      /* ── Stats ── */
+      .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 22px; text-align: center; }
+      .stat .num { font-size: clamp(44px, 7vw, 68px); font-weight: 600; letter-spacing: -0.03em; line-height: 1;
+        font-variant-numeric: tabular-nums; }
+      .stat .lbl { color: var(--muted); font-size: 15px; margin-top: 12px; }
+
+      /* ── Pricing ── */
+      .pricing { background: var(--sand); color: #16130f; border-radius: 28px; padding: clamp(28px, 5vw, 72px); }
+      .pricing h2 { text-align: center; font-size: clamp(30px, 5vw, 52px); letter-spacing: -0.02em; font-weight: 600; margin: 0 0 12px; }
+      .pricing .psub { text-align: center; color: rgba(22,19,15,0.6); margin: 0 auto 48px; max-width: 46ch; }
+      .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
+      .plan { display: flex; flex-direction: column; }
+      .plan .price { display: flex; align-items: baseline; gap: 8px; }
+      .plan .price .amt { font-size: 40px; font-weight: 600; letter-spacing: -0.02em; }
+      .plan .price .per { color: rgba(22,19,15,0.5); font-size: 18px; }
+      .plan .pdesc { color: rgba(22,19,15,0.8); margin: 16px 0 0; font-size: 15px; }
+      .plan hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 24px 0; }
+      .plan ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+      .plan li { display: flex; align-items: center; gap: 12px; font-size: 15px; }
+      .plan li .tick { width: 22px; height: 22px; border-radius: 999px; background: #16130f; color: var(--sand);
+        display: grid; place-items: center; flex: 0 0 22px; }
+      .plan li.dim .tick { opacity: 0.25; }
+      .plan .btn { justify-content: center; width: 100%; margin-top: 28px; }
+      .plan-a .btn { background: #16130f; color: var(--sand); }
+      .plan-b .btn { background: transparent; color: #16130f; box-shadow: inset 0 0 0 1px rgba(22,19,15,0.4); }
+
+      /* ── CTA band ── */
+      .band { text-align: center; }
+      .band .inner { border-radius: 28px; padding: clamp(36px, 6vw, 84px); position: relative; overflow: hidden;
+        background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+      .band .inner::before { content: ""; position: absolute; inset: -40% 20% auto; height: 300px;
+        background: radial-gradient(50% 100% at 50% 0%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%); filter: blur(30px); }
+      .band h2 { position: relative; font-size: clamp(30px, 5vw, 52px); letter-spacing: -0.02em; font-weight: 600; margin: 0 auto; max-width: 18ch; }
+      .band p { position: relative; color: var(--muted); margin: 18px auto 30px; max-width: 46ch; }
+      .band .actions { position: relative; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+      /* ── Footer ── */
+      footer { border-top: 1px solid var(--line-2); padding: 64px 0 40px; }
+      .fcols { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
+      @media (max-width: 700px) { .fcols { grid-template-columns: 1fr 1fr; } }
+      footer h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); margin: 0 0 14px; }
+      footer a { display: block; color: var(--muted); font-size: 14.5px; padding: 6px 0; transition: color 160ms var(--ease-out); }
+      footer a:hover { color: var(--ink); }
+      .fbottom { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;
+        margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line-2); color: var(--faint); font-size: 13px; }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .reveal { transition: opacity 0.4s ease; transform: none; }
+        .rise { animation: fade 0.4s ease forwards; transform: none; }
+        @keyframes fade { to { opacity: 1; } }
+        .btn:active { transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap row">
+        <a class="brand rise" href="/" style="animation-delay:.05s">
+          <span class="mark"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg></span>
+          Template
+        </a>
+        <nav class="main">
+          <a href="#fitur" class="active rise" style="animation-delay:.12s">Fitur</a>
+          <a href="#angka" class="rise" style="animation-delay:.17s">Angka</a>
+          <a href="#harga" class="rise" style="animation-delay:.22s">Harga</a>
+          <a href="#kontak" class="rise" style="animation-delay:.27s">Kontak</a>
+        </nav>
+        <div class="cta">
+          <button class="btn btn-primary btn-desktop rise" style="animation-delay:.32s">Mulai gratis</button>
+          <button class="burger m-only" aria-label="Menu" onclick="document.getElementById('menu').classList.add('open')">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div id="menu">
+      <div class="top">
+        <span class="brand"><span class="mark"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg></span>Template</span>
+        <button class="x" aria-label="Tutup" onclick="document.getElementById('menu').classList.remove('open')">×</button>
+      </div>
+      <nav onclick="document.getElementById('menu').classList.remove('open')">
+        <a href="#fitur">Fitur</a><a href="#angka">Angka</a><a href="#harga">Harga</a><a href="#kontak">Kontak</a>
+      </nav>
+      <button class="btn btn-primary" style="margin-top:auto">Mulai gratis</button>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero wrap">
+      <span class="eyebrow rise" style="animation-delay:.1s">✦ Selamat datang di template kami</span>
+      <!-- TODO: ganti judul + subjudul dengan pesan produkmu -->
+      <h1 class="rise" style="animation-delay:.2s">Cara elegan meluncurkan produkmu</h1>
+      <p class="sub rise" style="animation-delay:.34s">Landing page gelap yang cepat dan premium. Ganti teks, warna, dan tautan — lalu publish. Tanpa build, tanpa server.</p>
+      <div class="actions rise" style="animation-delay:.46s">
+        <button class="btn btn-accent">Mulai sekarang</button>
+        <button class="btn btn-ghost">Lihat demo</button>
+      </div>
+      <div class="note rise" style="animation-delay:.56s">Gratis dipakai · siap kamu host sendiri</div>
+
+      <!-- Product mock (CSS murni, tanpa aset eksternal) -->
+      <div class="mock rise" style="animation-delay:.7s" aria-hidden="true">
+        <div class="bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <div class="tools"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="body">
+          <div class="side">
+            <div class="item active"></div><div class="item"></div><div class="item"></div><div class="item"></div>
+          </div>
+          <div class="canvas">
+            <div class="tile sand"></div>
+            <div class="tile g2"></div>
+            <div class="tile g1"></div>
+            <div class="tile wide"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section id="fitur" class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="eyebrow reveal">Fitur</span>
+          <h2 class="reveal" data-d="1">Semua yang kamu butuh untuk tampil serius</h2>
+        </div>
+        <p class="lead reveal" data-d="2">Komponen rapi, animasi halus, dan struktur yang gampang kamu ubah. Ganti isi, biarkan desainnya bekerja.</p>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="ficon"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h7"/></svg></div>
+          <h3>Tanpa build</h3>
+          <p>Satu file HTML. Edit di editor apa pun, buka di browser, langsung jalan.</p>
+        </div>
+        <div class="card reveal" data-d="1">
+          <div class="ficon"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Cepat &amp; ringan</h3>
+          <p>Tanpa dependensi berat. Aset dibuat dengan CSS, jadi loading instan.</p>
+        </div>
+        <div class="card reveal" data-d="2">
+          <div class="ficon"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></div>
+          <h3>Milik kamu</h3>
+          <p>Host di domainmu sendiri. Ganti warna brand lewat satu token, selesai.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="angka" class="wrap">
+      <div class="stats">
+        <div class="stat reveal">
+          <div class="num" data-count="99" data-suffix="%">0%</div>
+          <div class="lbl">Skor performa halaman</div>
+        </div>
+        <div class="stat reveal" data-d="1">
+          <div class="num" data-count="1" data-suffix=" file">0</div>
+          <div class="lbl">Yang perlu kamu publish</div>
+        </div>
+        <div class="stat reveal" data-d="2">
+          <div class="num" data-count="0" data-prefix="$" >0</div>
+          <div class="lbl">Biaya server bulanan</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="harga" class="wrap">
+      <div class="pricing reveal">
+        <h2>Harga sederhana</h2>
+        <p class="psub">Contoh struktur harga. Ganti angka &amp; benefit sesuai produkmu.</p>
+        <div class="plans">
+          <div class="plan plan-a">
+            <div class="price"><span class="amt">Rp 0</span><span class="per">/ selamanya</span></div>
+            <p class="pdesc">Untuk mulai. Semua dasar yang kamu perlukan untuk meluncurkan.</p>
+            <hr />
+            <ul>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Template landing lengkap</li>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Animasi &amp; komponen dasar</li>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Host di mana saja</li>
+              <li class="dim"><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Dukungan prioritas</li>
+            </ul>
+            <button class="btn">Mulai</button>
+          </div>
+          <div class="plan plan-b">
+            <div class="price"><span class="amt">Rp 149rb</span><span class="per">/ bulan</span></div>
+            <p class="pdesc">Untuk yang mau lebih. Komponen &amp; dukungan tambahan.</p>
+            <hr />
+            <ul>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Semua di paket gratis</li>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Komponen pro</li>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Integrasi lanjutan</li>
+              <li><span class="tick"><svg class="ico" viewBox="0 0 24 24" style="width:14px;height:14px;stroke-width:2.4;stroke:currentColor"><path d="M20 6 9 17l-5-5"/></svg></span>Dukungan prioritas</li>
+            </ul>
+            <button class="btn">Hubungi kami</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="kontak" class="wrap band">
+      <div class="inner reveal">
+        <h2>Siap meluncurkan?</h2>
+        <p>Ganti teks di file ini, sesuaikan warna, lalu publish ke domainmu. Semudah itu.</p>
+        <div class="actions">
+          <button class="btn btn-accent">Mulai gratis</button>
+          <button class="btn btn-ghost">Pelajari dulu</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="wrap">
+        <div class="fcols">
+          <div>
+            <span class="brand"><span class="mark"><svg class="ico" viewBox="0 0 24 24" style="width:15px;height:15px;stroke-width:2"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg></span>Template</span>
+            <p style="color:var(--muted); font-size:14.5px; max-width:38ch; margin:16px 0 0">Template landing premium, self-contained. Ganti isinya, jadikan milikmu.</p>
+          </div>
+          <div>
+            <h4>Produk</h4>
+            <a href="#fitur">Fitur</a><a href="#harga">Harga</a><a href="#angka">Angka</a>
+          </div>
+          <div>
+            <h4>Perusahaan</h4>
+            <a href="#">Tentang</a><a href="#">Kontak</a><a href="#">Kebijakan privasi</a>
+          </div>
+        </div>
+        <div class="fbottom">
+          <span>© <span id="yr">2026</span> Template kamu. Semua hak dilindungi.</span>
+          <span>Dibuat dengan template Founder+</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // ── Reveal-on-scroll (IntersectionObserver) ──
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add("in");
+          io.unobserve(e.target);
+          if (e.target.classList.contains("stat")) countUp(e.target);
+        }
+      }, { threshold: 0.2, rootMargin: "0px 0px -8% 0px" });
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+      // ── Count-up for stats (respects reduced motion) ──
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      function countUp(statEl) {
+        const el = statEl.querySelector("[data-count]");
+        if (!el) return;
+        const end = Number(el.dataset.count) || 0;
+        const prefix = el.dataset.prefix || "";
+        const suffix = el.dataset.suffix || "";
+        const render = (n) => (el.textContent = prefix + Math.round(n).toLocaleString("id-ID") + suffix);
+        if (reduce || end === 0) { render(end); return; }
+        const dur = 1200, t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / dur);
+          render(end * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+
+      document.getElementById("yr").textContent = new Date().getFullYear();
+
+      // ── (Opsional) GTM Founder+ — sama seperti template lain (spec-driven).
+      // Isi PROJECT_ID untuk analytics + atribusi; kosong = mati.
+      const FP_PROJECT_ID = ""; // dari dashboard Founder+
+      if (FP_PROJECT_ID) {
+        const s = document.createElement("script");
+        s.src = "https://cdn.founderplus.id/funnel-tracker.js";
+        s.setAttribute("data-project-id", FP_PROJECT_ID);
+        s.defer = true;
+        document.body.appendChild(s);
+      }
+    </script>
+  </body>
+</html>

@@ -602,6 +602,36 @@
           "size": 5951
         }
       ]
+    },
+    {
+      "name": "premium-landing",
+      "title": "Premium Landing (dark, no-build)",
+      "description": "Original, self-contained premium dark landing page: hero, features, count-up stats, pricing, CTA, footer. Scroll-reveal + count-up animations (IntersectionObserver + CSS, reduced-motion aware). No third-party assets — icons are inline SVG and imagery is CSS-built; change the brand colour via one --accent token. Optional Founder+ GTM tracker. Deploy index.html with fp sites publish.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build",
+        "landing"
+      ],
+      "postInstall": [
+        "Edit copy (TODO markers) + set --accent in index.html",
+        "fp sites publish index.html"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/premium-landing/SETUP.md",
+          "digest": "sha256:675fc08c4a59e24d73e12f471f37d6ffaa2554a8a51e593a0e38418f5ad25521",
+          "size": 1896
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/premium-landing/index.html",
+          "digest": "sha256:60b47edfde3b5d139faf0148336d4a89c5c80354c2b777450e8aae3e87a44ab8",
+          "size": 26024
+        }
+      ]
     }
   ]
 }

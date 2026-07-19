@@ -93,6 +93,18 @@ const META = {
       'Open tables.html in a browser to print per-table QR codes'
     ],
     setupDoc: 'SETUP.md'
+  },
+  'premium-landing': {
+    title: 'Premium Landing (dark, no-build)',
+    description:
+      'Original, self-contained premium dark landing page: hero, features, count-up stats, pricing, CTA, footer. Scroll-reveal + count-up animations (IntersectionObserver + CSS, reduced-motion aware). No third-party assets — icons are inline SVG and imagery is CSS-built; change the brand colour via one --accent token. Optional Founder+ GTM tracker. Deploy index.html with fp sites publish.',
+    runtime: 'static',
+    stack: ['html', 'no-build', 'landing'],
+    postInstall: [
+      'Edit copy (TODO markers) + set --accent in index.html',
+      'fp sites publish index.html'
+    ],
+    setupDoc: 'SETUP.md'
   }
 }
 
