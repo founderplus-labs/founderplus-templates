@@ -6,136 +6,267 @@
     <!-- TODO: ganti nama tempat usahamu -->
     <title>Menu — Warung Kopi Founder+</title>
     <meta name="description" content="Scan meja, lihat menu, pesan langsung dari HP-mu." />
-    <meta name="theme-color" content="#8b5cf6" />
+    <meta name="theme-color" content="#faf9fb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141019" media="(prefers-color-scheme: dark)" />
     <style>
+      /* ─────────────────────────────────────────────────────────────
+         Design tokens. Motion follows emil-design-eng (strong custom
+         easings, sub-300ms UI, transform/opacity only); materials &
+         type follow apple-design (translucent chrome, size-specific
+         tracking, tight heading leading, shadow-over-border).
+         ───────────────────────────────────────────────────────────── */
       :root {
         --brand: #8b5cf6;
         --brand-ink: #6d28d9;
-        --ink: #1c1523;
-        --muted: #6b6577;
-        --line: #ece9f1;
+        --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+        --ink: #1a1420;
+        --secondary: #524b5e;
+        --muted: #857e91;
+        --line: #ece8f1;
         --bg: #faf9fb;
         --card: #ffffff;
-        --ok: #16a34a;
-        --radius: 16px;
+        --ok: #17984e;
+        --ok-ink: #0f7a3d;
+        --danger: #c2410c;
+
+        --r-card: 18px;
+        --r-ctl: 12px;
+
+        /* Shadow over border — layered, soft, tinted toward the ink. */
+        --shadow-card: 0 1px 2px rgba(26, 20, 32, 0.04), 0 4px 14px rgba(26, 20, 32, 0.05);
+        --shadow-pop: 0 1px 1px rgba(26, 20, 32, 0.05), 0 -8px 40px rgba(26, 20, 32, 0.14);
+
+        /* Strong custom easings — the built-ins are too weak. */
+        --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
         --safe-b: env(safe-area-inset-bottom, 0px);
+        --safe-t: env(safe-area-inset-top, 0px);
       }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ink: #f4eefc; --secondary: #b8b0c6; --muted: #8b8399;
+          --line: #2a2436; --bg: #131019; --card: #1c1626;
+          --brand: #a78bfa; --brand-ink: #c4b5fd;
+          --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+          --shadow-pop: 0 1px 1px rgba(0,0,0,0.4), 0 -8px 44px rgba(0,0,0,0.55);
+        }
+      }
+
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       html, body { margin: 0; }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        font-optical-sizing: auto;
         color: var(--ink);
         background: var(--bg);
         line-height: 1.5;
-        /* room for the floating cart bar */
-        padding-bottom: calc(96px + var(--safe-b));
+        letter-spacing: 0; /* body near zero; large text tightens below */
+        padding-bottom: calc(104px + var(--safe-b));
+        -webkit-font-smoothing: antialiased;
       }
+
+      /* ── Chrome: translucent material, bright top edge, scroll-edge mask ── */
       header {
         position: sticky; top: 0; z-index: 5;
-        background: color-mix(in srgb, var(--card) 88%, transparent);
-        backdrop-filter: saturate(1.4) blur(12px);
-        -webkit-backdrop-filter: saturate(1.4) blur(12px);
-        border-bottom: 1px solid var(--line);
-        padding: 14px 18px calc(12px);
+        padding: calc(14px + var(--safe-t)) 18px 13px;
+        background: color-mix(in srgb, var(--card) 72%, transparent);
+        backdrop-filter: saturate(1.8) blur(20px);
+        -webkit-backdrop-filter: saturate(1.8) blur(20px);
+        /* scroll-edge effect: a soft hairline that fades, not a hard 1px rule */
+        box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 60%, transparent);
       }
-      .store { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+      .store {
+        font-size: 19px; font-weight: 700;
+        letter-spacing: -0.02em; /* tighten large text */
+        line-height: 1.1;
+      }
       .table-pill {
         display: inline-flex; align-items: center; gap: 6px;
-        margin-top: 4px; font-size: 13px; color: var(--brand-ink);
-        background: color-mix(in srgb, var(--brand) 12%, transparent);
-        padding: 3px 10px; border-radius: 999px; font-weight: 600;
+        margin-top: 6px; font-size: 12.5px; font-weight: 650;
+        letter-spacing: 0.01em; color: var(--brand-ink);
+        background: var(--brand-soft);
+        padding: 4px 11px; border-radius: 999px;
       }
-      main { max-width: 560px; margin: 0 auto; padding: 8px 14px 24px; }
+
+      main { max-width: 560px; margin: 0 auto; padding: 4px 14px 24px; }
+
+      /* ── Category rail ── */
       .cats {
-        position: sticky; top: 64px; z-index: 4;
-        display: flex; gap: 8px; overflow-x: auto; padding: 10px 0;
-        scrollbar-width: none; background: linear-gradient(var(--bg), var(--bg) 70%, transparent);
+        position: sticky; top: calc(58px + var(--safe-t)); z-index: 4;
+        display: flex; gap: 8px; overflow-x: auto; padding: 12px 0 10px;
+        scrollbar-width: none;
+        background: linear-gradient(var(--bg) 62%, transparent);
       }
       .cats::-webkit-scrollbar { display: none; }
       .cats button {
-        flex: 0 0 auto; border: 1px solid var(--line); background: var(--card);
-        color: var(--muted); font-weight: 600; font-size: 13px;
-        padding: 7px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+        flex: 0 0 auto; border: none; cursor: pointer;
+        background: var(--card); color: var(--secondary);
+        font: inherit; font-weight: 600; font-size: 13.5px;
+        padding: 8px 15px; border-radius: 999px; white-space: nowrap;
+        box-shadow: inset 0 0 0 1px var(--line);
+        transition: color 180ms var(--ease-out), box-shadow 180ms var(--ease-out),
+                    background 180ms var(--ease-out), transform 140ms var(--ease-out);
       }
-      .cats button[aria-current="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
-      h2.cat { font-size: 14px; text-transform: uppercase; letter-spacing: 0.06em;
-        color: var(--muted); margin: 22px 2px 8px; }
+      .cats button:active { transform: scale(0.96); }
+      .cats button[aria-current="true"] {
+        background: var(--ink); color: var(--card);
+        box-shadow: inset 0 0 0 1px var(--ink);
+      }
+
+      h2.cat {
+        font-size: 12px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.07em; color: var(--muted);
+        margin: 26px 4px 10px;
+      }
+
+      /* ── Item card: solid surface, soft layered shadow (not a border) ── */
       .item {
         display: flex; gap: 12px; align-items: flex-start;
-        background: var(--card); border: 1px solid var(--line);
-        border-radius: var(--radius); padding: 14px; margin-bottom: 10px;
+        background: var(--card); border-radius: var(--r-card);
+        padding: 15px 16px; margin-bottom: 11px;
+        box-shadow: var(--shadow-card);
+        /* one-time entrance; stagger set inline. transform+opacity only. */
+        opacity: 0; transform: translateY(10px);
+        animation: item-in 460ms var(--ease-out) forwards;
       }
-      .item.out { opacity: 0.55; }
+      @keyframes item-in { to { opacity: 1; transform: none; } }
+      .item.out { box-shadow: none; background: color-mix(in srgb, var(--card) 60%, var(--bg)); }
+      .item.out .name, .item.out .price { color: var(--muted); }
       .item .body { flex: 1; min-width: 0; }
-      .item .name { font-weight: 650; }
-      .item .desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
-      .item .price { font-weight: 700; margin-top: 8px; }
-      .item .thumb {
-        width: 68px; height: 68px; border-radius: 12px; object-fit: cover;
-        background: color-mix(in srgb, var(--brand) 10%, #eee); flex: 0 0 auto;
+      .item .name { font-weight: 640; font-size: 15.5px; letter-spacing: -0.01em; }
+      .item .desc { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+      .item .price { font-weight: 700; font-size: 15px; margin-top: 9px; letter-spacing: -0.01em; }
+
+      /* ── Controls: press feedback, hover gated to fine pointers ── */
+      .controls { margin-top: 11px; }
+      .stepper { display: inline-flex; align-items: center; gap: 8px; }
+      .btn {
+        font: inherit; cursor: pointer; border: none;
+        transition: transform 150ms var(--ease-out), background 180ms var(--ease-out),
+                    box-shadow 180ms var(--ease-out), color 180ms var(--ease-out);
       }
-      .stepper { display: inline-flex; align-items: center; gap: 0; margin-top: 10px; }
-      .stepper button {
-        width: 34px; height: 34px; border: 1px solid var(--line); background: var(--card);
-        font-size: 18px; line-height: 1; border-radius: 10px; cursor: pointer; color: var(--brand-ink);
+      .btn:active { transform: scale(0.94); }
+      .add {
+        background: var(--brand); color: #fff; font-weight: 650; font-size: 14px;
+        height: 36px; padding: 0 18px; border-radius: var(--r-ctl); white-space: nowrap;
+        box-shadow: 0 1px 2px color-mix(in srgb, var(--brand) 40%, transparent);
       }
-      .stepper .add {
-        width: auto; border: none; background: var(--brand); color: #fff; font-weight: 650;
-        padding: 0 18px; height: 34px; border-radius: 10px; font-size: 14px; white-space: nowrap;
+      .round {
+        width: 36px; height: 36px; border-radius: var(--r-ctl);
+        background: var(--card); color: var(--brand-ink); font-size: 19px; line-height: 1;
+        box-shadow: inset 0 0 0 1px var(--line);
       }
-      .stepper .qty { min-width: 34px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
-      .stepper .g { display: inline-flex; gap: 8px; align-items: center; }
-      .soldout { font-size: 12px; color: #b91c1c; font-weight: 600; margin-top: 8px; }
-      /* Floating cart bar */
+      .qty {
+        min-width: 24px; text-align: center; font-weight: 700; font-size: 15px;
+        font-variant-numeric: tabular-nums;
+      }
+      .soldout { font-size: 12.5px; color: var(--danger); font-weight: 650; margin-top: 11px; }
+      @media (hover: hover) and (pointer: fine) {
+        .add:hover { background: var(--brand-ink); }
+        .round:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 40%, var(--line)); }
+        .cats button:hover:not([aria-current="true"]) { color: var(--ink); }
+      }
+
+      /* ── Floating cart bar: slides up on the drawer curve ── */
       .cartbar {
         position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
         padding: 12px 14px calc(12px + var(--safe-b));
-        background: color-mix(in srgb, var(--card) 92%, transparent);
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-        border-top: 1px solid var(--line);
-        transform: translateY(120%); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+        background: color-mix(in srgb, var(--card) 78%, transparent);
+        backdrop-filter: saturate(1.8) blur(20px);
+        -webkit-backdrop-filter: saturate(1.8) blur(20px);
+        box-shadow: 0 -1px 0 color-mix(in srgb, var(--line) 70%, transparent);
+        transform: translateY(140%);
+        transition: transform 420ms var(--ease-drawer);
       }
       .cartbar.show { transform: translateY(0); }
-      .cartbar button {
-        width: 100%; max-width: 560px; margin: 0 auto; display: flex;
-        align-items: center; justify-content: space-between; gap: 12px;
-        background: var(--ink); color: #fff; border: none;
-        padding: 15px 20px; border-radius: 14px; font-size: 16px; font-weight: 650; cursor: pointer;
+      .cartbar .go {
+        width: 100%; max-width: 560px; margin: 0 auto; cursor: pointer; border: none;
+        display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        background: var(--ink); color: var(--card);
+        padding: 15px 18px; border-radius: 15px; font: inherit; font-size: 16px; font-weight: 650;
+        box-shadow: 0 4px 16px rgba(26, 20, 32, 0.18);
+        transition: transform 150ms var(--ease-out);
       }
-      .cartbar .count {
-        background: rgba(255,255,255,.18); border-radius: 999px; padding: 1px 9px;
-        font-size: 13px; font-variant-numeric: tabular-nums;
+      .cartbar .go:active { transform: scale(0.985); }
+      .cartbar .go .left { display: inline-flex; align-items: center; gap: 10px; }
+      .count {
+        min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: color-mix(in srgb, var(--card) 22%, transparent);
+        font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
       }
-      /* Order sheet */
+      .cartbar .total { letter-spacing: -0.01em; }
+
+      /* ── Order sheet: iOS-like slide-up drawer (native <dialog>) ── */
       dialog#sheet {
-        border: none; border-radius: 22px 22px 0 0; padding: 0; width: 100%;
-        max-width: 560px; margin: auto auto 0; background: var(--card);
-        box-shadow: 0 -10px 40px rgba(20,10,40,.18);
+        border: none; padding: 0; width: 100%; max-width: 560px;
+        margin: auto auto 0; border-radius: 24px 24px 0 0;
+        background: var(--card); color: var(--ink); box-shadow: var(--shadow-pop);
+        transform: translateY(100%);
+        transition: transform 440ms var(--ease-drawer),
+                    overlay 440ms allow-discrete, display 440ms allow-discrete;
       }
-      dialog#sheet::backdrop { background: rgba(20,12,30,.45); }
-      .sheet-in { padding: 20px 18px calc(20px + var(--safe-b)); }
-      .sheet-in h3 { margin: 4px 0 14px; font-size: 18px; }
-      .line { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
-      .line .n { color: var(--muted); }
-      .total { display: flex; justify-content: space-between; font-weight: 800; font-size: 18px; margin: 14px 0 6px; }
+      dialog#sheet[open] { transform: translateY(0); }
+      @starting-style { dialog#sheet[open] { transform: translateY(100%); } }
+      dialog#sheet::backdrop {
+        background: rgba(16, 10, 26, 0);
+        backdrop-filter: blur(0px);
+        transition: background 440ms var(--ease-out), backdrop-filter 440ms var(--ease-out),
+                    overlay 440ms allow-discrete, display 440ms allow-discrete;
+      }
+      dialog#sheet[open]::backdrop { background: rgba(16, 10, 26, 0.5); backdrop-filter: blur(2px); }
+      @starting-style { dialog#sheet[open]::backdrop { background: rgba(16, 10, 26, 0); backdrop-filter: blur(0px); } }
+
+      .grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--line);
+        margin: 10px auto 0; }
+      .sheet-in { padding: 14px 18px calc(20px + var(--safe-b)); }
+      .sheet-in h3 { margin: 4px 0 14px; font-size: 18px; letter-spacing: -0.015em; font-weight: 700; }
+      .line { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0;
+        border-bottom: 1px solid var(--line); font-size: 15px; }
+      .line:last-of-type { border-bottom: none; }
+      .line .n { color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+      .line b { font-variant-numeric: tabular-nums; }
+      .total-row { display: flex; justify-content: space-between; align-items: baseline;
+        font-weight: 800; font-size: 19px; letter-spacing: -0.02em; margin: 14px 0 4px; }
+      .total-row span:last-child { font-variant-numeric: tabular-nums; }
       textarea, input {
-        width: 100%; border: 1px solid var(--line); border-radius: 12px;
-        padding: 12px; font: inherit; margin-top: 10px; background: #fff; color: var(--ink);
+        width: 100%; border: none; box-shadow: inset 0 0 0 1px var(--line);
+        border-radius: var(--r-ctl); padding: 12px 13px; font: inherit; margin-top: 10px;
+        background: var(--bg); color: var(--ink);
+        transition: box-shadow 160ms var(--ease-out);
       }
+      textarea:focus, input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--brand); }
+      textarea { resize: none; }
       .send {
         width: 100%; background: var(--ok); color: #fff; border: none; margin-top: 14px;
-        padding: 15px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer;
+        padding: 15px; border-radius: 15px; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+        box-shadow: 0 4px 16px color-mix(in srgb, var(--ok) 34%, transparent);
+        transition: transform 150ms var(--ease-out), background 180ms var(--ease-out), opacity 180ms var(--ease-out);
       }
-      .send[disabled] { opacity: .5; }
-      .close { position: absolute; top: 12px; right: 14px; background: none; border: none;
-        font-size: 26px; color: var(--muted); cursor: pointer; line-height: 1; }
-      .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
-      .banner-warn { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa;
-        border-radius: 12px; padding: 10px 12px; font-size: 13px; margin: 8px 0 4px; }
-      footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px 0 8px; }
-      footer a { color: var(--brand-ink); text-decoration: none; }
-      @media (prefers-color-scheme: dark) {
-        :root { --ink:#f3eefb; --muted:#a79fb5; --line:#2a2435; --bg:#141019; --card:#1d1726; }
+      .send:active { transform: scale(0.985); }
+      .send[disabled] { opacity: 0.45; box-shadow: none; }
+      @media (hover: hover) and (pointer: fine) { .send:hover:not([disabled]) { background: var(--ok-ink); } }
+      .close { position: absolute; top: 16px; right: 16px; width: 30px; height: 30px;
+        display: grid; place-items: center; border: none; border-radius: 999px;
+        background: var(--bg); color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer;
+        transition: transform 150ms var(--ease-out); }
+      .close:active { transform: scale(0.9); }
+      .empty { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 15px; }
+
+      .banner-warn { background: color-mix(in srgb, var(--danger) 8%, var(--card));
+        color: var(--danger); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 22%, transparent);
+        border-radius: var(--r-ctl); padding: 11px 13px; font-size: 13px; margin: 10px 0 2px; }
+      footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 28px 0 8px; }
+      footer a { color: var(--brand-ink); text-decoration: none; font-weight: 600; }
+
+      /* Reduced motion: gentle, not zero — keep opacity, drop movement. */
+      @media (prefers-reduced-motion: reduce) {
+        .item { animation: item-fade 260ms ease forwards; transform: none; }
+        @keyframes item-fade { to { opacity: 1; } }
+        .cartbar { transition: opacity 240ms ease; }
+        dialog#sheet, dialog#sheet::backdrop { transition: opacity 220ms ease; transform: none !important; }
+        .btn:active, .go:active, .send:active, .cats button:active, .close:active { transform: none; }
       }
     </style>
   </head>
@@ -164,18 +295,19 @@
     </main>
 
     <div class="cartbar" id="cartbar">
-      <button type="button" id="openSheet">
-        <span>Lihat pesanan <span class="count" id="cartCount">0</span></span>
-        <span id="cartTotal">Rp 0</span>
+      <button type="button" class="go" id="openSheet">
+        <span class="left">Lihat pesanan <span class="count" id="cartCount">0</span></span>
+        <span class="total" id="cartTotal">Rp 0</span>
       </button>
     </div>
 
     <dialog id="sheet">
-      <button class="close" id="closeSheet" aria-label="Tutup">×</button>
+      <div class="grabber" aria-hidden="true"></div>
+      <button class="close" id="closeSheet" aria-label="Tutup">✕</button>
       <div class="sheet-in">
         <h3>Pesanan · <span id="sheetTable">—</span></h3>
         <div id="orderLines"></div>
-        <div class="total"><span>Total</span><span id="sheetTotal">Rp 0</span></div>
+        <div class="total-row"><span>Total</span><span id="sheetTotal">Rp 0</span></div>
         <input id="custName" type="text" inputmode="text" placeholder="Nama (opsional)" autocomplete="name" />
         <textarea id="note" rows="2" placeholder="Catatan buat dapur (opsional) — mis. es sedikit, pedas"></textarea>
         <button class="send" id="sendOrder">Kirim pesanan</button>
@@ -188,7 +320,7 @@
         storeName: "Warung Kopi Founder+",
         currency: "IDR",
         // Nomor WhatsApp kasir/dapur (format internasional tanpa +, mis. 62812xxxx).
-        // Ini jalur pesanan default yang LANGSUNG BEKERJA tanpa backend.
+        // Jalur pesanan default yang LANGSUNG BEKERJA tanpa backend.
         whatsapp: "6281234567890",
         // (Opsional) Endpoint POS Founder+. Kalau diisi, pesanan dikirim ke
         // backend POS dulu; WhatsApp jadi fallback. Biarkan null sampai
@@ -252,9 +384,7 @@
         }
       }
 
-      function categories() {
-        return [...new Set(MENU.map((m) => m.category))];
-      }
+      const categories = () => [...new Set(MENU.map((m) => m.category))];
 
       function renderCats() {
         const nav = document.getElementById("cats");
@@ -273,46 +403,55 @@
         });
       }
 
+      // Build the menu ONCE. Qty changes patch only the affected item's controls
+      // (no full rebuild) so the entrance stagger never replays and we stay cheap.
       function renderMenu() {
         const root = document.getElementById("menu");
         root.innerHTML = "";
+        let idx = 0;
         categories().forEach((cat, i) => {
           const h = document.createElement("h2");
           h.className = "cat"; h.id = "cat-" + i; h.textContent = cat;
           root.appendChild(h);
-          MENU.filter((m) => m.category === cat).forEach((it) => root.appendChild(itemEl(it)));
+          MENU.filter((m) => m.category === cat).forEach((it) => {
+            root.appendChild(itemEl(it, idx++));
+          });
         });
       }
 
-      function itemEl(it) {
+      function itemEl(it, idx) {
         const el = document.createElement("article");
         el.className = "item" + (it.available ? "" : " out");
-        const qty = cart.get(it.id) || 0;
+        // Stagger: 45ms between items, capped so a long menu never feels slow.
+        el.style.animationDelay = Math.min(idx * 45, 360) + "ms";
         el.innerHTML = `
           <div class="body">
             <div class="name">${escapeHtml(it.name)}</div>
             ${it.desc ? `<div class="desc">${escapeHtml(it.desc)}</div>` : ""}
             <div class="price">${fmt(it.price)}</div>
-            ${it.available ? controls(it, qty) : `<div class="soldout">Habis</div>`}
+            <div class="controls" data-controls="${it.id}">${it.available ? controls(it.id) : `<div class="soldout">Habis</div>`}</div>
           </div>`;
         return el;
       }
 
-      function controls(it, qty) {
+      function controls(id) {
+        const qty = cart.get(id) || 0;
         if (qty <= 0) {
-          return `<div class="stepper"><button class="add" type="button" data-add="${it.id}">+ Tambah</button></div>`;
+          return `<div class="stepper"><button class="btn add" type="button" data-add="${id}">+ Tambah</button></div>`;
         }
-        return `<div class="stepper g">
-            <button type="button" data-dec="${it.id}" aria-label="Kurangi">−</button>
+        return `<div class="stepper">
+            <button class="btn round" type="button" data-dec="${id}" aria-label="Kurangi">−</button>
             <span class="qty">${qty}</span>
-            <button type="button" data-inc="${it.id}" aria-label="Tambah">+</button>
+            <button class="btn round" type="button" data-inc="${id}" aria-label="Tambah">+</button>
           </div>`;
       }
 
       function setQty(id, qty) {
         if (qty <= 0) cart.delete(id);
         else cart.set(id, qty);
-        renderMenu();
+        // Patch just this item's control cluster — no menu rebuild.
+        const slot = document.querySelector(`[data-controls="${id}"]`);
+        if (slot) slot.innerHTML = controls(id);
         renderCartBar();
       }
 
@@ -338,12 +477,11 @@
             wrap.appendChild(row);
           }
         }
-        const { total } = money();
-        document.getElementById("sheetTotal").textContent = fmt(total);
+        document.getElementById("sheetTotal").textContent = fmt(money().total);
         document.getElementById("sendOrder").disabled = cart.size === 0;
       }
 
-      // Build a human-readable order summary (used for WhatsApp + POS payload).
+      // Human-readable order summary (used for WhatsApp + POS payload).
       function orderSummary() {
         const lines = [];
         for (const [id, qty] of cart) {
@@ -387,7 +525,12 @@
 
       function orderDone() {
         cart.clear();
-        renderMenu();
+        // Reset each visible control cluster without rebuilding the menu.
+        document.querySelectorAll("[data-controls]").forEach((slot) => {
+          const id = slot.getAttribute("data-controls");
+          const it = MENU.find((m) => m.id === id);
+          if (it && it.available) slot.innerHTML = controls(id);
+        });
         renderCartBar();
         document.getElementById("sheet").close();
       }
@@ -409,6 +552,8 @@
       const sheet = document.getElementById("sheet");
       document.getElementById("openSheet").onclick = () => { renderSheet(); sheet.showModal(); };
       document.getElementById("closeSheet").onclick = () => sheet.close();
+      // Tap on the backdrop (outside the sheet body) closes it.
+      sheet.addEventListener("click", (e) => { if (e.target === sheet) sheet.close(); });
       document.getElementById("sendOrder").onclick = submitOrder;
 
       renderHeader();

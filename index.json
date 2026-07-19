@@ -556,8 +556,8 @@
         {
           "path": "index.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/index.html",
-          "digest": "sha256:843a0e7cf37beea853e8f98324e9bd47c8fc8f25755997445d9fa53b294165dc",
-          "size": 19841
+          "digest": "sha256:5a9d43cea6564ffe458aef1fff66f1a36a0be1d73ff23d2f06c9ae159dab5748",
+          "size": 28003
         },
         {
           "path": "qrcode.vendor.js",
