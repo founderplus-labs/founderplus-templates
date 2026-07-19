@@ -141,15 +141,16 @@ validator JSON-Schema apa pun yang paham YAML terhadap `schema/spec.schema.json`
 | [0006](./0006-pos-cashier-qris-receipt.spec.yaml) | Kasir: QRIS/struk/rekap | pos-qr-menu | shipped |
 | [0007](./0007-fp-fullstack-product-gate.spec.yaml) | Product gate + owner bypass | fp-fullstack | shipped |
 | [0008](./0008-pos-multi-device-sync.spec.yaml) | Sinkron POS multi-device | pos-qr-menu | draft |
-| [0009](./0009-okr-goal-definition.spec.yaml) | **OKR** — definisi Goal (champion/reviewer/timeframe/parent) | fp-goals | draft |
-| [0010](./0010-okr-targets-progress.spec.yaml) | **OKR** — Targets/Key Results & progres otomatis | fp-goals | draft |
-| [0011](./0011-okr-check-in-review.spec.yaml) | **OKR** — Check-in bulanan (R/Y/G) & review | fp-goals | draft |
-| [0012](./0012-okr-alignment-tree.spec.yaml) | **OKR** — Pohon alignment & rollup | fp-goals | draft |
+| [0009](./0009-okr-goal-definition.spec.yaml) | **OKR** — definisi Goal (champion/reviewer/timeframe/parent) | fp-goals | in_progress |
+| [0010](./0010-okr-targets-progress.spec.yaml) | **OKR** — Targets/Key Results & progres otomatis | fp-goals | in_progress |
+| [0011](./0011-okr-check-in-review.spec.yaml) | **OKR** — Check-in bulanan (R/Y/G) & review | fp-goals | in_progress |
+| [0012](./0012-okr-alignment-tree.spec.yaml) | **OKR** — Pohon alignment & rollup | fp-goals | in_progress |
 
 > Slice `0001–0007` mendokumentasikan perilaku yang **sudah ada** di template
-> (spec sebagai kebenaran hidup). `0008` dan `0009–0012` adalah slice **yang
-> direncanakan** (semua checkbox kosong) — memperlihatkan tampilan spec sebelum
-> dikerjakan.
+> (spec sebagai kebenaran hidup). `0008` adalah slice **yang direncanakan**
+> (checkbox kosong). `0009–0012` sedang **in_progress**: domain core-nya sudah
+> dibangun & diuji di [`../fp-goals/`](../fp-goals/) (checkbox logic/service
+> tercentang), UI/reminder/e2e masih terbuka.
 
 ### Cluster OKR (`fp-goals`) — sistem OKR ala Operately
 
@@ -163,6 +164,10 @@ Empat slice yang saling menggantung membentuk sistem OKR lengkap:
 ```
 
 Reference implementation menargetkan **TanStack Start (`fp-fullstack`)** — kita
-**tidak** merekomendasikan Next.js.
+**tidak** merekomendasikan Next.js. Domain core-nya sudah dibangun & diuji di
+[`../fp-goals/`](../fp-goals/) (TypeScript murni, **29 test lulus**,
+`tsc --noEmit` bersih) — jalankan `npm --prefix fp-goals run demo` untuk melihat
+Work Map ter-rollup, dan `npm --prefix fp-goals test` untuk membuktikan
+acceptance criteria.
 
 Perbarui tabel ini + kolom `status` tiap kali menambah/menaikkan slice.

@@ -116,6 +116,20 @@ node specs/progress.mjs                                        # meter checklist
 
 Mulai dari [`specs/README.md`](./specs/README.md).
 
+**Contoh spec-driven end-to-end — sistem OKR (`fp-goals`).** Spec
+[`0009`–`0012`](./specs/) (OKR ala [Operately](https://github.com/operately/operately):
+Goal → champion/reviewer → Targets/KR → check-in R/Y/G → alignment tree) sudah
+punya **domain core TypeScript** di [`fp-goals/`](./fp-goals/) — framework-agnostic,
+siap dipakai app **TanStack Start (`fp-fullstack`)**:
+
+```bash
+npm --prefix fp-goals test      # 29 test membuktikan acceptance criteria spec
+npm --prefix fp-goals run demo  # cetak Work Map ter-rollup (progres + worst-wins)
+```
+
+Checkbox di tiap spec dicentang persis untuk yang sudah terverifikasi test;
+UI/reminder/e2e masih terbuka (lihat `node specs/progress.mjs`).
+
 ## Contributing a template
 
 1. Add `your-template/` with the files.

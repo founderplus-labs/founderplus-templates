@@ -3,7 +3,7 @@ id: "0011"
 slug: okr-check-in-review
 title: "OKR — Check-in bulanan (status R/Y/G + narasi) & acknowledgement reviewer"
 app: fp-goals
-status: draft
+status: in_progress
 owner: "@founderplus"
 created: "2026-07-19"
 updated: "2026-07-19"
@@ -76,14 +76,14 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given Goal aktif, when aku pilih status on_track/caution/off_track, update target, tulis narasi, lalu kirim, then check-in tersimpan & tampil di timeline."
-        done: false
+        done: true
       - text: "Given aku update nilai target di check-in, when terkirim, then nilai target ter-update (0010) dan snapshot-nya tersimpan di check-in."
-        done: false
+        done: true
       - text: "Given narasi kosong & status off_track, when kirim, then diminta mengisi alasan (obstacles/needs)."
-        done: false
+        done: true
     tasks:
       - text: "Entitas CheckIn + snapshot target."
-        done: false
+        done: true
       - text: "Form check-in (status, target update, narasi wins/obstacles/needs)."
         done: false
     edge_cases:
@@ -96,12 +96,12 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given check-in baru, when reviewer klik Acknowledge, then check-in bertanda acknowledged (oleh siapa & kapan)."
-        done: false
+        done: true
       - text: "Given reviewer menulis komentar, when disimpan, then tampil menempel pada check-in itu."
-        done: false
+        done: true
     tasks:
       - text: "Aksi acknowledge + komentar; hanya reviewer goal yang berwenang."
-        done: false
+        done: true
     edge_cases:
       - "Non-reviewer mencoba acknowledge → ditolak (403)."
   - id: US-3
@@ -156,7 +156,7 @@ test_plan:
   - id: T-2
     kind: e2e
     text: "Reviewer acknowledge + komentar → tertandai; non-reviewer ditolak."
-    done: false
+    done: true
   - id: T-3
     kind: integration
     text: "Lewati tenggat cadence → goal 'overdue' + pengingat; setelah check-in → hilang."
@@ -164,9 +164,9 @@ test_plan:
 
 definition_of_done:
   - text: "Check-in (status R/Y/G + narasi + snapshot target) tersimpan sebagai timeline."
-    done: false
+    done: true
   - text: "Reviewer acknowledgement + otorisasi peran ditegakkan."
-    done: false
+    done: true
   - text: "Cadence bulanan + penanda overdue + pengingat bekerja; paused dikecualikan."
     done: false
   - text: "Status R/Y/G aksesibel (bukan hanya warna)."

@@ -1,0 +1,16 @@
+{
+  "name": "fp-goals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OKR / Goals domain core (Operately-style) — specs 0009–0012. Framework-agnostic; drop into a TanStack Start (fp-fullstack) app.",
+  "scripts": {
+    "test": "node --experimental-strip-types --test src/core/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "demo": "node --experimental-strip-types src/demo.ts"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.0",
+    "@types/node": "^22.0.0"
+  }
+}

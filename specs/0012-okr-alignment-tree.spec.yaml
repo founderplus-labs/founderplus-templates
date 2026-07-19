@@ -3,7 +3,7 @@ id: "0012"
 slug: okr-alignment-tree
 title: "OKR — Pohon alignment & rollup (company → space → goal → sub-goal)"
 app: fp-goals
-status: draft
+status: in_progress
 owner: "@founderplus"
 created: "2026-07-19"
 updated: "2026-07-19"
@@ -68,16 +68,16 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given goal berjenjang (parent→anak), when aku buka peta, then tiap parent menampilkan progres rollup dari anak-anaknya."
-        done: false
+        done: true
       - text: "Given anak punya bobot, when rollup, then progres parent berbobot sesuai (konsisten dengan 0010)."
-        done: false
+        done: true
       - text: "Given ada anak off_track, when status parent dihitung, then parent menampilkan status terparah (worst-wins)."
-        done: false
+        done: true
     tasks:
       - text: "getGoalTree membangun hierarki dari parent_id (aman terhadap kedalaman besar)."
-        done: false
+        done: true
       - text: "Rollup progres (berbobot) & status (worst-wins) bottom-up."
-        done: false
+        done: true
       - text: "UI pohon expand/collapse + badge progres/status."
         done: false
     edge_cases:
@@ -91,7 +91,7 @@ user_stories:
     priority: should
     acceptance_criteria:
       - text: "Given filter space/timeframe/champion, when diterapkan, then pohon hanya menampilkan cabang yang cocok."
-        done: false
+        done: true
       - text: "Given aku klik node, when dibuka, then masuk ke halaman detail goal (0009–0011)."
         done: false
     tasks:
@@ -126,7 +126,7 @@ test_plan:
   - id: T-1
     kind: unit
     text: "Rollup progres berbobot & status worst-wins pada pohon contoh (termasuk 'unmeasured')."
-    done: false
+    done: true
   - id: T-2
     kind: e2e
     text: "Buat hierarki 3 tingkat → peta menampilkan rollup benar & drill-down bekerja."
@@ -138,11 +138,11 @@ test_plan:
 
 definition_of_done:
   - text: "Pohon dibangun dari parent_id, aman untuk kedalaman/lebar besar."
-    done: false
+    done: true
   - text: "Rollup progres (berbobot) & status (worst-wins) benar & teruji."
-    done: false
+    done: true
   - text: "'Unmeasured' tidak menyeret rollup jadi 0% palsu."
-    done: false
+    done: true
   - text: "Filter, drill-down, visibilitas, & aksesibilitas keyboard bekerja."
     done: false
 

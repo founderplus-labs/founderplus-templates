@@ -3,7 +3,7 @@ id: "0010"
 slug: okr-targets-progress
 title: "OKR — Targets/Key Results & progres otomatis"
 app: fp-goals
-status: draft
+status: in_progress
 owner: "@founderplus"
 created: "2026-07-19"
 updated: "2026-07-19"
@@ -65,16 +65,16 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given Goal, when aku tambah target {from:0,to:100,unit:percent}, then target tampil dengan progres 0%."
-        done: false
+        done: true
       - text: "Given target arah turun (from:20,to:5), when current=12, then progres = (20-12)/(20-5)=53%."
-        done: false
+        done: true
       - text: "Given from==to, when dihitung, then progres = 100% jika current>=to else 0% (tanpa div-by-zero)."
-        done: false
+        done: true
     tasks:
       - text: "Entitas Target + migrasi."
         done: false
       - text: "Fungsi murni computeTargetProgress(from,to,current) (uji unit terpisah)."
-        done: false
+        done: true
     edge_cases:
       - "current di luar [from,to] → progres di-clamp 0..100%."
       - "unit currency → format Rp saat tampil, hitung tetap numerik."
@@ -86,12 +86,12 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given Goal punya beberapa target, when dibuka, then progres Goal = rollup progres target (default rata-rata)."
-        done: false
+        done: true
       - text: "Given target diberi weight, when rollup, then kontribusinya proporsional terhadap bobot."
-        done: false
+        done: true
     tasks:
       - text: "computeGoalProgress(targets[]) dengan bobot opsional."
-        done: false
+        done: true
     edge_cases:
       - "Goal tanpa target → progres 'belum terukur' (bukan 0% yang menyesatkan)."
   - id: US-3
@@ -102,10 +102,10 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given target, when aku set current baru, then progres target & Goal langsung terhitung ulang."
-        done: false
+        done: true
     tasks:
       - text: "Endpoint updateTargetValue; recompute rollup."
-        done: false
+        done: true
     edge_cases:
       - "Nilai non-numerik untuk unit numerik → ditolak dengan pesan."
 
@@ -138,11 +138,11 @@ test_plan:
   - id: T-1
     kind: unit
     text: "computeTargetProgress: arah naik, arah turun, clamp, from==to (no div0)."
-    done: false
+    done: true
   - id: T-2
     kind: unit
     text: "computeGoalProgress: rata-rata & berbobot; goal tanpa target = 'belum terukur'."
-    done: false
+    done: true
   - id: T-3
     kind: e2e
     text: "Tambah 3 target → update current → header Goal menampilkan rollup benar."
@@ -150,11 +150,11 @@ test_plan:
 
 definition_of_done:
   - text: "Perhitungan progres target & rollup Goal terbukti benar (uji unit)."
-    done: false
+    done: true
   - text: "Dukungan unit number/percent/currency/boolean + arah naik/turun."
     done: false
   - text: "Div-by-zero & clamp ditangani; goal tanpa target tidak menampilkan 0% palsu."
-    done: false
+    done: true
 
 open_questions:
   - "Default rollup: rata-rata sederhana atau selalu berbobot?"

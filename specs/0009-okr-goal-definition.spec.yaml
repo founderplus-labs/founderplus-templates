@@ -5,7 +5,7 @@ id: "0009"
 slug: okr-goal-definition
 title: "OKR — definisi Goal (champion, reviewer, timeframe, parent, space)"
 app: fp-goals
-status: draft
+status: in_progress
 owner: "@founderplus"
 created: "2026-07-19"
 updated: "2026-07-19"
@@ -83,16 +83,16 @@ user_stories:
     priority: must
     acceptance_criteria:
       - text: "Given aku di sebuah Space, when aku isi nama+champion+reviewer+timeframe lalu simpan, then Goal aktif terbuat dan tampil di Space itu."
-        done: false
+        done: true
       - text: "Given champion sama dengan reviewer, when aku simpan, then ditolak dengan pesan 'champion & reviewer harus beda orang'."
-        done: false
+        done: true
       - text: "Given timeframe kosong/terbalik (mulai>selesai), when aku simpan, then ditolak dengan pesan jelas."
-        done: false
+        done: true
     tasks:
       - text: "Skema entitas Goal + migrasi."
         done: false
       - text: "Endpoint createGoal dengan validasi champion/reviewer/timeframe."
-        done: false
+        done: true
       - text: "Form UI + halaman detail goal."
         done: false
     edge_cases:
@@ -105,12 +105,12 @@ user_stories:
     priority: should
     acceptance_criteria:
       - text: "Given ada goal lain, when aku set sebagai parent, then relasi tersimpan & tampil di header."
-        done: false
+        done: true
       - text: "Given aku memilih parent yang membuat siklus (parent=diri/keturunan), when simpan, then ditolak (anti-siklus)."
-        done: false
+        done: true
     tasks:
       - text: "Field parent_id + pemeriksaan anti-siklus (walk ancestor chain)."
-        done: false
+        done: true
     edge_cases:
       - "Parent ditutup/dihapus → child jadi top-level (bukan yatim tergantung)."
   - id: US-3
@@ -121,12 +121,12 @@ user_stories:
     priority: should
     acceptance_criteria:
       - text: "Given champion mengajukan close (achieved/missed/dropped), when reviewer menyetujui, then status goal jadi closed dengan outcome tsb."
-        done: false
+        done: true
       - text: "Given reviewer belum menyetujui, when goal diajukan close, then status tetap 'pending close' (belum closed)."
-        done: false
+        done: true
     tasks:
       - text: "State machine close + gate persetujuan reviewer."
-        done: false
+        done: true
     edge_cases:
       - "Goal di-pause di tengah timeframe → dikecualikan dari kewajiban check-in (0011)."
 
@@ -163,7 +163,7 @@ test_plan:
   - id: T-1
     kind: unit
     text: "Validasi champion≠reviewer, timeframe valid, anti-siklus parent."
-    done: false
+    done: true
   - id: T-2
     kind: e2e
     text: "Buat goal → tampil di space → set parent → header menampilkan alignment."
@@ -171,17 +171,17 @@ test_plan:
   - id: T-3
     kind: e2e
     text: "Ajukan close tanpa approval → 'pending'; reviewer approve → 'closed'."
-    done: false
+    done: true
 
 definition_of_done:
   - text: "CRUD Goal + validasi (champion/reviewer/timeframe/anti-siklus) lulus."
-    done: false
+    done: true
   - text: "State machine draft→active→(pending close)→closed(outcome)/paused."
-    done: false
+    done: true
   - text: "Otorisasi space & reviewer-approval ditegakkan."
-    done: false
+    done: true
   - text: "Reference impl menargetkan TanStack Start (fp-fullstack), bukan Next.js."
-    done: false
+    done: true
 
 open_questions:
   - "Apakah space bersifat wajib, atau boleh goal personal tanpa space?"
