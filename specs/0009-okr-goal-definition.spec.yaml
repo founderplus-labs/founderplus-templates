@@ -1,0 +1,196 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+# Sistem OKR (model Operately). Fitur BARU → status draft, checkbox kosong (0%).
+# Referensi: https://github.com/operately/operately · https://operately.com/help
+id: "0009"
+slug: okr-goal-definition
+title: "OKR — definisi Goal (champion, reviewer, timeframe, parent, space)"
+app: fp-goals
+status: draft
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Membuat sebuah Goal (Objective) ala Operately: punya juara (champion) yang
+  akuntabel, reviewer yang mengawasi, timeframe (biasanya kuartalan), space
+  (tim/area), dan opsional parent goal untuk alignment. Fondasi dari seluruh
+  sistem OKR — target/KR (0010), check-in (0011), dan pohon alignment (0012)
+  menggantung dari sini.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika sebuah tim/founder menetapkan tujuan kuartal,"
+    i_want: "aku ingin mendefinisikan Goal yang jelas dengan satu orang akuntabel & satu reviewer,"
+    so_that: "supaya semua tahu apa yang dikejar, siapa penanggung jawab, dan sampai kapan."
+    persona: champion
+    signal: "Setiap Goal aktif punya champion, reviewer, dan timeframe terisi (nol goal 'yatim')."
+  - id: JTBD-2
+    when: "Ketika perusahaan ingin semua tujuan tim nyambung ke tujuan besar,"
+    i_want: "aku ingin menautkan Goal ke parent goal,"
+    so_that: "supaya arah tiap tim selaras dengan strategi perusahaan."
+    persona: admin
+    signal: "Mayoritas Goal non-top-level punya parent (alignment tinggi)."
+
+personas:
+  - id: champion
+    label: "Champion (juara goal)"
+    context: "Akuntabel atas goal; wajib check-in bulanan (lihat 0011)."
+  - id: reviewer
+    label: "Reviewer"
+    context: "Mengawasi, memberi arahan, meng-acknowledge check-in, menyetujui penutupan."
+  - id: admin
+    label: "Admin / company owner"
+    context: "Menata struktur space & goal tingkat perusahaan."
+  - id: member
+    label: "Anggota tim"
+    context: "Melihat goal, kontribusi lewat sub-goal/proyek."
+
+problem: >
+  Tujuan tim sering kabur: tidak jelas siapa akuntabel, kapan tenggatnya, dan
+  bagaimana kaitannya ke tujuan besar. Tanpa struktur Goal yang tegas, OKR jadi
+  dokumen mati.
+goals:
+  - "CRUD Goal dengan field inti: name, champion, reviewer, timeframe, space, parent (opsional), description."
+  - "Champion & reviewer wajib untuk goal aktif; keduanya berbeda orang."
+  - "Timeframe terstruktur (kuartal/tahun/kustom rentang tanggal)."
+  - "Parent goal opsional untuk alignment (validasi anti-siklus)."
+non_goals:
+  - "Perhitungan progres dari target → slice 0010."
+  - "Mekanik check-in & persetujuan → slice 0011."
+  - "Visualisasi pohon alignment → slice 0012."
+
+slice:
+  entry_points:
+    - "UI 'New Goal' di dalam sebuah Space."
+    - "API createGoal / updateGoal / closeGoal."
+  ui:
+    - "Form goal: nama, deskripsi, champion, reviewer, timeframe, parent."
+    - "Halaman detail goal (header: champion, reviewer, timeframe, status)."
+  logic:
+    - "Validasi: champion≠reviewer, timeframe valid, parent bukan diri/keturunan (anti-siklus)."
+    - "State goal: draft → active → closed (achieved|missed|dropped) → (paused)."
+  data:
+    - "Entitas Goal (id, name, description, space_id, champion_id, reviewer_id, timeframe, parent_id, status)."
+  integrations:
+    - "Identitas & keanggotaan Founder+ (untuk champion/reviewer/space)."
+
+user_stories:
+  - id: US-1
+    persona: champion
+    as_a: "champion"
+    i_want: "membuat Goal dengan champion, reviewer, dan timeframe"
+    so_that: "goal punya penanggung jawab & tenggat yang jelas"
+    priority: must
+    acceptance_criteria:
+      - text: "Given aku di sebuah Space, when aku isi nama+champion+reviewer+timeframe lalu simpan, then Goal aktif terbuat dan tampil di Space itu."
+        done: false
+      - text: "Given champion sama dengan reviewer, when aku simpan, then ditolak dengan pesan 'champion & reviewer harus beda orang'."
+        done: false
+      - text: "Given timeframe kosong/terbalik (mulai>selesai), when aku simpan, then ditolak dengan pesan jelas."
+        done: false
+    tasks:
+      - text: "Skema entitas Goal + migrasi."
+        done: false
+      - text: "Endpoint createGoal dengan validasi champion/reviewer/timeframe."
+        done: false
+      - text: "Form UI + halaman detail goal."
+        done: false
+    edge_cases:
+      - "Champion/reviewer keluar dari perusahaan → goal ditandai butuh re-assign."
+  - id: US-2
+    persona: admin
+    as_a: "admin"
+    i_want: "menautkan Goal ke parent goal"
+    so_that: "tujuan tim selaras ke tujuan perusahaan"
+    priority: should
+    acceptance_criteria:
+      - text: "Given ada goal lain, when aku set sebagai parent, then relasi tersimpan & tampil di header."
+        done: false
+      - text: "Given aku memilih parent yang membuat siklus (parent=diri/keturunan), when simpan, then ditolak (anti-siklus)."
+        done: false
+    tasks:
+      - text: "Field parent_id + pemeriksaan anti-siklus (walk ancestor chain)."
+        done: false
+    edge_cases:
+      - "Parent ditutup/dihapus → child jadi top-level (bukan yatim tergantung)."
+  - id: US-3
+    persona: reviewer
+    as_a: "reviewer"
+    i_want: "menyetujui penutupan goal di akhir timeframe"
+    so_that: "penutupan punya kontrol kualitas"
+    priority: should
+    acceptance_criteria:
+      - text: "Given champion mengajukan close (achieved/missed/dropped), when reviewer menyetujui, then status goal jadi closed dengan outcome tsb."
+        done: false
+      - text: "Given reviewer belum menyetujui, when goal diajukan close, then status tetap 'pending close' (belum closed)."
+        done: false
+    tasks:
+      - text: "State machine close + gate persetujuan reviewer."
+        done: false
+    edge_cases:
+      - "Goal di-pause di tengah timeframe → dikecualikan dari kewajiban check-in (0011)."
+
+contracts:
+  api:
+    - name: "createGoal"
+      method: POST
+      path: "{FP_API}/goals"
+      request: |
+        { "name", "description?", "spaceId",
+          "championId", "reviewerId",
+          "timeframe": { "type": "quarter|year|custom", "startDate", "endDate" },
+          "parentId?": "goal-id" }
+      response: |
+        201 { "id", "status": "active", ...goal }
+        422 { "error": "champion_reviewer_same" | "invalid_timeframe" | "parent_cycle" }
+    - name: "closeGoal"
+      method: POST
+      path: "{FP_API}/goals/{id}/close"
+      request: |
+        { "outcome": "achieved|missed|dropped" }   # butuh persetujuan reviewer
+      response: |
+        200 { "status": "closed", "outcome" } | 409 pending_reviewer_approval
+
+security:
+  - "Hanya anggota space (atau di atasnya) boleh membuat/mengedit goal di space itu."
+  - "Hanya reviewer goal yang boleh meng-approve penutupan."
+telemetry:
+  - "goal_created, goal_parent_set, goal_close_requested, goal_closed{outcome}."
+accessibility:
+  - "Form dapat diselesaikan penuh via keyboard; label & error terbaca screen reader."
+
+test_plan:
+  - id: T-1
+    kind: unit
+    text: "Validasi champion≠reviewer, timeframe valid, anti-siklus parent."
+    done: false
+  - id: T-2
+    kind: e2e
+    text: "Buat goal → tampil di space → set parent → header menampilkan alignment."
+    done: false
+  - id: T-3
+    kind: e2e
+    text: "Ajukan close tanpa approval → 'pending'; reviewer approve → 'closed'."
+    done: false
+
+definition_of_done:
+  - text: "CRUD Goal + validasi (champion/reviewer/timeframe/anti-siklus) lulus."
+    done: false
+  - text: "State machine draft→active→(pending close)→closed(outcome)/paused."
+    done: false
+  - text: "Otorisasi space & reviewer-approval ditegakkan."
+    done: false
+  - text: "Reference impl menargetkan TanStack Start (fp-fullstack), bukan Next.js."
+    done: false
+
+open_questions:
+  - "Apakah space bersifat wajib, atau boleh goal personal tanpa space?"
+  - "Timeframe kustom: batasi ke kuartal/tahun saja atau bebas rentang?"
+
+links:
+  - label: "Operately — assign champion"
+    url: "https://operately.com/help/assign-goal-champion/"
+  - label: "Operately — assign reviewer"
+    url: "https://operately.com/help/assign-goal-reviewer/"
+  - label: "Slice 0010 — targets/KR"
+    url: "./0010-okr-targets-progress.spec.yaml"

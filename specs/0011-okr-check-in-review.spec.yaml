@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0011"
+slug: okr-check-in-review
+title: "OKR — Check-in bulanan (status R/Y/G + narasi) & acknowledgement reviewer"
+app: fp-goals
+status: draft
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Ritual inti OKR ala Operately: champion melakukan check-in berkala (default
+  bulanan) — menetapkan status (on_track/caution/off_track), memperbarui nilai
+  target, dan menulis narasi (wins/obstacles/needs). Reviewer wajib meng-
+  acknowledge tiap check-in dan bisa turun tangan bila off-track.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika sebulan berjalan pada sebuah Goal,"
+    i_want: "aku (champion) ingin melaporkan kemajuan: status, angka terbaru, dan cerita singkat,"
+    so_that: "supaya reviewer & tim tahu posisi sebenarnya dan bisa membantu tepat waktu."
+    persona: champion
+    signal: "Setiap goal aktif punya check-in dalam siklus berjalan; nol goal 'senyap'."
+  - id: JTBD-2
+    when: "Ketika champion mengirim check-in,"
+    i_want: "aku (reviewer) ingin membacanya, memberi tanggapan, dan meng-acknowledge,"
+    so_that: "supaya ada akuntabilitas dua arah dan masalah tidak menumpuk."
+    persona: reviewer
+    signal: "Sebagian besar check-in di-acknowledge reviewer sebelum siklus berikutnya."
+
+personas:
+  - id: champion
+    label: "Champion"
+    context: "Menulis check-in berkala; memperbarui nilai target."
+  - id: reviewer
+    label: "Reviewer"
+    context: "Membaca, memberi arahan, meng-acknowledge; eskalasi bila off-track."
+  - id: member
+    label: "Anggota tim"
+    context: "Melihat timeline check-in & status terkini."
+
+problem: >
+  OKR mati kalau tidak ada ritual update. Tanpa check-in terstruktur + status
+  jujur, goal off-track baru ketahuan saat sudah terlambat.
+goals:
+  - "Check-in dengan status kualitatif R/Y/G, update nilai target, narasi (wins/obstacles/needs)."
+  - "Cadence terjadwal (default bulanan) + pengingat ke champion."
+  - "Reviewer acknowledgement per check-in (+ komentar/arahan)."
+  - "Timeline check-in tersimpan sebagai riwayat progres goal."
+non_goals:
+  - "Perhitungan progres numerik dari target → slice 0010 (di sini kita MENCATAT snapshot & status)."
+  - "Notifikasi email penuh → mengonsumsi mekanik notifikasi terpisah; di sini cukup event + pengingat."
+
+slice:
+  entry_points:
+    - "Tombol 'Check-in' di halaman Goal; jadwal cadence memicu pengingat."
+    - "API createCheckIn / acknowledgeCheckIn."
+  ui:
+    - "Form check-in: pilih status, update nilai target, tulis narasi."
+    - "Timeline check-in (status berwarna, ringkasan, tanggal, penulis)."
+    - "Aksi reviewer: Acknowledge + komentar."
+  logic:
+    - "Snapshot nilai target saat check-in; hitung delta vs check-in sebelumnya."
+    - "State check-in: submitted → acknowledged; flag 'overdue' bila lewat cadence."
+  data:
+    - "Entitas CheckIn (id, goal_id, author_id, status, narrative{wins,obstacles,needs}, target_snapshots[], created_at, acknowledged_by?, acknowledged_at?)."
+  integrations:
+    - "Goal (0009) & Targets (0010); identitas Founder+ untuk author/reviewer."
+
+user_stories:
+  - id: US-1
+    persona: champion
+    as_a: "champion"
+    i_want: "membuat check-in dengan status & narasi serta update nilai target"
+    so_that: "kemajuan terlaporkan jujur dan terekam"
+    priority: must
+    acceptance_criteria:
+      - text: "Given Goal aktif, when aku pilih status on_track/caution/off_track, update target, tulis narasi, lalu kirim, then check-in tersimpan & tampil di timeline."
+        done: false
+      - text: "Given aku update nilai target di check-in, when terkirim, then nilai target ter-update (0010) dan snapshot-nya tersimpan di check-in."
+        done: false
+      - text: "Given narasi kosong & status off_track, when kirim, then diminta mengisi alasan (obstacles/needs)."
+        done: false
+    tasks:
+      - text: "Entitas CheckIn + snapshot target."
+        done: false
+      - text: "Form check-in (status, target update, narasi wins/obstacles/needs)."
+        done: false
+    edge_cases:
+      - "Dua check-in di hari sama → diizinkan tapi ditandai; timeline tetap urut waktu."
+  - id: US-2
+    persona: reviewer
+    as_a: "reviewer"
+    i_want: "meng-acknowledge check-in dan memberi komentar"
+    so_that: "champion tahu laporannya dibaca & dapat arahan"
+    priority: must
+    acceptance_criteria:
+      - text: "Given check-in baru, when reviewer klik Acknowledge, then check-in bertanda acknowledged (oleh siapa & kapan)."
+        done: false
+      - text: "Given reviewer menulis komentar, when disimpan, then tampil menempel pada check-in itu."
+        done: false
+    tasks:
+      - text: "Aksi acknowledge + komentar; hanya reviewer goal yang berwenang."
+        done: false
+    edge_cases:
+      - "Non-reviewer mencoba acknowledge → ditolak (403)."
+  - id: US-3
+    persona: champion
+    as_a: "champion"
+    i_want: "diingatkan saat check-in jatuh tempo"
+    so_that: "aku tidak lupa ritual bulanan"
+    priority: should
+    acceptance_criteria:
+      - text: "Given cadence bulanan & belum ada check-in siklus ini, when tanggal jatuh tempo tiba, then Goal ditandai 'check-in overdue' dan champion diingatkan."
+        done: false
+      - text: "Given check-in siklus ini sudah ada, when siklus berjalan, then tidak ada pengingat duplikat."
+        done: false
+    tasks:
+      - text: "Penjadwal cadence + penanda overdue + pemicu pengingat (event)."
+        done: false
+    edge_cases:
+      - "Goal paused → dikecualikan dari overdue & pengingat."
+
+contracts:
+  api:
+    - name: "createCheckIn"
+      method: POST
+      path: "{FP_API}/goals/{goalId}/check-ins"
+      request: |
+        { "status": "on_track|caution|off_track",
+          "narrative": { "wins", "obstacles", "needs" },
+          "targetUpdates": [ { "targetId", "currentValue" } ] }
+      response: |
+        201 { "id", "status", "targetSnapshots": [...], "createdAt" }
+    - name: "acknowledgeCheckIn"
+      method: POST
+      path: "{FP_API}/check-ins/{id}/acknowledge"
+      request: |
+        { "comment?": "arahan reviewer" }
+      response: |
+        200 { "acknowledgedBy", "acknowledgedAt" } | 403 not_reviewer
+
+security:
+  - "Hanya champion (atau berwenang) yang membuat check-in; hanya reviewer yang acknowledge."
+  - "Riwayat check-in immutable (koreksi = check-in baru, bukan edit diam-diam)."
+telemetry:
+  - "checkin_created{status}, checkin_acknowledged, checkin_overdue, goal_status_changed."
+accessibility:
+  - "Status R/Y/G tidak hanya warna — sertakan label teks/ikon (buta warna)."
+
+test_plan:
+  - id: T-1
+    kind: e2e
+    text: "Champion check-in (status+target+narasi) → tampil timeline & target ter-update."
+    done: false
+  - id: T-2
+    kind: e2e
+    text: "Reviewer acknowledge + komentar → tertandai; non-reviewer ditolak."
+    done: false
+  - id: T-3
+    kind: integration
+    text: "Lewati tenggat cadence → goal 'overdue' + pengingat; setelah check-in → hilang."
+    done: false
+
+definition_of_done:
+  - text: "Check-in (status R/Y/G + narasi + snapshot target) tersimpan sebagai timeline."
+    done: false
+  - text: "Reviewer acknowledgement + otorisasi peran ditegakkan."
+    done: false
+  - text: "Cadence bulanan + penanda overdue + pengingat bekerja; paused dikecualikan."
+    done: false
+  - text: "Status R/Y/G aksesibel (bukan hanya warna)."
+    done: false
+
+open_questions:
+  - "Cadence: fixed bulanan global atau bisa per-goal (dwimingguan/kuartalan)?"
+  - "Apakah reviewer bisa MENOLAK (request changes) check-in, bukan hanya acknowledge?"
+
+links:
+  - label: "Operately — reviewer responsibilities"
+    url: "https://operately.com/help/assign-goal-reviewer/"
+  - label: "Slice 0010 — targets/progress"
+    url: "./0010-okr-targets-progress.spec.yaml"

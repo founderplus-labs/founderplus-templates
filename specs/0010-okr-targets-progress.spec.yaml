@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0010"
+slug: okr-targets-progress
+title: "OKR — Targets/Key Results & progres otomatis"
+app: fp-goals
+status: draft
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Setiap Goal punya Targets (Key Results) terukur — dari nilai awal (from) menuju
+  nilai target (to) dengan satuan (unit). Progres tiap target dihitung otomatis
+  dari nilai sekarang (current), lalu di-rollup menjadi progres Goal. Ini yang
+  mengubah OKR dari niat jadi angka.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku menetapkan Goal,"
+    i_want: "aku ingin menaruh 1–5 hasil kunci yang terukur dengan angka awal & target,"
+    so_that: "supaya kemajuan bisa diukur objektif, bukan opini."
+    persona: champion
+    signal: "Progres Goal terhitung dari target (bukan input manual); 100% target tercapai = goal achievable."
+
+personas:
+  - id: champion
+    label: "Champion"
+    context: "Menentukan target & memperbarui nilai current saat check-in."
+  - id: viewer
+    label: "Pemirsa (anggota/reviewer)"
+    context: "Membaca progres Goal & tiap target."
+
+problem: >
+  Goal tanpa hasil terukur tidak bisa dilacak — 'kira-kira 70%' tidak berarti.
+  Butuh key result numerik dengan progres yang dihitung, bukan ditebak.
+goals:
+  - "Target dengan from/to/current/unit; dukung arah naik (to>from) & turun (to<from)."
+  - "Progres target = clamp((current-from)/(to-from), 0..100)% dengan pembagi nol ditangani."
+  - "Rollup progres Goal = rata-rata (opsional berbobot) progres target-nya."
+  - "Dukung unit: number, percent, currency (Rp), dan boolean/done."
+non_goals:
+  - "Riwayat perubahan nilai per check-in → dicatat di slice 0011."
+  - "Status kualitatif (hijau/kuning/merah) → slice 0011 (itu penilaian, bukan progres numerik)."
+
+slice:
+  entry_points:
+    - "Bagian 'Targets' di halaman Goal; API addTarget/updateTargetValue."
+  ui:
+    - "Daftar target dengan progress bar; editor nilai current; badge unit."
+    - "Ringkasan progres Goal di header (mis. 62%)."
+  logic:
+    - "Hitung progres per target (arah naik/turun, clamp, unit)."
+    - "Rollup ke progres Goal; bobot opsional per target."
+  data:
+    - "Entitas Target (id, goal_id, name, unit, from_value, to_value, current_value, weight?)."
+  integrations:
+    - "Goal (0009) sebagai induk; nilai current diperbarui saat check-in (0011)."
+
+user_stories:
+  - id: US-1
+    persona: champion
+    as_a: "champion"
+    i_want: "menambah target dengan nilai awal, target, dan satuan"
+    so_that: "hasil kunci terukur jelas"
+    priority: must
+    acceptance_criteria:
+      - text: "Given Goal, when aku tambah target {from:0,to:100,unit:percent}, then target tampil dengan progres 0%."
+        done: false
+      - text: "Given target arah turun (from:20,to:5), when current=12, then progres = (20-12)/(20-5)=53%."
+        done: false
+      - text: "Given from==to, when dihitung, then progres = 100% jika current>=to else 0% (tanpa div-by-zero)."
+        done: false
+    tasks:
+      - text: "Entitas Target + migrasi."
+        done: false
+      - text: "Fungsi murni computeTargetProgress(from,to,current) (uji unit terpisah)."
+        done: false
+    edge_cases:
+      - "current di luar [from,to] → progres di-clamp 0..100%."
+      - "unit currency → format Rp saat tampil, hitung tetap numerik."
+  - id: US-2
+    persona: viewer
+    as_a: "pemirsa"
+    i_want: "melihat satu angka progres untuk Goal"
+    so_that: "aku paham posisi tanpa buka tiap target"
+    priority: must
+    acceptance_criteria:
+      - text: "Given Goal punya beberapa target, when dibuka, then progres Goal = rollup progres target (default rata-rata)."
+        done: false
+      - text: "Given target diberi weight, when rollup, then kontribusinya proporsional terhadap bobot."
+        done: false
+    tasks:
+      - text: "computeGoalProgress(targets[]) dengan bobot opsional."
+        done: false
+    edge_cases:
+      - "Goal tanpa target → progres 'belum terukur' (bukan 0% yang menyesatkan)."
+  - id: US-3
+    persona: champion
+    as_a: "champion"
+    i_want: "memperbarui nilai current sebuah target"
+    so_that: "progres mencerminkan kondisi terkini"
+    priority: must
+    acceptance_criteria:
+      - text: "Given target, when aku set current baru, then progres target & Goal langsung terhitung ulang."
+        done: false
+    tasks:
+      - text: "Endpoint updateTargetValue; recompute rollup."
+        done: false
+    edge_cases:
+      - "Nilai non-numerik untuk unit numerik → ditolak dengan pesan."
+
+contracts:
+  api:
+    - name: "addTarget"
+      method: POST
+      path: "{FP_API}/goals/{goalId}/targets"
+      request: |
+        { "name", "unit": "number|percent|currency|boolean",
+          "fromValue", "toValue", "weight?": 1 }
+      response: |
+        201 { "id", "currentValue": fromValue, "progress": 0 }
+    - name: "updateTargetValue"
+      method: PATCH
+      path: "{FP_API}/targets/{id}"
+      request: |
+        { "currentValue": 42 }
+      response: |
+        200 { "progress": <target%>, "goalProgress": <rollup%> }
+
+security:
+  - "Hanya champion (atau yang berwenang) boleh menambah/mengubah target & nilai."
+telemetry:
+  - "target_added, target_value_updated{delta}, goal_progress_recomputed."
+accessibility:
+  - "Progress bar punya teks alternatif (mis. '62% menuju target')."
+
+test_plan:
+  - id: T-1
+    kind: unit
+    text: "computeTargetProgress: arah naik, arah turun, clamp, from==to (no div0)."
+    done: false
+  - id: T-2
+    kind: unit
+    text: "computeGoalProgress: rata-rata & berbobot; goal tanpa target = 'belum terukur'."
+    done: false
+  - id: T-3
+    kind: e2e
+    text: "Tambah 3 target → update current → header Goal menampilkan rollup benar."
+    done: false
+
+definition_of_done:
+  - text: "Perhitungan progres target & rollup Goal terbukti benar (uji unit)."
+    done: false
+  - text: "Dukungan unit number/percent/currency/boolean + arah naik/turun."
+    done: false
+  - text: "Div-by-zero & clamp ditangani; goal tanpa target tidak menampilkan 0% palsu."
+    done: false
+
+open_questions:
+  - "Default rollup: rata-rata sederhana atau selalu berbobot?"
+  - "Perlukah target tipe milestone (checklist) selain numerik?"
+
+links:
+  - label: "Slice 0009 — definisi Goal"
+    url: "./0009-okr-goal-definition.spec.yaml"
+  - label: "Slice 0011 — check-in"
+    url: "./0011-okr-check-in-review.spec.yaml"

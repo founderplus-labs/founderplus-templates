@@ -141,9 +141,28 @@ validator JSON-Schema apa pun yang paham YAML terhadap `schema/spec.schema.json`
 | [0006](./0006-pos-cashier-qris-receipt.spec.yaml) | Kasir: QRIS/struk/rekap | pos-qr-menu | shipped |
 | [0007](./0007-fp-fullstack-product-gate.spec.yaml) | Product gate + owner bypass | fp-fullstack | shipped |
 | [0008](./0008-pos-multi-device-sync.spec.yaml) | Sinkron POS multi-device | pos-qr-menu | draft |
+| [0009](./0009-okr-goal-definition.spec.yaml) | **OKR** — definisi Goal (champion/reviewer/timeframe/parent) | fp-goals | draft |
+| [0010](./0010-okr-targets-progress.spec.yaml) | **OKR** — Targets/Key Results & progres otomatis | fp-goals | draft |
+| [0011](./0011-okr-check-in-review.spec.yaml) | **OKR** — Check-in bulanan (R/Y/G) & review | fp-goals | draft |
+| [0012](./0012-okr-alignment-tree.spec.yaml) | **OKR** — Pohon alignment & rollup | fp-goals | draft |
 
 > Slice `0001–0007` mendokumentasikan perilaku yang **sudah ada** di template
-> (spec sebagai kebenaran hidup). `0008` contoh slice **yang direncanakan**
-> (semua checkbox kosong) — memperlihatkan tampilan spec sebelum dikerjakan.
+> (spec sebagai kebenaran hidup). `0008` dan `0009–0012` adalah slice **yang
+> direncanakan** (semua checkbox kosong) — memperlihatkan tampilan spec sebelum
+> dikerjakan.
+
+### Cluster OKR (`fp-goals`) — sistem OKR ala Operately
+
+Empat slice yang saling menggantung membentuk sistem OKR lengkap:
+
+```
+0009 Goal (Objective)   champion · reviewer · timeframe · parent · space
+  └─ 0010 Targets/KR     from → to → current (unit) → progres otomatis + rollup
+       └─ 0011 Check-in  status R/Y/G + narasi (wins/obstacles/needs) + ack reviewer
+            └─ 0012 Tree company → space → goal → sub-goal, rollup progres & status
+```
+
+Reference implementation menargetkan **TanStack Start (`fp-fullstack`)** — kita
+**tidak** merekomendasikan Next.js.
 
 Perbarui tabel ini + kolom `status` tiap kali menambah/menaikkan slice.

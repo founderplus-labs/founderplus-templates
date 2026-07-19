@@ -1,0 +1,157 @@
+# yaml-language-server: $schema=./schema/spec.schema.json
+id: "0012"
+slug: okr-alignment-tree
+title: "OKR — Pohon alignment & rollup (company → space → goal → sub-goal)"
+app: fp-goals
+status: draft
+owner: "@founderplus"
+created: "2026-07-19"
+updated: "2026-07-19"
+
+summary: >
+  Pandangan menyeluruh ala Work Map Operately: seluruh Goal tersusun sebagai
+  pohon alignment (parent → sub-goal, dengan proyek/kontributor menggantung),
+  dan progres/status di-rollup ke atas sehingga founder bisa melihat kesehatan
+  seluruh organisasi dalam satu layar.
+
+jtbd:
+  - id: JTBD-1
+    when: "Ketika aku (founder) ingin tahu kesehatan semua tujuan sekaligus,"
+    i_want: "aku ingin melihat pohon goal dengan progres & status ter-rollup,"
+    so_that: "supaya aku tahu di mana harus fokus tanpa membuka satu-satu."
+    persona: founder
+    signal: "Founder bisa menemukan goal off-track terdalam dalam < 10 detik dari satu layar."
+
+personas:
+  - id: founder
+    label: "Founder / eksekutif"
+    context: "Butuh pandangan level perusahaan, drill-down bila perlu."
+  - id: champion
+    label: "Champion"
+    context: "Melihat posisi goal-nya dalam konteks tujuan besar."
+  - id: member
+    label: "Anggota tim"
+    context: "Menelusuri dari perusahaan → space → goal timnya."
+
+problem: >
+  Progres tiap goal berguna, tapi tanpa pandangan agregat, founder tidak bisa
+  melihat gambaran besar atau menemukan titik lemah dengan cepat.
+goals:
+  - "Pohon alignment: company → space → goal → sub-goal (memakai parent_id dari 0009)."
+  - "Rollup progres ke parent (rata-rata berbobot dari progres anak, 0010)."
+  - "Rollup status ke parent (paling parah menang: off_track > caution > on_track)."
+  - "Filter per space/timeframe/champion; drill-down ke detail goal."
+non_goals:
+  - "Mengubah cara progres per-goal dihitung (itu 0010) atau status ditetapkan (0011)."
+  - "Perencanaan/ Gantt proyek mendetail — hanya tampilkan keterkaitannya."
+
+slice:
+  entry_points:
+    - "Halaman 'Goals map' level perusahaan & per-space; API getGoalTree."
+  ui:
+    - "Pohon/peta goal: node = nama + progres + badge status; expand/collapse; breadcrumb."
+    - "Filter (space, timeframe, champion); klik node → detail goal."
+  logic:
+    - "Bangun pohon dari parent_id; hitung rollup progres (berbobot) & status (worst-wins) bottom-up."
+    - "Tangani goal top-level (tanpa parent) & goal paused (dikecualikan dari rollup atau ditandai)."
+  data:
+    - "Baca-saja atas Goal (0009), Target/progres (0010), status check-in terakhir (0011)."
+  integrations:
+    - "Struktur Space & identitas Founder+."
+
+user_stories:
+  - id: US-1
+    persona: founder
+    as_a: "founder"
+    i_want: "melihat semua goal sebagai pohon dengan progres ter-rollup"
+    so_that: "aku paham kesehatan organisasi sekali lihat"
+    priority: must
+    acceptance_criteria:
+      - text: "Given goal berjenjang (parent→anak), when aku buka peta, then tiap parent menampilkan progres rollup dari anak-anaknya."
+        done: false
+      - text: "Given anak punya bobot, when rollup, then progres parent berbobot sesuai (konsisten dengan 0010)."
+        done: false
+      - text: "Given ada anak off_track, when status parent dihitung, then parent menampilkan status terparah (worst-wins)."
+        done: false
+    tasks:
+      - text: "getGoalTree membangun hierarki dari parent_id (aman terhadap kedalaman besar)."
+        done: false
+      - text: "Rollup progres (berbobot) & status (worst-wins) bottom-up."
+        done: false
+      - text: "UI pohon expand/collapse + badge progres/status."
+        done: false
+    edge_cases:
+      - "Goal tanpa target → 'belum terukur', tidak dihitung 0% dalam rollup (jangan menyeret parent turun palsu)."
+      - "Kedalaman besar / banyak node → virtualisasi/rendering bertahap agar tetap responsif."
+  - id: US-2
+    persona: member
+    as_a: "anggota tim"
+    i_want: "memfilter & drill-down dari perusahaan ke goal timku"
+    so_that: "aku fokus ke yang relevan"
+    priority: should
+    acceptance_criteria:
+      - text: "Given filter space/timeframe/champion, when diterapkan, then pohon hanya menampilkan cabang yang cocok."
+        done: false
+      - text: "Given aku klik node, when dibuka, then masuk ke halaman detail goal (0009–0011)."
+        done: false
+    tasks:
+      - text: "Filter + breadcrumb + navigasi drill-down."
+        done: false
+    edge_cases:
+      - "Filter menghasilkan pohon kosong → empty state jelas, bukan layar kosong."
+
+contracts:
+  api:
+    - name: "getGoalTree"
+      method: GET
+      path: "{FP_API}/goals/tree?space={id}&timeframe={tf}&champion={id}"
+      response: |
+        200 {
+          "nodes": [ {
+            "id", "name", "status": "on_track|caution|off_track|paused|unmeasured",
+            "progress": 0..100 | null,           // null = belum terukur
+            "rollup": { "progress", "status", "childCount" },
+            "parentId": null | "goal-id"
+          } ]
+        }
+
+security:
+  - "Peta menghormati visibilitas: pengguna hanya melihat space/goal yang berhak."
+telemetry:
+  - "goaltree_viewed, goaltree_filtered, goaltree_node_opened."
+accessibility:
+  - "Pohon dapat dinavigasi keyboard (panah expand/collapse); status via label+ikon, bukan warna saja."
+
+test_plan:
+  - id: T-1
+    kind: unit
+    text: "Rollup progres berbobot & status worst-wins pada pohon contoh (termasuk 'unmeasured')."
+    done: false
+  - id: T-2
+    kind: e2e
+    text: "Buat hierarki 3 tingkat → peta menampilkan rollup benar & drill-down bekerja."
+    done: false
+  - id: T-3
+    kind: e2e
+    text: "Filter space/champion → hanya cabang cocok; pohon kosong → empty state."
+    done: false
+
+definition_of_done:
+  - text: "Pohon dibangun dari parent_id, aman untuk kedalaman/lebar besar."
+    done: false
+  - text: "Rollup progres (berbobot) & status (worst-wins) benar & teruji."
+    done: false
+  - text: "'Unmeasured' tidak menyeret rollup jadi 0% palsu."
+    done: false
+  - text: "Filter, drill-down, visibilitas, & aksesibilitas keyboard bekerja."
+    done: false
+
+open_questions:
+  - "Proyek/task ikut ditampilkan sebagai daun di pohon, atau hanya goal?"
+  - "Rollup status: murni worst-wins, atau ambang (mis. >50% anak caution → parent caution)?"
+
+links:
+  - label: "Operately — features overview (Work Map)"
+    url: "https://operately.com/help/features-overview/"
+  - label: "Slice 0009–0011 — OKR core"
+    url: "./0009-okr-goal-definition.spec.yaml"

@@ -14,10 +14,14 @@ and checkout; your app just gates content by product ownership.
 | **`static-landing`** | HTML · no-build | One-file sell page + funnel-tracker buy button. Zero server. Lowest friction — deploy with `fp sites publish`. |
 | **`pos-qr-menu`** | HTML · no-build | **POS suite** for cafe/resto/jasa: customers scan a per-table QR → menu → order (table attached). **Cashier** (`kasir.html`) — pay by dynamic **QRIS** / bank transfer / cash + proof photo, **ESC/POS Bluetooth receipt**, and transaction **history + daily report**. **Tables + reservations** (`meja.html`), **service tickets** (`servis.html`), and an offline per-table QR print tool. Owner tools run locally, no server. |
 | **`ai-studio`** | Google AI Studio · static · CDN | Product-specific prompts → Gemini generates a static selling page wired to the Founder+ CDN checkout. |
-| **`fp-fullstack`** | TanStack Start · Cloudflare · Tailwind · React 19 | Login + product gate + checkout + tracking. Full app. |
+| **`fp-fullstack`** ⭐ | TanStack Start · Cloudflare · Tailwind · React 19 | Login + product gate + checkout + tracking. Full app. **Recommended default for fullstack.** |
 | **`astro`** | Astro SSR · Cloudflare | Login + gate + checkout. Content + interactive islands. |
-| **`nextjs`** | Next.js App Router · Node/Vercel | Login + gate + checkout. Server Component gate. Biggest ecosystem. |
 | **`hono`** | Hono · Cloudflare Workers | Minimal edge app, JSX HTML, no client framework. |
+
+> **Fullstack? Reach for `fp-fullstack` (TanStack Start).** It's our recommended
+> default — edge-native on Cloudflare Workers, same runtime as the rest of the
+> stack. We **don't recommend Next.js**; if you're migrating off it, `fp-fullstack`
+> is the target.
 
 Every gated template ships with `SETUP.md` (wiring) and `SECURITY.md`
 (MITM / cookie / paywall posture). All share the same vendored
