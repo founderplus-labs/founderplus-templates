@@ -550,14 +550,14 @@
         {
           "path": "SETUP.md",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/SETUP.md",
-          "digest": "sha256:751e35d8f4835fbd3249d4987e45317be54f20ceeacc98f380b6e041af2a5486",
-          "size": 3430
+          "digest": "sha256:effd33eedb9040416f54f4a41eb00e3112de77513185a52b38e13ef3b7128875",
+          "size": 3807
         },
         {
           "path": "index.html",
           "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/pos-qr-menu/index.html",
-          "digest": "sha256:5a9d43cea6564ffe458aef1fff66f1a36a0be1d73ff23d2f06c9ae159dab5748",
-          "size": 28003
+          "digest": "sha256:2ff7c3cc62a9fba84deaf67389edebc14d1435195aa0e3a14ff096151f07cdee",
+          "size": 32442
         },
         {
           "path": "qrcode.vendor.js",

@@ -10,10 +10,12 @@
     <meta name="theme-color" content="#141019" media="(prefers-color-scheme: dark)" />
     <style>
       /* ─────────────────────────────────────────────────────────────
-         Design tokens. Motion follows emil-design-eng (strong custom
-         easings, sub-300ms UI, transform/opacity only); materials &
-         type follow apple-design (translucent chrome, size-specific
-         tracking, tight heading leading, shadow-over-border).
+         Layout grounded in real food-ordering apps (Keeta, Gojek,
+         talabat, DoorDash, sweetgreen) via Mobbin: image-led item rows
+         with the add/stepper control anchored to the thumbnail, a sticky
+         category rail, and a persistent cart bar. Motion follows
+         emil-design-eng (strong custom easings, sub-300ms UI,
+         transform/opacity only); materials + type follow apple-design.
          ───────────────────────────────────────────────────────────── */
       :root {
         --brand: #8b5cf6;
@@ -32,11 +34,10 @@
         --r-card: 18px;
         --r-ctl: 12px;
 
-        /* Shadow over border — layered, soft, tinted toward the ink. */
         --shadow-card: 0 1px 2px rgba(26, 20, 32, 0.04), 0 4px 14px rgba(26, 20, 32, 0.05);
+        --shadow-ctl: 0 2px 8px rgba(26, 20, 32, 0.14), 0 0 0 1px rgba(26, 20, 32, 0.04);
         --shadow-pop: 0 1px 1px rgba(26, 20, 32, 0.05), 0 -8px 40px rgba(26, 20, 32, 0.14);
 
-        /* Strong custom easings — the built-ins are too weak. */
         --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
         --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
@@ -49,6 +50,7 @@
           --line: #2a2436; --bg: #131019; --card: #1c1626;
           --brand: #a78bfa; --brand-ink: #c4b5fd;
           --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.35);
+          --shadow-ctl: 0 3px 10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
           --shadow-pop: 0 1px 1px rgba(0,0,0,0.4), 0 -8px 44px rgba(0,0,0,0.55);
         }
       }
@@ -61,31 +63,24 @@
         color: var(--ink);
         background: var(--bg);
         line-height: 1.5;
-        letter-spacing: 0; /* body near zero; large text tightens below */
         padding-bottom: calc(104px + var(--safe-b));
         -webkit-font-smoothing: antialiased;
       }
 
-      /* ── Chrome: translucent material, bright top edge, scroll-edge mask ── */
+      /* ── Chrome: translucent material, scroll-edge hairline ── */
       header {
         position: sticky; top: 0; z-index: 5;
         padding: calc(14px + var(--safe-t)) 18px 13px;
         background: color-mix(in srgb, var(--card) 72%, transparent);
         backdrop-filter: saturate(1.8) blur(20px);
         -webkit-backdrop-filter: saturate(1.8) blur(20px);
-        /* scroll-edge effect: a soft hairline that fades, not a hard 1px rule */
         box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 60%, transparent);
       }
-      .store {
-        font-size: 19px; font-weight: 700;
-        letter-spacing: -0.02em; /* tighten large text */
-        line-height: 1.1;
-      }
+      .store { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
       .table-pill {
         display: inline-flex; align-items: center; gap: 6px;
-        margin-top: 6px; font-size: 12.5px; font-weight: 650;
-        letter-spacing: 0.01em; color: var(--brand-ink);
-        background: var(--brand-soft);
+        margin-top: 6px; font-size: 12.5px; font-weight: 650; letter-spacing: 0.01em;
+        color: var(--brand-ink); background: var(--brand-soft);
         padding: 4px 11px; border-radius: 999px;
       }
 
@@ -95,8 +90,7 @@
       .cats {
         position: sticky; top: calc(58px + var(--safe-t)); z-index: 4;
         display: flex; gap: 8px; overflow-x: auto; padding: 12px 0 10px;
-        scrollbar-width: none;
-        background: linear-gradient(var(--bg) 62%, transparent);
+        scrollbar-width: none; background: linear-gradient(var(--bg) 62%, transparent);
       }
       .cats::-webkit-scrollbar { display: none; }
       .cats button {
@@ -110,74 +104,85 @@
       }
       .cats button:active { transform: scale(0.96); }
       .cats button[aria-current="true"] {
-        background: var(--ink); color: var(--card);
-        box-shadow: inset 0 0 0 1px var(--ink);
+        background: var(--ink); color: var(--card); box-shadow: inset 0 0 0 1px var(--ink);
       }
 
       h2.cat {
         font-size: 12px; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 0.07em; color: var(--muted);
-        margin: 26px 4px 10px;
+        letter-spacing: 0.07em; color: var(--muted); margin: 26px 4px 10px;
       }
 
-      /* ── Item card: solid surface, soft layered shadow (not a border) ── */
+      /* ── Item row: text left, image-led media right (control anchored to it) ── */
       .item {
-        display: flex; gap: 12px; align-items: flex-start;
+        display: flex; gap: 14px; align-items: stretch;
         background: var(--card); border-radius: var(--r-card);
-        padding: 15px 16px; margin-bottom: 11px;
+        padding: 14px 15px; margin-bottom: 11px;
         box-shadow: var(--shadow-card);
-        /* one-time entrance; stagger set inline. transform+opacity only. */
         opacity: 0; transform: translateY(10px);
         animation: item-in 460ms var(--ease-out) forwards;
       }
       @keyframes item-in { to { opacity: 1; transform: none; } }
-      .item.out { box-shadow: none; background: color-mix(in srgb, var(--card) 60%, var(--bg)); }
+      .item.out { box-shadow: none; background: color-mix(in srgb, var(--card) 55%, var(--bg)); }
       .item.out .name, .item.out .price { color: var(--muted); }
-      .item .body { flex: 1; min-width: 0; }
-      .item .name { font-weight: 640; font-size: 15.5px; letter-spacing: -0.01em; }
-      .item .desc { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
-      .item .price { font-weight: 700; font-size: 15px; margin-top: 9px; letter-spacing: -0.01em; }
+      .item.out .thumb, .item.out .thumb-ph { filter: grayscale(0.7); opacity: 0.75; }
 
-      /* ── Controls: press feedback, hover gated to fine pointers ── */
-      .controls { margin-top: 11px; }
-      .stepper { display: inline-flex; align-items: center; gap: 8px; }
-      .btn {
-        font: inherit; cursor: pointer; border: none;
-        transition: transform 150ms var(--ease-out), background 180ms var(--ease-out),
-                    box-shadow 180ms var(--ease-out), color 180ms var(--ease-out);
+      .item .body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .item .name { font-weight: 640; font-size: 15.5px; letter-spacing: -0.01em; }
+      .item .desc {
+        font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.45;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
       }
-      .btn:active { transform: scale(0.94); }
+      .item .price { font-weight: 700; font-size: 15px; margin-top: auto; padding-top: 9px; letter-spacing: -0.01em; }
+
+      /* Media column: 92px thumb; control floats centered on its bottom edge. */
+      .media { position: relative; flex: 0 0 92px; width: 92px; align-self: center; }
+      .thumb, .thumb-ph {
+        width: 92px; height: 92px; border-radius: 14px; object-fit: cover; display: block;
+      }
+      .thumb-ph { display: grid; place-items: center; font-size: 34px; }
+      .control {
+        position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%);
+      }
       .add {
-        background: var(--brand); color: #fff; font-weight: 650; font-size: 14px;
-        height: 36px; padding: 0 18px; border-radius: var(--r-ctl); white-space: nowrap;
-        box-shadow: 0 1px 2px color-mix(in srgb, var(--brand) 40%, transparent);
+        display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+        min-width: 78px; height: 34px; padding: 0 14px; border: none; cursor: pointer;
+        background: var(--card); color: var(--brand-ink); font: inherit; font-weight: 700; font-size: 14px;
+        border-radius: 999px; box-shadow: var(--shadow-ctl); white-space: nowrap;
+        transition: transform 150ms var(--ease-out), color 160ms var(--ease-out);
       }
-      .round {
-        width: 36px; height: 36px; border-radius: var(--r-ctl);
-        background: var(--card); color: var(--brand-ink); font-size: 19px; line-height: 1;
-        box-shadow: inset 0 0 0 1px var(--line);
+      .add:active { transform: translateX(0) scale(0.94); }
+      .stepper {
+        display: inline-flex; align-items: center; gap: 2px; height: 34px; padding: 0 4px;
+        background: var(--card); border-radius: 999px; box-shadow: var(--shadow-ctl);
       }
-      .qty {
-        min-width: 24px; text-align: center; font-weight: 700; font-size: 15px;
-        font-variant-numeric: tabular-nums;
+      .step {
+        width: 30px; height: 30px; border: none; cursor: pointer; background: transparent;
+        color: var(--brand-ink); font: inherit; font-size: 19px; line-height: 1; border-radius: 999px;
+        display: grid; place-items: center;
+        transition: transform 150ms var(--ease-out), background 150ms var(--ease-out);
       }
-      .soldout { font-size: 12.5px; color: var(--danger); font-weight: 650; margin-top: 11px; }
+      .step:active { transform: scale(0.86); }
+      .qty { min-width: 20px; text-align: center; font-weight: 700; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+      .badge-out {
+        position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%);
+        background: var(--card); color: var(--danger); font-size: 11.5px; font-weight: 700;
+        padding: 4px 11px; border-radius: 999px; box-shadow: var(--shadow-ctl); white-space: nowrap;
+      }
+
       @media (hover: hover) and (pointer: fine) {
-        .add:hover { background: var(--brand-ink); }
-        .round:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 40%, var(--line)); }
+        .add:hover { color: var(--brand); }
+        .step:hover { background: var(--brand-soft); }
         .cats button:hover:not([aria-current="true"]) { color: var(--ink); }
       }
 
-      /* ── Floating cart bar: slides up on the drawer curve ── */
+      /* ── Floating cart bar ── */
       .cartbar {
         position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
         padding: 12px 14px calc(12px + var(--safe-b));
         background: color-mix(in srgb, var(--card) 78%, transparent);
-        backdrop-filter: saturate(1.8) blur(20px);
-        -webkit-backdrop-filter: saturate(1.8) blur(20px);
+        backdrop-filter: saturate(1.8) blur(20px); -webkit-backdrop-filter: saturate(1.8) blur(20px);
         box-shadow: 0 -1px 0 color-mix(in srgb, var(--line) 70%, transparent);
-        transform: translateY(140%);
-        transition: transform 420ms var(--ease-drawer);
+        transform: translateY(140%); transition: transform 420ms var(--ease-drawer);
       }
       .cartbar.show { transform: translateY(0); }
       .cartbar .go {
@@ -203,38 +208,50 @@
         border: none; padding: 0; width: 100%; max-width: 560px;
         margin: auto auto 0; border-radius: 24px 24px 0 0;
         background: var(--card); color: var(--ink); box-shadow: var(--shadow-pop);
+        max-height: 88vh;
         transform: translateY(100%);
-        transition: transform 440ms var(--ease-drawer),
-                    overlay 440ms allow-discrete, display 440ms allow-discrete;
+        transition: transform 440ms var(--ease-drawer), overlay 440ms allow-discrete, display 440ms allow-discrete;
       }
       dialog#sheet[open] { transform: translateY(0); }
       @starting-style { dialog#sheet[open] { transform: translateY(100%); } }
       dialog#sheet::backdrop {
-        background: rgba(16, 10, 26, 0);
-        backdrop-filter: blur(0px);
+        background: rgba(16, 10, 26, 0); backdrop-filter: blur(0px);
         transition: background 440ms var(--ease-out), backdrop-filter 440ms var(--ease-out),
                     overlay 440ms allow-discrete, display 440ms allow-discrete;
       }
       dialog#sheet[open]::backdrop { background: rgba(16, 10, 26, 0.5); backdrop-filter: blur(2px); }
       @starting-style { dialog#sheet[open]::backdrop { background: rgba(16, 10, 26, 0); backdrop-filter: blur(0px); } }
 
-      .grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--line);
-        margin: 10px auto 0; }
-      .sheet-in { padding: 14px 18px calc(20px + var(--safe-b)); }
-      .sheet-in h3 { margin: 4px 0 14px; font-size: 18px; letter-spacing: -0.015em; font-weight: 700; }
-      .line { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0;
-        border-bottom: 1px solid var(--line); font-size: 15px; }
-      .line:last-of-type { border-bottom: none; }
-      .line .n { color: var(--muted); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-      .line b { font-variant-numeric: tabular-nums; }
+      .grabber { width: 38px; height: 5px; border-radius: 3px; background: var(--line); margin: 10px auto 0; }
+      .sheet-in { padding: 12px 18px calc(20px + var(--safe-b)); overflow-y: auto; }
+      .sheet-in h3 { margin: 6px 0 6px; font-size: 18px; letter-spacing: -0.015em; font-weight: 700; }
+
+      /* Cart line: thumbnail + name + in-place stepper + line price (Nike/Magnolia pattern) */
+      .cline { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+      .cline:last-of-type { border-bottom: none; }
+      .cline .cthumb, .cline .cthumb-ph {
+        width: 46px; height: 46px; border-radius: 11px; object-fit: cover; flex: 0 0 46px;
+        display: grid; place-items: center; font-size: 20px;
+      }
+      .cline .cinfo { flex: 1; min-width: 0; }
+      .cline .cname { font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .cline .cprice { font-size: 12.5px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+      .cline .cstep { display: inline-flex; align-items: center; gap: 2px; flex: 0 0 auto;
+        background: var(--bg); border-radius: 999px; padding: 0 3px; box-shadow: inset 0 0 0 1px var(--line); }
+      .cline .cstep button { width: 28px; height: 28px; border: none; background: transparent; cursor: pointer;
+        color: var(--brand-ink); font-size: 17px; line-height: 1; border-radius: 999px;
+        transition: transform 150ms var(--ease-out); }
+      .cline .cstep button:active { transform: scale(0.86); }
+      .cline .cstep .cq { min-width: 18px; text-align: center; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+
       .total-row { display: flex; justify-content: space-between; align-items: baseline;
-        font-weight: 800; font-size: 19px; letter-spacing: -0.02em; margin: 14px 0 4px; }
+        font-weight: 800; font-size: 19px; letter-spacing: -0.02em; margin: 16px 0 4px; }
       .total-row span:last-child { font-variant-numeric: tabular-nums; }
       textarea, input {
         width: 100%; border: none; box-shadow: inset 0 0 0 1px var(--line);
         border-radius: var(--r-ctl); padding: 12px 13px; font: inherit; margin-top: 10px;
-        background: var(--bg); color: var(--ink);
-        transition: box-shadow 160ms var(--ease-out);
+        background: var(--bg); color: var(--ink); transition: box-shadow 160ms var(--ease-out);
       }
       textarea:focus, input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--brand); }
       textarea { resize: none; }
@@ -247,12 +264,12 @@
       .send:active { transform: scale(0.985); }
       .send[disabled] { opacity: 0.45; box-shadow: none; }
       @media (hover: hover) and (pointer: fine) { .send:hover:not([disabled]) { background: var(--ok-ink); } }
-      .close { position: absolute; top: 16px; right: 16px; width: 30px; height: 30px;
+      .close { position: absolute; top: 14px; right: 16px; width: 30px; height: 30px;
         display: grid; place-items: center; border: none; border-radius: 999px;
-        background: var(--bg); color: var(--muted); font-size: 18px; line-height: 1; cursor: pointer;
+        background: var(--bg); color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer;
         transition: transform 150ms var(--ease-out); }
       .close:active { transform: scale(0.9); }
-      .empty { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 15px; }
+      .empty { text-align: center; color: var(--muted); padding: 32px 20px; font-size: 15px; }
 
       .banner-warn { background: color-mix(in srgb, var(--danger) 8%, var(--card));
         color: var(--danger); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 22%, transparent);
@@ -260,13 +277,13 @@
       footer { text-align: center; color: var(--muted); font-size: 12.5px; padding: 28px 0 8px; }
       footer a { color: var(--brand-ink); text-decoration: none; font-weight: 600; }
 
-      /* Reduced motion: gentle, not zero — keep opacity, drop movement. */
       @media (prefers-reduced-motion: reduce) {
         .item { animation: item-fade 260ms ease forwards; transform: none; }
         @keyframes item-fade { to { opacity: 1; } }
         .cartbar { transition: opacity 240ms ease; }
         dialog#sheet, dialog#sheet::backdrop { transition: opacity 220ms ease; transform: none !important; }
-        .btn:active, .go:active, .send:active, .cats button:active, .close:active { transform: none; }
+        .add:active, .step:active, .go:active, .send:active, .cats button:active, .close:active,
+        .cline .cstep button:active { transform: none; }
       }
     </style>
   </head>
@@ -328,19 +345,23 @@
         posApi: null, // mis. "https://api.founderplus.id/creator/pos/orders"
         // Param URL yang dipakai untuk nomor meja (dukung beberapa alias).
         tableParams: ["meja", "table", "t"],
+        // Emoji placeholder per kategori — dipakai kalau item belum punya foto.
+        categoryEmoji: { Kopi: "☕️", "Non-Kopi": "🍵", Makanan: "🍽️" },
       };
 
       // ══════════════════════════ MENU ══════════════════════════
       // Satu sumber kebenaran menu. price = angka rupiah (tanpa titik/koma).
-      // Set available:false untuk sold out. category mengelompokkan tampilan.
+      //   available:false → sold out.   category → grup tampilan.
+      //   image:"https://…/foto.jpg" (opsional) → foto produk. Kalau kosong,
+      //   tampil placeholder gradient + emoji (kategori / field `emoji`).
       const MENU = [
         { id: "kopi-susu", name: "Kopi Susu Gula Aren", desc: "Espresso, susu segar, gula aren cair", price: 22000, category: "Kopi", available: true },
         { id: "americano", name: "Americano", desc: "Double shot, air, tanpa gula", price: 18000, category: "Kopi", available: true },
         { id: "latte", name: "Cafe Latte", desc: "Espresso + steamed milk", price: 25000, category: "Kopi", available: true },
-        { id: "matcha", name: "Matcha Latte", desc: "Matcha premium, susu", price: 27000, category: "Non-Kopi", available: true },
-        { id: "coklat", name: "Coklat Panas", desc: "Dark chocolate, susu", price: 24000, category: "Non-Kopi", available: false },
-        { id: "croissant", name: "Butter Croissant", desc: "Panggang, mentega Prancis", price: 20000, category: "Makanan", available: true },
-        { id: "nasi-ayam", name: "Nasi Ayam Sambal Matah", desc: "Ayam goreng, sambal matah, nasi hangat", price: 32000, category: "Makanan", available: true },
+        { id: "matcha", name: "Matcha Latte", desc: "Matcha premium, susu", price: 27000, category: "Non-Kopi", available: true, emoji: "🍵" },
+        { id: "coklat", name: "Coklat Panas", desc: "Dark chocolate, susu", price: 24000, category: "Non-Kopi", available: false, emoji: "🍫" },
+        { id: "croissant", name: "Butter Croissant", desc: "Panggang, mentega Prancis", price: 20000, category: "Makanan", available: true, emoji: "🥐" },
+        { id: "nasi-ayam", name: "Nasi Ayam Sambal Matah", desc: "Ayam goreng, sambal matah, nasi hangat", price: 32000, category: "Makanan", available: true, emoji: "🍛" },
       ];
       // ═════════════════════════════════════════════════════════════
 
@@ -349,7 +370,6 @@
           ? "Rp " + Number(n || 0).toLocaleString("id-ID")
           : Number(n || 0).toLocaleString("en-US", { style: "currency", currency: CONFIG.currency });
 
-      // Read table id from any configured param. Sanitized to a short, safe token.
       function readTable() {
         const q = new URLSearchParams(location.search);
         for (const key of CONFIG.tableParams) {
@@ -361,11 +381,29 @@
 
       const TABLE = readTable();
       const cart = new Map(); // id -> qty
+      const itemById = (id) => MENU.find((m) => m.id === id);
+      const emojiFor = (it) => it.emoji || CONFIG.categoryEmoji[it.category] || "🍽️";
+
+      // Deterministic soft gradient from the item id — a tasteful placeholder so
+      // the menu looks intentional out of the box (owners add real photos later).
+      function placeholderBg(id) {
+        let h = 0;
+        for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
+        return `linear-gradient(135deg, hsl(${h} 52% 90%), hsl(${(h + 42) % 360} 56% 82%))`;
+      }
+      // Dark-mode placeholder: deeper, still tinted.
+      function placeholderBgDark(id) {
+        let h = 0;
+        for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 360;
+        return `linear-gradient(135deg, hsl(${h} 32% 26%), hsl(${(h + 42) % 360} 34% 20%))`;
+      }
+      const isDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
+      const phStyle = (id) => `background:${isDark() ? placeholderBgDark(id) : placeholderBg(id)}`;
 
       function money() {
         let total = 0, count = 0;
         for (const [id, qty] of cart) {
-          const it = MENU.find((m) => m.id === id);
+          const it = itemById(id);
           if (it) { total += it.price * qty; count += qty; }
         }
         return { total, count };
@@ -403,8 +441,8 @@
         });
       }
 
-      // Build the menu ONCE. Qty changes patch only the affected item's controls
-      // (no full rebuild) so the entrance stagger never replays and we stay cheap.
+      // Build the menu ONCE. Qty changes patch only the affected control cluster
+      // (no full rebuild) so the entrance stagger never replays and it stays cheap.
       function renderMenu() {
         const root = document.getElementById("menu");
         root.innerHTML = "";
@@ -413,46 +451,59 @@
           const h = document.createElement("h2");
           h.className = "cat"; h.id = "cat-" + i; h.textContent = cat;
           root.appendChild(h);
-          MENU.filter((m) => m.category === cat).forEach((it) => {
-            root.appendChild(itemEl(it, idx++));
-          });
+          MENU.filter((m) => m.category === cat).forEach((it) => root.appendChild(itemEl(it, idx++)));
         });
+      }
+
+      function thumbHtml(it) {
+        if (it.image) return `<img class="thumb" src="${escapeAttr(it.image)}" alt="" loading="lazy" />`;
+        return `<div class="thumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${emojiFor(it)}</div>`;
       }
 
       function itemEl(it, idx) {
         const el = document.createElement("article");
         el.className = "item" + (it.available ? "" : " out");
-        // Stagger: 45ms between items, capped so a long menu never feels slow.
         el.style.animationDelay = Math.min(idx * 45, 360) + "ms";
         el.innerHTML = `
           <div class="body">
             <div class="name">${escapeHtml(it.name)}</div>
             ${it.desc ? `<div class="desc">${escapeHtml(it.desc)}</div>` : ""}
             <div class="price">${fmt(it.price)}</div>
-            <div class="controls" data-controls="${it.id}">${it.available ? controls(it.id) : `<div class="soldout">Habis</div>`}</div>
+          </div>
+          <div class="media">
+            ${thumbHtml(it)}
+            <div class="control" data-control="${it.id}">
+              ${it.available ? controlHtml(it.id) : `<div class="badge-out">Habis</div>`}
+            </div>
           </div>`;
         return el;
       }
 
-      function controls(id) {
+      // The add button (qty 0) becomes an inline stepper (qty > 0), anchored to the thumbnail.
+      function controlHtml(id) {
         const qty = cart.get(id) || 0;
         if (qty <= 0) {
-          return `<div class="stepper"><button class="btn add" type="button" data-add="${id}">+ Tambah</button></div>`;
+          return `<button class="add" type="button" data-add="${id}">+ Tambah</button>`;
         }
         return `<div class="stepper">
-            <button class="btn round" type="button" data-dec="${id}" aria-label="Kurangi">−</button>
+            <button class="step" type="button" data-dec="${id}" aria-label="Kurangi">−</button>
             <span class="qty">${qty}</span>
-            <button class="btn round" type="button" data-inc="${id}" aria-label="Tambah">+</button>
+            <button class="step" type="button" data-inc="${id}" aria-label="Tambah">+</button>
           </div>`;
+      }
+
+      function patchControl(id) {
+        const slot = document.querySelector(`[data-control="${id}"]`);
+        if (slot) slot.innerHTML = controlHtml(id);
       }
 
       function setQty(id, qty) {
         if (qty <= 0) cart.delete(id);
         else cart.set(id, qty);
-        // Patch just this item's control cluster — no menu rebuild.
-        const slot = document.querySelector(`[data-controls="${id}"]`);
-        if (slot) slot.innerHTML = controls(id);
+        patchControl(id);
         renderCartBar();
+        // If the sheet is open, keep it in sync (edit-in-place from the menu too).
+        if (document.getElementById("sheet").open) renderSheet();
       }
 
       function renderCartBar() {
@@ -462,6 +513,11 @@
         document.getElementById("cartbar").classList.toggle("show", count > 0);
       }
 
+      function cthumbHtml(it) {
+        if (it.image) return `<img class="cthumb" src="${escapeAttr(it.image)}" alt="" />`;
+        return `<div class="cthumb-ph" style="${phStyle(it.id)}" aria-hidden="true">${emojiFor(it)}</div>`;
+      }
+
       function renderSheet() {
         const wrap = document.getElementById("orderLines");
         wrap.innerHTML = "";
@@ -469,11 +525,21 @@
           wrap.innerHTML = `<div class="empty">Belum ada pesanan.</div>`;
         } else {
           for (const [id, qty] of cart) {
-            const it = MENU.find((m) => m.id === id);
+            const it = itemById(id);
             if (!it) continue;
             const row = document.createElement("div");
-            row.className = "line";
-            row.innerHTML = `<span><b>${qty}×</b> ${escapeHtml(it.name)}</span><span class="n">${fmt(it.price * qty)}</span>`;
+            row.className = "cline";
+            row.innerHTML = `
+              ${cthumbHtml(it)}
+              <div class="cinfo">
+                <div class="cname">${escapeHtml(it.name)}</div>
+                <div class="cprice">${fmt(it.price)} · ${fmt(it.price * qty)}</div>
+              </div>
+              <div class="cstep">
+                <button type="button" data-cdec="${id}" aria-label="Kurangi">−</button>
+                <span class="cq">${qty}</span>
+                <button type="button" data-cinc="${id}" aria-label="Tambah">+</button>
+              </div>`;
             wrap.appendChild(row);
           }
         }
@@ -481,11 +547,10 @@
         document.getElementById("sendOrder").disabled = cart.size === 0;
       }
 
-      // Human-readable order summary (used for WhatsApp + POS payload).
       function orderSummary() {
         const lines = [];
         for (const [id, qty] of cart) {
-          const it = MENU.find((m) => m.id === id);
+          const it = itemById(id);
           if (it) lines.push({ id, name: it.name, qty, price: it.price, subtotal: it.price * qty });
         }
         return { table: TABLE || null, items: lines, total: money().total };
@@ -525,11 +590,10 @@
 
       function orderDone() {
         cart.clear();
-        // Reset each visible control cluster without rebuilding the menu.
-        document.querySelectorAll("[data-controls]").forEach((slot) => {
-          const id = slot.getAttribute("data-controls");
-          const it = MENU.find((m) => m.id === id);
-          if (it && it.available) slot.innerHTML = controls(id);
+        document.querySelectorAll("[data-control]").forEach((slot) => {
+          const id = slot.getAttribute("data-control");
+          const it = itemById(id);
+          if (it && it.available) slot.innerHTML = controlHtml(id);
         });
         renderCartBar();
         document.getElementById("sheet").close();
@@ -539,8 +603,9 @@
         return String(s).replace(/[&<>"']/g, (ch) =>
           ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
       }
+      const escapeAttr = escapeHtml;
 
-      // Event delegation for menu +/- buttons.
+      // Menu: add / stepper.
       document.getElementById("menu").addEventListener("click", (e) => {
         const t = e.target.closest("button");
         if (!t) return;
@@ -549,10 +614,17 @@
         else if (t.dataset.dec) setQty(t.dataset.dec, (cart.get(t.dataset.dec) || 0) - 1);
       });
 
+      // Sheet: in-place quantity editing.
+      document.getElementById("orderLines").addEventListener("click", (e) => {
+        const t = e.target.closest("button");
+        if (!t) return;
+        if (t.dataset.cinc) setQty(t.dataset.cinc, (cart.get(t.dataset.cinc) || 0) + 1);
+        else if (t.dataset.cdec) setQty(t.dataset.cdec, (cart.get(t.dataset.cdec) || 0) - 1);
+      });
+
       const sheet = document.getElementById("sheet");
       document.getElementById("openSheet").onclick = () => { renderSheet(); sheet.showModal(); };
       document.getElementById("closeSheet").onclick = () => sheet.close();
-      // Tap on the backdrop (outside the sheet body) closes it.
       sheet.addEventListener("click", (e) => { if (e.target === sheet) sheet.close(); });
       document.getElementById("sendOrder").onclick = submitOrder;
 

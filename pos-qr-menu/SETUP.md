@@ -32,12 +32,18 @@ const CONFIG = {
 };
 
 const MENU = [
-  { id: "kopi-susu", name: "Kopi Susu", desc: "…", price: 22000, category: "Kopi", available: true },
+  { id: "kopi-susu", name: "Kopi Susu", desc: "…", price: 22000, category: "Kopi",
+    available: true, image: "https://…/kopi.jpg", emoji: "☕️" },
   // set available:false untuk item habis
 ];
 ```
 
-`price` = angka rupiah polos (tanpa titik/koma). `id` harus unik.
+- `price` = angka rupiah polos (tanpa titik/koma). `id` harus unik.
+- `image` (opsional) = URL foto produk. Kalau kosong, tampil **placeholder
+  gradient + emoji** otomatis — menu tetap rapi sebelum kamu pasang foto.
+  Foto asli sangat disarankan: pelanggan memilih lewat gambar.
+- `emoji` (opsional) = emoji placeholder per item; default ikut kategori
+  (atur di `CONFIG.categoryEmoji`).
 
 ### 2. Publish halaman menu
 ```bash
