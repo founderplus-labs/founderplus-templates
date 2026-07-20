@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- TODO: ganti nama usaha -->
+    <title>Usaha Kamu — Booking</title>
+    <meta name="description" content="Pilih layanan & jadwal, konfirmasi lewat WhatsApp." />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0f12" media="(prefers-color-scheme: dark)" />
+    <style>
+      /* ─────────────────────────────────────────────────────────────
+         Booking / janji temu — desain orisinal, self-contained.
+         Customer: pilih layanan → tanggal → slot → detail → WhatsApp.
+         Edit blok BUSINESS + SERVICES + HOURS. Warna via --accent.
+         ───────────────────────────────────────────────────────────── */
+      :root {
+        --bg:#f6f6f7; --card:#ffffff; --ink:#17171b; --secondary:#55555f; --muted:#8a8a94;
+        --line:#e9e9ee; --accent:#8b5cf6; --accent-ink:#6d28d9; --ok:#17984e;
+        --r:16px; --ease-out:cubic-bezier(0.23,1,0.32,1);
+        --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root { --bg:#0f0f12; --card:#17171c; --ink:#f3f3f6; --secondary:#b3b3bd; --muted:#8a8a94;
+          --line:#26262e; --accent:#a78bfa; --accent-ink:#c4b5fd; }
+      }
+      * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+      [hidden] { display:none !important; }
+      body { margin:0; background:var(--bg); color:var(--ink);
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+        line-height:1.5; padding-bottom:calc(96px + var(--safe-b)); }
+      svg { display:block; } .ico { stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+      .wrap { max-width:560px; margin:0 auto; padding:0 16px; }
+      header { position:sticky; top:0; z-index:10; padding:calc(16px + var(--safe-t)) 0 14px;
+        background:color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter:saturate(1.4) blur(16px); -webkit-backdrop-filter:saturate(1.4) blur(16px);
+        border-bottom:1px solid var(--line); }
+      header .row { display:flex; align-items:center; gap:10px; }
+      .biz { font-size:18px; font-weight:700; letter-spacing:-0.02em; flex:1; }
+      .tag { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--accent-ink);
+        background:color-mix(in srgb, var(--accent) 14%, transparent); padding:3px 9px; border-radius:999px; }
+
+      .step { margin-top:26px; }
+      .step .lbl { display:flex; align-items:center; gap:9px; font-size:12.5px; font-weight:700; text-transform:uppercase;
+        letter-spacing:.05em; color:var(--muted); margin-bottom:12px; }
+      .step .num { width:20px; height:20px; border-radius:999px; background:var(--ink); color:var(--bg);
+        display:grid; place-items:center; font-size:11px; }
+
+      .svc { display:flex; flex-direction:column; gap:10px; }
+      .svc button { display:flex; align-items:center; gap:14px; text-align:left; width:100%; border:none; cursor:pointer; font:inherit;
+        background:var(--card); color:var(--ink); border-radius:var(--r); padding:15px; box-shadow:inset 0 0 0 1px var(--line);
+        transition:box-shadow 160ms var(--ease-out), transform 150ms var(--ease-out); }
+      .svc button:active { transform:scale(0.99); }
+      .svc button[aria-current="true"] { box-shadow:inset 0 0 0 2px var(--accent); }
+      .svc .body { flex:1; min-width:0; }
+      .svc .nm { display:block; font-weight:640; font-size:15.5px; letter-spacing:-0.01em; }
+      .svc .meta { display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+      .svc .pr { font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-0.01em; }
+      .svc .check { width:22px; height:22px; border-radius:999px; box-shadow:inset 0 0 0 2px var(--line); display:grid; place-items:center; color:transparent; flex:0 0 22px; }
+      .svc button[aria-current="true"] .check { background:var(--accent); box-shadow:none; color:#fff; }
+
+      .field { width:100%; border:none; box-shadow:inset 0 0 0 1px var(--line); border-radius:12px; padding:13px 14px;
+        font:inherit; background:var(--card); color:var(--ink); }
+      .field:focus { outline:none; box-shadow:inset 0 0 0 2px var(--accent); }
+
+      .slots { display:grid; grid-template-columns:repeat(auto-fill, minmax(84px,1fr)); gap:9px; margin-top:12px; }
+      .slots button { border:none; cursor:pointer; font:inherit; font-weight:600; font-size:14px; padding:11px 6px; border-radius:11px;
+        background:var(--card); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line); font-variant-numeric:tabular-nums;
+        transition:all 150ms var(--ease-out); }
+      .slots button:active { transform:scale(0.95); }
+      .slots button[aria-current="true"] { background:var(--ink); color:var(--bg); box-shadow:none; }
+      .slots .none { grid-column:1/-1; color:var(--muted); font-size:13.5px; padding:8px 2px; }
+
+      .fld { margin-top:10px; }
+      .fld label { display:block; font-size:12.5px; color:var(--secondary); font-weight:600; margin-bottom:6px; }
+
+      /* Sticky confirm bar */
+      .bar { position:fixed; left:0; right:0; bottom:0; z-index:20; padding:12px 16px calc(12px + var(--safe-b));
+        background:color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter:saturate(1.4) blur(16px); -webkit-backdrop-filter:saturate(1.4) blur(16px);
+        border-top:1px solid var(--line); }
+      .bar .in { max-width:560px; margin:0 auto; }
+      .bar .summary { font-size:13px; color:var(--muted); margin-bottom:9px; min-height:18px; }
+      .bar .summary b { color:var(--ink); font-weight:650; }
+      .bar .go { width:100%; border:none; cursor:pointer; background:var(--ok); color:#fff; font:inherit; font-weight:700; font-size:16px;
+        padding:15px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; gap:9px;
+        transition:transform 150ms var(--ease-out), opacity 160ms var(--ease-out); }
+      .bar .go:active { transform:scale(0.985); } .bar .go[disabled] { opacity:0.45; }
+      footer { text-align:center; color:var(--muted); font-size:12.5px; padding:24px 0; }
+      footer a { color:var(--accent-ink); text-decoration:none; }
+      @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap row">
+        <div class="biz" id="bizName">Usaha Kamu</div>
+        <span class="tag">Booking</span>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="step">
+        <div class="lbl"><span class="num">1</span> Pilih layanan</div>
+        <div class="svc" id="svcList"></div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="num">2</span> Pilih tanggal &amp; jam</div>
+        <input class="field" id="date" type="date" />
+        <div class="slots" id="slots"></div>
+      </div>
+
+      <div class="step">
+        <div class="lbl"><span class="num">3</span> Data kamu</div>
+        <div class="fld"><label>Nama</label><input class="field" id="nama" type="text" autocomplete="name" /></div>
+        <div class="fld"><label>No. WhatsApp</label><input class="field" id="hp" inputmode="tel" placeholder="0812…" /></div>
+        <div class="fld"><label>Catatan (opsional)</label><input class="field" id="note" type="text" placeholder="Permintaan khusus" /></div>
+      </div>
+
+      <footer>Ditenagai <a href="https://founderplus.id" target="_blank" rel="noopener">Founder+</a></footer>
+    </main>
+
+    <div class="bar">
+      <div class="in">
+        <div class="summary" id="summary">Pilih layanan &amp; jadwal untuk mulai.</div>
+        <button class="go" id="confirm" type="button" disabled>
+          <svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          Booking via WhatsApp
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // ══════════════════════════ BUSINESS ══════════════════════════
+      const BUSINESS = {
+        name: "Usaha Kamu",
+        whatsapp: "6281234567890",     // WA penerima booking, format 62…
+        currency: "IDR",
+        founderplus: { projectId: "" }, // GTM opsional (spec-driven)
+      };
+
+      // Jam operasional + panjang slot (menit). closedDays: 0=Min … 6=Sab.
+      const HOURS = { open: "09:00", close: "17:00", slotMinutes: 60, closedDays: [0] };
+
+      // ══════════════════════════ SERVICES ══════════════════════════
+      const SERVICES = [
+        { id: "potong", name: "Potong rambut", duration: 45, price: 50000 },
+        { id: "cuci-blow", name: "Cuci + blow", duration: 60, price: 75000 },
+        { id: "cat", name: "Cat rambut", duration: 120, price: 250000 },
+        { id: "creambath", name: "Creambath", duration: 60, price: 90000 },
+      ];
+      // ═════════════════════════════════════════════════════════════
+
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      const fmt = (n) => BUSINESS.currency === "IDR" ? "Rp " + Number(n||0).toLocaleString("id-ID") : Number(n||0).toLocaleString();
+      const pad = (n) => String(n).padStart(2, "0");
+      const CHECK = `<svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;stroke-width:2.6"><path d="M20 6 9 17l-5-5"/></svg>`;
+
+      let selService = null, selDate = "", selSlot = "";
+
+      function renderServices() {
+        $("svcList").innerHTML = "";
+        for (const s of SERVICES) {
+          const b = document.createElement("button");
+          b.type = "button"; b.dataset.id = s.id;
+          if (selService === s.id) b.setAttribute("aria-current", "true");
+          b.innerHTML =
+            `<span class="check">${CHECK}</span>` +
+            `<span class="body"><span class="nm">${esc(s.name)}</span><span class="meta">${s.duration} menit</span></span>` +
+            `<span class="pr">${esc(fmt(s.price))}</span>`;
+          $("svcList").appendChild(b);
+        }
+      }
+      $("svcList").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-id]"); if (!b) return;
+        selService = b.dataset.id; renderServices(); updateSummary();
+      });
+
+      // Date: default to next open day, min = today.
+      function toInput(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+      function initDate() {
+        const today = new Date(); today.setHours(0,0,0,0);
+        $("date").min = toInput(today);
+        let d = new Date(today);
+        for (let i = 0; i < 8 && HOURS.closedDays.includes(d.getDay()); i++) d.setDate(d.getDate()+1);
+        selDate = toInput(d); $("date").value = selDate;
+        renderSlots();
+      }
+      $("date").addEventListener("change", () => { selDate = $("date").value; selSlot = ""; renderSlots(); updateSummary(); });
+
+      function renderSlots() {
+        const root = $("slots"); root.innerHTML = "";
+        if (!selDate) return;
+        const d = new Date(selDate + "T00:00:00");
+        if (HOURS.closedDays.includes(d.getDay())) { root.innerHTML = `<div class="none">Tutup di hari ini. Pilih tanggal lain.</div>`; return; }
+        const [oh, om] = HOURS.open.split(":").map(Number);
+        const [ch, cm] = HOURS.close.split(":").map(Number);
+        const start = oh*60+om, end = ch*60+cm;
+        const now = new Date(); const isToday = toInput(now) === selDate;
+        const nowMin = now.getHours()*60 + now.getMinutes();
+        let any = false;
+        for (let t = start; t + 0 <= end - HOURS.slotMinutes + HOURS.slotMinutes; t += HOURS.slotMinutes) {
+          if (t > end - HOURS.slotMinutes) break;
+          if (isToday && t <= nowMin) continue; // slot lewat → skip
+          any = true;
+          const label = `${pad(Math.floor(t/60))}:${pad(t%60)}`;
+          const b = document.createElement("button");
+          b.type = "button"; b.dataset.slot = label; b.textContent = label;
+          if (selSlot === label) b.setAttribute("aria-current", "true");
+          root.appendChild(b);
+        }
+        if (!any) root.innerHTML = `<div class="none">Tak ada slot tersisa hari ini. Pilih tanggal lain.</div>`;
+      }
+      $("slots").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-slot]"); if (!b) return;
+        selSlot = b.dataset.slot; renderSlots(); updateSummary();
+      });
+
+      const svcById = (id) => SERVICES.find((s) => s.id === id);
+      function ready() { return selService && selDate && selSlot && $("nama").value.trim(); }
+      function updateSummary() {
+        const s = svcById(selService);
+        if (s && selDate && selSlot) {
+          const d = new Date(selDate + "T00:00:00");
+          const day = d.toLocaleDateString("id-ID", { weekday:"long", day:"numeric", month:"long" });
+          $("summary").innerHTML = `<b>${esc(s.name)}</b> · ${esc(day)}, ${esc(selSlot)} · ${esc(fmt(s.price))}`;
+        } else {
+          $("summary").textContent = "Pilih layanan & jadwal untuk mulai.";
+        }
+        $("confirm").disabled = !ready();
+      }
+      $("nama").addEventListener("input", updateSummary);
+
+      $("confirm").onclick = () => {
+        if (!ready()) { if (!$("nama").value.trim()) $("nama").focus(); return; }
+        const s = svcById(selService);
+        const d = new Date(selDate + "T00:00:00");
+        const day = d.toLocaleDateString("id-ID", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+        const nama = $("nama").value.trim(), hp = $("hp").value.trim(), note = $("note").value.trim();
+        const text =
+          `Halo ${BUSINESS.name}! Mau booking:\n` +
+          `Layanan: ${s.name} (${s.duration} menit · ${fmt(s.price)})\n` +
+          `Jadwal: ${day}, ${selSlot}\n` +
+          `Nama: ${nama}` + (hp ? `\nWA: ${hp}` : "") + (note ? `\nCatatan: ${note}` : "");
+        location.href = `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(text)}`;
+      };
+
+      function boot() {
+        $("bizName").textContent = BUSINESS.name; document.title = BUSINESS.name + " — Booking";
+        renderServices(); initDate(); updateSummary();
+        if (BUSINESS.founderplus && BUSINESS.founderplus.projectId) {
+          const sc = document.createElement("script"); sc.src = "https://cdn.founderplus.id/funnel-tracker.js";
+          sc.setAttribute("data-project-id", BUSINESS.founderplus.projectId); sc.defer = true; document.body.appendChild(sc);
+        }
+      }
+      boot();
+    </script>
+  </body>
+</html>

@@ -632,6 +632,129 @@
           "size": 26024
         }
       ]
+    },
+    {
+      "name": "link-in-bio",
+      "title": "Link-in-bio (microsite kreator)",
+      "description": "Original self-contained link-in-bio / microsite: avatar (initials or photo), bio, socials, and a column of link buttons — plain links, WhatsApp, or product links to Founder+ checkout. Premium dark, mobile-first; change the accent via one --accent token; optional Founder+ GTM. No third-party assets. Edit the PROFILE + LINKS blocks and publish index.html.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build",
+        "link-in-bio",
+        "creator"
+      ],
+      "postInstall": [
+        "Edit PROFILE + LINKS in index.html",
+        "fp sites publish index.html"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/link-in-bio/SETUP.md",
+          "digest": "sha256:73e0f7801af5f1d47566b688ba653117b139163fe79cc6da28574c1d1854b994",
+          "size": 978
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/link-in-bio/index.html",
+          "digest": "sha256:393957df94016f1d503bf741bb00a391a1550231c148ce2e24f212e6180d6e92",
+          "size": 14674
+        }
+      ]
+    },
+    {
+      "name": "katalog",
+      "title": "Katalog (toko online sederhana)",
+      "description": "Original self-contained product catalog: category filter, product grid, cart with steppers, and WhatsApp order (checkout via Founder+ optional). Config-driven PRODUCTS array; CSS/SVG placeholders (optional per-item photo); light + dark. Edit SHOP + PRODUCTS and publish index.html.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build",
+        "catalog",
+        "shop"
+      ],
+      "postInstall": [
+        "Edit SHOP + PRODUCTS in index.html",
+        "fp sites publish index.html"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/katalog/SETUP.md",
+          "digest": "sha256:abe67a9c7bc9b025ed40ca7465ced2dccc619370060b2512c98c6da7e32fc394",
+          "size": 932
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/katalog/index.html",
+          "digest": "sha256:1d07b3672f58a329628ab519d69b353281da9b78b085008bcc57590b7301584e",
+          "size": 20821
+        }
+      ]
+    },
+    {
+      "name": "booking",
+      "title": "Booking (janji temu jasa)",
+      "description": "Original self-contained appointment booking page: pick a service (name/duration/price), a date, and a generated time slot, then confirm via WhatsApp. Respects business hours + closed days; skips past slots. Config-driven SERVICES + HOURS; light + dark. Edit and publish index.html.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build",
+        "booking",
+        "service"
+      ],
+      "postInstall": [
+        "Edit BUSINESS + SERVICES + HOURS in index.html",
+        "fp sites publish index.html"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/booking/SETUP.md",
+          "digest": "sha256:c74176adb7fb06867ebf464657a00b75b51cdeda6eabf734d9bc8444ac856f93",
+          "size": 969
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/booking/index.html",
+          "digest": "sha256:0adc5cbbeb66991e82cbef2e5d57ace6eec8c506c24363c295773d1ddef73938",
+          "size": 15392
+        }
+      ]
+    },
+    {
+      "name": "invoice",
+      "title": "Invoice / Kwitansi generator",
+      "description": "Original self-contained invoice/receipt generator: fill business + client + line items + tax, get a live document preview, then Print/PDF (print CSS) — plus save/load a draft in localStorage. Invoice or Kwitansi mode. No server, no third-party assets. Open index.html.",
+      "runtime": "static",
+      "stack": [
+        "html",
+        "no-build",
+        "invoice",
+        "tool"
+      ],
+      "postInstall": [
+        "Open index.html, fill the form, Cetak / PDF"
+      ],
+      "setupDoc": "SETUP.md",
+      "files": [
+        {
+          "path": "SETUP.md",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/invoice/SETUP.md",
+          "digest": "sha256:538ec23b7af6db4bdc38a048fa0b6c6fd4eae21067b246fc4c385c01a8ad30ed",
+          "size": 939
+        },
+        {
+          "path": "index.html",
+          "url": "https://raw.githubusercontent.com/founderplus-labs/founderplus-templates/main/invoice/index.html",
+          "digest": "sha256:78590022a7c5eb276d2ff1bfac0e72f652ad474533bdebdffd50de4560d9288a",
+          "size": 19233
+        }
+      ]
     }
   ]
 }

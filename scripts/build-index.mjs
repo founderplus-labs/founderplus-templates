@@ -105,6 +105,42 @@ const META = {
       'fp sites publish index.html'
     ],
     setupDoc: 'SETUP.md'
+  },
+  'link-in-bio': {
+    title: 'Link-in-bio (microsite kreator)',
+    description:
+      'Original self-contained link-in-bio / microsite: avatar (initials or photo), bio, socials, and a column of link buttons — plain links, WhatsApp, or product links to Founder+ checkout. Premium dark, mobile-first; change the accent via one --accent token; optional Founder+ GTM. No third-party assets. Edit the PROFILE + LINKS blocks and publish index.html.',
+    runtime: 'static',
+    stack: ['html', 'no-build', 'link-in-bio', 'creator'],
+    postInstall: ['Edit PROFILE + LINKS in index.html', 'fp sites publish index.html'],
+    setupDoc: 'SETUP.md'
+  },
+  katalog: {
+    title: 'Katalog (toko online sederhana)',
+    description:
+      'Original self-contained product catalog: category filter, product grid, cart with steppers, and WhatsApp order (checkout via Founder+ optional). Config-driven PRODUCTS array; CSS/SVG placeholders (optional per-item photo); light + dark. Edit SHOP + PRODUCTS and publish index.html.',
+    runtime: 'static',
+    stack: ['html', 'no-build', 'catalog', 'shop'],
+    postInstall: ['Edit SHOP + PRODUCTS in index.html', 'fp sites publish index.html'],
+    setupDoc: 'SETUP.md'
+  },
+  booking: {
+    title: 'Booking (janji temu jasa)',
+    description:
+      'Original self-contained appointment booking page: pick a service (name/duration/price), a date, and a generated time slot, then confirm via WhatsApp. Respects business hours + closed days; skips past slots. Config-driven SERVICES + HOURS; light + dark. Edit and publish index.html.',
+    runtime: 'static',
+    stack: ['html', 'no-build', 'booking', 'service'],
+    postInstall: ['Edit BUSINESS + SERVICES + HOURS in index.html', 'fp sites publish index.html'],
+    setupDoc: 'SETUP.md'
+  },
+  invoice: {
+    title: 'Invoice / Kwitansi generator',
+    description:
+      'Original self-contained invoice/receipt generator: fill business + client + line items + tax, get a live document preview, then Print/PDF (print CSS) — plus save/load a draft in localStorage. Invoice or Kwitansi mode. No server, no third-party assets. Open index.html.',
+    runtime: 'static',
+    stack: ['html', 'no-build', 'invoice', 'tool'],
+    postInstall: ['Open index.html, fill the form, Cetak / PDF'],
+    setupDoc: 'SETUP.md'
   }
 }
 

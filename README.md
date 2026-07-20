@@ -13,6 +13,10 @@ and checkout; your app just gates content by product ownership.
 |------|-------|--------------|
 | **`static-landing`** | HTML · no-build | One-file sell page + funnel-tracker buy button. Zero server. Lowest friction — deploy with `fp sites publish`. |
 | **`premium-landing`** | HTML · no-build | Original, self-contained **premium dark landing** (hero, features, count-up stats, pricing, CTA, footer) with scroll-reveal animations. No third-party assets; change the brand colour via one `--accent` token. |
+| **`link-in-bio`** | HTML · no-build | Creator **link-in-bio / microsite**: avatar, bio, socials, link buttons (plain / WhatsApp / product → Founder+ checkout). Premium, mobile-first, `--accent` token. |
+| **`katalog`** | HTML · no-build | Simple **online shop catalog**: category filter, product grid, cart, **WhatsApp order**. Config-driven `PRODUCTS`; light + dark. |
+| **`booking`** | HTML · no-build | **Appointment booking** for services: pick service → date → time slot → confirm via WhatsApp. Respects business hours + closed days. |
+| **`invoice`** | HTML · no-build | **Invoice / Kwitansi generator**: form → live document preview → Print/PDF, save/load drafts. Owner tool, self-contained. |
 | **`pos-qr-menu`** | HTML · no-build | **POS suite** for cafe/resto/jasa: customers scan a per-table QR → menu → order (table attached). **Cashier** (`kasir.html`) — pay by dynamic **QRIS** / bank transfer / cash + proof photo, **ESC/POS Bluetooth receipt**, and transaction **history + daily report**. **Tables + reservations** (`meja.html`), **service tickets** (`servis.html`), and an offline per-table QR print tool. Owner tools run locally, no server. |
 | **`ai-studio`** | Google AI Studio · static · CDN | Product-specific prompts → Gemini generates a static selling page wired to the Founder+ CDN checkout. |
 | **`fp-fullstack`** ⭐ | TanStack Start · Cloudflare · Tailwind · React 19 | Login + product gate + checkout + tracking. Full app. **Recommended default for fullstack.** |

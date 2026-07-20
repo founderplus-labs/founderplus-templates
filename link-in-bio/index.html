@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- TODO: ganti nama + deskripsi -->
+    <title>Namamu — Link in bio</title>
+    <meta name="description" content="Semua tautanku di satu tempat." />
+    <meta name="theme-color" content="#0b0b0e" />
+    <style>
+      /* ─────────────────────────────────────────────────────────────
+         Link-in-bio / microsite — desain orisinal, self-contained.
+         Tanpa aset pihak ketiga: avatar & ikon = CSS/inline SVG.
+         Edit blok PROFILE + LINKS di <script>. Ganti warna via --accent.
+         ───────────────────────────────────────────────────────────── */
+      :root {
+        --bg: #0b0b0e; --panel: #16161c; --panel-2: #1c1c23;
+        --ink: #f3f3f6; --muted: #a0a0ac; --faint: #6a6a76;
+        --line: rgba(255,255,255,0.09);
+        --accent: #8b5cf6;            /* ← warna brand */
+        --accent-ink: #c4b5fd;
+        --r: 16px;
+        --ease-out: cubic-bezier(0.23,1,0.32,1);
+        --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      body {
+        margin: 0; min-height: 100dvh; color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased; line-height: 1.5;
+        background:
+          radial-gradient(60% 40% at 50% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+          var(--bg);
+        background-attachment: fixed;
+        padding: calc(40px + var(--safe-t)) 18px calc(40px + var(--safe-b));
+      }
+      .wrap { max-width: 480px; margin: 0 auto; text-align: center; }
+      svg { display: block; }
+      .ico { stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+      .avatar { width: 96px; height: 96px; border-radius: 999px; margin: 0 auto 18px; position: relative;
+        display: grid; place-items: center; font-size: 34px; font-weight: 700; letter-spacing: -0.02em; color: #fff;
+        background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 45%, #f97316));
+        box-shadow: 0 10px 40px -12px color-mix(in srgb, var(--accent) 60%, transparent), inset 0 0 0 1px rgba(255,255,255,0.12);
+        animation: pop 0.7s var(--ease-out) both; }
+      /* Optional real photo: set PROFILE.photo → this <img> shows over the gradient */
+      .avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 999px; }
+      @keyframes pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: none; } }
+      @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+      .rise { opacity: 0; animation: rise 0.6s var(--ease-out) forwards; }
+
+      .name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; display: inline-flex; align-items: center; gap: 7px; }
+      .verified { width: 18px; height: 18px; color: var(--accent-ink); }
+      .handle { color: var(--accent-ink); font-size: 14px; font-weight: 600; margin-top: 3px; }
+      .bio { color: var(--muted); font-size: 14.5px; margin: 12px auto 0; max-width: 34ch; }
+
+      .socials { display: flex; justify-content: center; gap: 10px; margin: 22px 0 26px; }
+      .socials a { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; color: var(--ink);
+        background: var(--panel); box-shadow: inset 0 0 0 1px var(--line);
+        transition: transform 150ms var(--ease-out), background 160ms var(--ease-out); }
+      .socials a:hover { background: var(--panel-2); }
+      .socials a:active { transform: scale(0.92); }
+      .socials svg { width: 19px; height: 19px; }
+
+      .links { display: flex; flex-direction: column; gap: 12px; }
+      .link { display: flex; align-items: center; gap: 14px; text-align: left; text-decoration: none; color: var(--ink);
+        background: var(--panel); border: none; cursor: pointer; font: inherit;
+        border-radius: var(--r); padding: 15px 16px; box-shadow: inset 0 0 0 1px var(--line);
+        transition: transform 150ms var(--ease-out), background 160ms var(--ease-out); }
+      .link:hover { background: var(--panel-2); }
+      .link:active { transform: scale(0.985); }
+      .link .l-ico { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; flex: 0 0 40px;
+        background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+      .link .l-ico svg { width: 19px; height: 19px; }
+      .link .l-body { flex: 1; min-width: 0; }
+      .link .l-title { display: block; font-weight: 600; font-size: 15.5px; letter-spacing: -0.01em; }
+      .link .l-sub { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .link .l-right { font-size: 13px; font-weight: 600; color: var(--accent-ink); flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+      .link .l-right .arrow { color: var(--faint); }
+      /* Featured (highlight) link — the primary CTA */
+      .link.feature { background: var(--accent); box-shadow: none; color: #fff; }
+      .link.feature .l-ico { background: rgba(255,255,255,0.18); box-shadow: none; color: #fff; }
+      .link.feature .l-sub { color: rgba(255,255,255,0.8); }
+      .link.feature .l-right, .link.feature .l-right .arrow { color: #fff; }
+      .link.feature:hover { background: color-mix(in srgb, var(--accent) 88%, #fff); }
+      .price-tag { background: rgba(255,255,255,0.16); border-radius: 999px; padding: 3px 9px; font-variant-numeric: tabular-nums; }
+      .link:not(.feature) .price-tag { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+
+      footer { margin-top: 30px; color: var(--faint); font-size: 12px; }
+      footer a { color: var(--muted); text-decoration: none; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .avatar, .rise { animation: none; opacity: 1; transform: none; }
+        .link:active, .socials a:active { transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="avatar" id="avatar"></div>
+      <div class="name rise" style="animation-delay:.08s">
+        <span id="name">Namamu</span>
+        <svg class="verified ico" viewBox="0 0 24 24" id="verified" hidden><path d="M12 2l2.4 1.8 3 .1 1 2.8 2.4 1.7-.9 2.9.9 2.9-2.4 1.7-1 2.8-3 .1L12 22l-2.4-1.8-3-.1-1-2.8L3.2 15l.9-2.9L3.2 9.2l2.4-1.7 1-2.8 3-.1z" fill="currentColor" stroke="none"/><path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="#0b0b0e" stroke-width="2"/></svg>
+      </div>
+      <div class="handle rise" id="handle" style="animation-delay:.12s"></div>
+      <p class="bio rise" id="bio" style="animation-delay:.18s"></p>
+
+      <div class="socials rise" id="socials" style="animation-delay:.24s"></div>
+
+      <div class="links" id="links"></div>
+
+      <footer class="rise" style="animation-delay:.6s">
+        <span id="footText"></span>
+      </footer>
+    </main>
+
+    <script>
+      // ══════════════════════════ PROFILE ══════════════════════════
+      const PROFILE = {
+        name: "Namamu",
+        handle: "@namamu",
+        bio: "Kreator · bikin sesuatu yang berguna. Semua tautanku di sini.",
+        photo: "",              // (opsional) URL foto profil. Kosong = inisial di gradient.
+        verified: true,
+        whatsapp: "6281234567890",
+        // Sosial: hapus yang tak dipakai. type = ig | tiktok | youtube | x | web | email
+        socials: [
+          { type: "ig", url: "https://instagram.com/namamu" },
+          { type: "tiktok", url: "https://tiktok.com/@namamu" },
+          { type: "youtube", url: "https://youtube.com/@namamu" },
+          { type: "web", url: "https://situsmu.com" },
+        ],
+        // Integrasi Founder+ (spec-driven) — GTM opsional.
+        founderplus: { projectId: "" },   // isi id project untuk analytics; kosong = off
+      };
+
+      // ══════════════════════════ LINKS ══════════════════════════
+      // type: "link" (biasa) | "product" (checkout Founder+) | "whatsapp"
+      //   feature:true → tombol sorot (aksen). price → tampil label harga.
+      const LINKS = [
+        { type: "product", feature: true, title: "Beli e-book ku", sub: "Panduan lengkap, akses instan",
+          productSlug: "GANTI-SLUG-PRODUK", productType: "customProduct", price: 99000 },
+        { type: "whatsapp", title: "Chat / kerja sama", sub: "Balas cepat di jam kerja" },
+        { type: "link", title: "Portofolio terbaru", sub: "situsmu.com/karya", url: "https://situsmu.com/karya" },
+        { type: "link", title: "Newsletter mingguan", sub: "Tips tiap Jumat", url: "https://situsmu.com/newsletter" },
+      ];
+      // ═════════════════════════════════════════════════════════════
+
+      const CHECKOUT_BASE = "https://academy.founderplus.id/checkout"; // rel checkout Founder+
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+      const fmt = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
+      const initials = (s) => s.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
+      // Inline social/link icons (monochrome).
+      const IC = {
+        ig: `<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`,
+        tiktok: `<svg class="ico" viewBox="0 0 24 24"><path d="M15 4c.4 2.4 2 4 4.5 4.2"/><path d="M15 4v9.5a4.5 4.5 0 1 1-4.5-4.5c.6 0 1 .1 1.5.2"/></svg>`,
+        youtube: `<svg class="ico" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.5l5 2.5-5 2.5z" fill="currentColor" stroke="none"/></svg>`,
+        x: `<svg class="ico" viewBox="0 0 24 24"><path d="M4 4l16 16M20 4L4 20"/></svg>`,
+        web: `<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></svg>`,
+        email: `<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>`,
+        cart: `<svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L22 7H6"/></svg>`,
+        wa: `<svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.2-5.2A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 9c0 3.5 3 6.5 6.5 6.5.6 0 1-.5 1-.9l-.2-1.4a.8.8 0 0 0-.6-.6l-1.3-.3a.8.8 0 0 0-.7.2l-.4.4a5 5 0 0 1-2-2l.4-.4a.8.8 0 0 0 .2-.7l-.3-1.3a.8.8 0 0 0-.6-.6L9.4 8c-.4 0-.9.4-.9 1z" fill="currentColor" stroke="none"/></svg>`,
+        arrow: `<svg class="ico" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M7 17 17 7M9 7h8v8"/></svg>`,
+      };
+
+      function render() {
+        document.title = PROFILE.name + " — Link in bio";
+        // avatar
+        const av = $("avatar");
+        av.textContent = "";
+        if (PROFILE.photo) { const img = document.createElement("img"); img.src = PROFILE.photo; img.alt = PROFILE.name; av.appendChild(img); }
+        else av.textContent = initials(PROFILE.name);
+        $("name").textContent = PROFILE.name;
+        $("verified").hidden = !PROFILE.verified;
+        $("handle").textContent = PROFILE.handle || "";
+        $("bio").textContent = PROFILE.bio || "";
+
+        // socials
+        $("socials").innerHTML = (PROFILE.socials || []).map((s) =>
+          `<a href="${esc(s.url)}" target="_blank" rel="noopener" aria-label="${esc(s.type)}">${IC[s.type] || IC.web}</a>`
+        ).join("");
+
+        // links
+        $("links").innerHTML = "";
+        LINKS.forEach((lk, i) => {
+          const el = document.createElement("a");
+          el.className = "link rise" + (lk.feature ? " feature" : "");
+          el.style.animationDelay = (0.3 + i * 0.06) + "s";
+          el.href = hrefFor(lk);
+          if (lk.type !== "link" || /^https?:/.test(lk.url || "")) el.target = "_blank";
+          el.rel = "noopener";
+          const icon = lk.type === "product" ? IC.cart : lk.type === "whatsapp" ? IC.wa : IC.arrow;
+          const right = lk.type === "product" && lk.price
+            ? `<span class="l-right"><span class="price-tag">${esc(fmt(lk.price))}</span></span>`
+            : `<span class="l-right"><span class="arrow">${IC.arrow}</span></span>`;
+          el.innerHTML =
+            `<span class="l-ico">${icon}</span>` +
+            `<span class="l-body"><span class="l-title">${esc(lk.title)}</span>${lk.sub ? `<span class="l-sub">${esc(lk.sub)}</span>` : ""}</span>` +
+            right;
+          $("links").appendChild(el);
+        });
+
+        $("footText").innerHTML = "Dibuat dengan " + `<a href="https://founderplus.id" target="_blank" rel="noopener">Founder+</a>`;
+      }
+
+      function hrefFor(lk) {
+        if (lk.type === "whatsapp") {
+          const text = encodeURIComponent(`Halo ${PROFILE.name}, saya lihat link bio-mu.`);
+          return `https://wa.me/${PROFILE.whatsapp}?text=${text}`;
+        }
+        if (lk.type === "product") {
+          // Checkout diproses Founder+ (transaksi = Founder+).
+          const q = new URLSearchParams({ slug: lk.productSlug || "", type: lk.productType || "customProduct" });
+          return `${CHECKOUT_BASE}?${q}`;
+        }
+        return lk.url || "#";
+      }
+
+      render();
+
+      // GTM Founder+ (opsional, spec-driven).
+      if (PROFILE.founderplus && PROFILE.founderplus.projectId) {
+        const s = document.createElement("script");
+        s.src = "https://cdn.founderplus.id/funnel-tracker.js";
+        s.setAttribute("data-project-id", PROFILE.founderplus.projectId);
+        s.defer = true;
+        document.body.appendChild(s);
+      }
+    </script>
+  </body>
+</html>
