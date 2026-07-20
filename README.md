@@ -23,6 +23,12 @@ and checkout; your app just gates content by product ownership.
 | **`astro`** | Astro SSR · Cloudflare | Login + gate + checkout. Content + interactive islands. |
 | **`hono`** | Hono · Cloudflare Workers | Minimal edge app, JSX HTML, no client framework. |
 
+> **Prefer React?** Every no-build template above (premium-landing, link-in-bio,
+> katalog, booking, invoice, and the full `pos-qr-menu` suite) is also ported to
+> **React 19 + Vite 7 + Tailwind CSS v4** in [`react-templates/`](./react-templates/)
+> — same designs and behaviour as real components. See its
+> [`README`](./react-templates/README.md).
+
 > **Fullstack? Reach for `fp-fullstack` (TanStack Start).** It's our recommended
 > default — edge-native on Cloudflare Workers, same runtime as the rest of the
 > stack. We **don't recommend Next.js**; if you're migrating off it, `fp-fullstack`
