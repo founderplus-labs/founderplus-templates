@@ -1,0 +1,37 @@
+/* Invoice generator — light-only (the document is a printable light sheet).
+   Scoped chrome tokens + print rules. */
+[data-tpl="invoice"] {
+  --i-bg: #f2f2f4;
+  --i-card: #ffffff;
+  --i-ink: #17171b;
+  --i-secondary: #55555f;
+  --i-muted: #8a8a94;
+  --i-line: #e6e6ec;
+  --i-accent: #8b5cf6;
+  --i-accent-ink: #6d28d9;
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  /* Only the document prints — hide the editor, toast, and showcase chrome. */
+  [data-tpl="invoice"] .inv-form,
+  [data-tpl="invoice"] .inv-toast {
+    display: none !important;
+  }
+  [data-tpl="invoice"] .inv-app {
+    display: block !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  [data-tpl="invoice"] .inv-preview {
+    position: static !important;
+  }
+  [data-tpl="invoice"] .inv-doc {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}

@@ -3,6 +3,7 @@ import { LinkInBio } from "./templates/LinkInBio.tsx";
 import { PremiumLanding } from "./templates/PremiumLanding.tsx";
 import { Katalog } from "./templates/Katalog.tsx";
 import { Booking } from "./templates/Booking.tsx";
+import { Invoice } from "./templates/Invoice.tsx";
 
 /**
  * Showcase shell. Each template is a self-contained component that owns its own
@@ -41,6 +42,12 @@ const TEMPLATES: Entry[] = [
     blurb: "Janji temu jasa — pilih layanan, tanggal, slot jam, konfirmasi WhatsApp.",
     Component: Booking,
   },
+  {
+    id: "invoice",
+    name: "Invoice / Kwitansi",
+    blurb: "Generator dokumen — form → pratinjau live → Cetak/PDF, simpan draft.",
+    Component: Invoice,
+  },
 ];
 
 export function App() {
@@ -50,7 +57,7 @@ export function App() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-neutral-50 text-neutral-900 md:flex-row dark:bg-neutral-950 dark:text-neutral-100">
-      <aside className="shrink-0 border-b border-neutral-200 bg-white/70 p-4 backdrop-blur md:w-72 md:border-r md:border-b-0 dark:border-neutral-800 dark:bg-neutral-900/60">
+      <aside className="shrink-0 border-b border-neutral-200 bg-white/70 p-4 backdrop-blur md:w-72 md:border-r md:border-b-0 print:hidden dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="mb-4 flex items-center gap-2">
           <span className="size-6 rounded-md bg-gradient-to-br from-brand-1 via-brand-4 to-brand-6" />
           <span className="text-sm font-semibold tracking-tight">Founder+ Templates</span>
