@@ -4,6 +4,11 @@ import { PremiumLanding } from "./templates/PremiumLanding.tsx";
 import { Katalog } from "./templates/Katalog.tsx";
 import { Booking } from "./templates/Booking.tsx";
 import { Invoice } from "./templates/Invoice.tsx";
+import { PosMenu } from "./templates/pos/PosMenu.tsx";
+import { PosKasir } from "./templates/pos/PosKasir.tsx";
+import { PosMeja } from "./templates/pos/PosMeja.tsx";
+import { PosServis } from "./templates/pos/PosServis.tsx";
+import { PosTables } from "./templates/pos/PosTables.tsx";
 
 /**
  * Showcase shell. Each template is a self-contained component that owns its own
@@ -47,6 +52,36 @@ const TEMPLATES: Entry[] = [
     name: "Invoice / Kwitansi",
     blurb: "Generator dokumen — form → pratinjau live → Cetak/PDF, simpan draft.",
     Component: Invoice,
+  },
+  {
+    id: "pos-menu",
+    name: "POS · Menu QR",
+    blurb: "Menu per-meja untuk pelanggan — scan, pilih, kirim pesanan.",
+    Component: PosMenu,
+  },
+  {
+    id: "pos-kasir",
+    name: "POS · Kasir",
+    blurb: "Kasir — QRIS dinamis / transfer / tunai, struk ESC/POS, riwayat + rekap.",
+    Component: PosKasir,
+  },
+  {
+    id: "pos-meja",
+    name: "POS · Meja",
+    blurb: "Status meja + reservasi.",
+    Component: PosMeja,
+  },
+  {
+    id: "pos-servis",
+    name: "POS · Servis",
+    blurb: "Tiket service management dengan alur status.",
+    Component: PosServis,
+  },
+  {
+    id: "pos-tables",
+    name: "POS · Cetak QR",
+    blurb: "Alat cetak QR per-meja (offline).",
+    Component: PosTables,
   },
 ];
 

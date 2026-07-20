@@ -1,0 +1,498 @@
+/* POS Servis tokens + component styles — light-first, dark via
+   prefers-color-scheme. Copied 1:1 from the no-build template and scoped to
+   [data-tpl="pos-servis"]. Dialog/backdrop animation is handled by the shared
+   BottomSheet (.fp-sheet); the inner sheet-content classes live here. */
+[data-tpl="pos-servis"] {
+  --brand: #8b5cf6;
+  --brand-ink: #6d28d9;
+  --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+  --ink: #1a1420;
+  --secondary: #524b5e;
+  --muted: #857e91;
+  --line: #ece8f1;
+  --bg: #faf9fb;
+  --card: #ffffff;
+  --ok: #17984e;
+  --warn: #b45309;
+  --info: #1d4ed8;
+  --danger: #c2410c;
+  --r-card: 18px;
+  --r-ctl: 12px;
+  --shadow-card: 0 1px 2px rgba(26, 20, 32, 0.04), 0 4px 14px rgba(26, 20, 32, 0.05);
+  --shadow-ctl: 0 2px 8px rgba(26, 20, 32, 0.14), 0 0 0 1px rgba(26, 20, 32, 0.04);
+  --shadow-pop: 0 1px 1px rgba(26, 20, 32, 0.05), 0 -8px 40px rgba(26, 20, 32, 0.14);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-optical-sizing: auto;
+  min-height: 100vh;
+  padding-bottom: calc(90px + var(--safe-b));
+}
+@media (prefers-color-scheme: dark) {
+  [data-tpl="pos-servis"] {
+    --ink: #f4eefc;
+    --secondary: #b8b0c6;
+    --muted: #8b8399;
+    --line: #2a2436;
+    --bg: #131019;
+    --card: #1c1626;
+    --brand: #a78bfa;
+    --brand-ink: #c4b5fd;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --info: #93c5fd;
+    --danger: #fb7185;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-ctl: 0 3px 10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --shadow-pop: 0 1px 1px rgba(0, 0, 0, 0.4), 0 -8px 44px rgba(0, 0, 0, 0.55);
+  }
+}
+
+[data-tpl="pos-servis"] * {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-tpl="pos-servis"] .header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(14px + var(--safe-t)) 16px 13px;
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  backdrop-filter: saturate(1.8) blur(20px);
+  -webkit-backdrop-filter: saturate(1.8) blur(20px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 60%, transparent);
+}
+[data-tpl="pos-servis"] .header .store {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-tpl="pos-servis"] .header .tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-ink);
+  background: var(--brand-soft);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+[data-tpl="pos-servis"] .icon-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .icon-btn:active {
+  transform: scale(0.9);
+}
+[data-tpl="pos-servis"] .icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+[data-tpl="pos-servis"] .main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12px 16px 8px;
+}
+
+[data-tpl="pos-servis"] .filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 12px;
+  scrollbar-width: none;
+}
+[data-tpl="pos-servis"] .filters::-webkit-scrollbar {
+  display: none;
+}
+[data-tpl="pos-servis"] .filters button {
+  flex: 0 0 auto;
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  color: var(--secondary);
+  font: inherit;
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: all 160ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .filters button[aria-current="true"] {
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+[data-tpl="pos-servis"] .filters .n {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+[data-tpl="pos-servis"] .ticket {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--card);
+  border-radius: var(--r-card);
+  padding: 14px 15px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .ticket:active {
+  transform: scale(0.99);
+}
+[data-tpl="pos-servis"] .ticket.prio {
+  box-shadow: var(--shadow-card), inset 3px 0 0 var(--danger);
+}
+[data-tpl="pos-servis"] .ticket .body {
+  flex: 1;
+  min-width: 0;
+}
+[data-tpl="pos-servis"] .ticket .code {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+[data-tpl="pos-servis"] .ticket .ttl {
+  font-weight: 650;
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-tpl="pos-servis"] .ticket .cust {
+  font-size: 13px;
+  color: var(--secondary);
+  margin-top: 2px;
+}
+[data-tpl="pos-servis"] .ticket .foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  flex-wrap: wrap;
+}
+[data-tpl="pos-servis"] .ticket .price {
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-servis"] .ticket .sched {
+  font-size: 12px;
+  color: var(--muted);
+}
+[data-tpl="pos-servis"] .stag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+[data-tpl="pos-servis"] .stag.new {
+  color: var(--secondary);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+[data-tpl="pos-servis"] .stag.scheduled {
+  color: var(--info);
+  background: color-mix(in srgb, var(--info) 13%, transparent);
+}
+[data-tpl="pos-servis"] .stag.in_progress {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 15%, transparent);
+}
+[data-tpl="pos-servis"] .stag.done {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 14%, transparent);
+}
+[data-tpl="pos-servis"] .stag.cancelled {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+[data-tpl="pos-servis"] .empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 44px 20px;
+}
+
+[data-tpl="pos-servis"] .fab {
+  position: fixed;
+  right: 18px;
+  bottom: calc(20px + var(--safe-b));
+  z-index: 9;
+  height: 52px;
+  padding: 0 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--card);
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 8px 24px rgba(26, 20, 32, 0.28);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .fab:active {
+  transform: scale(0.96);
+}
+[data-tpl="pos-servis"] .fab svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Sheet-content chrome (rendered inside the shared BottomSheet .fp-sheet) */
+[data-tpl="pos-servis"] .grabber {
+  width: 38px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--line);
+  margin: 10px auto 0;
+}
+[data-tpl="pos-servis"] .sin {
+  padding: 8px 18px calc(22px + var(--safe-b));
+  overflow-y: auto;
+}
+[data-tpl="pos-servis"] .sin h3 {
+  font-size: 18px;
+  letter-spacing: -0.015em;
+  margin: 6px 0 2px;
+}
+[data-tpl="pos-servis"] .sin .sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+[data-tpl="pos-servis"] .sec {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 16px 0 8px;
+}
+[data-tpl="pos-servis"] .close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .close:active {
+  transform: scale(0.9);
+}
+[data-tpl="pos-servis"] .fld {
+  margin-bottom: 11px;
+}
+[data-tpl="pos-servis"] .fld label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--secondary);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+[data-tpl="pos-servis"] .fld input,
+[data-tpl="pos-servis"] .fld textarea {
+  width: 100%;
+  border: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: var(--r-ctl);
+  padding: 11px 12px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--ink);
+  transition: box-shadow 160ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .fld input:focus,
+[data-tpl="pos-servis"] .fld textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+[data-tpl="pos-servis"] .fld textarea {
+  resize: vertical;
+  min-height: 56px;
+}
+[data-tpl="pos-servis"] .row2 {
+  display: flex;
+  gap: 10px;
+}
+[data-tpl="pos-servis"] .row2 > * {
+  flex: 1;
+}
+[data-tpl="pos-servis"] .check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: var(--r-ctl);
+  box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--bg);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+[data-tpl="pos-servis"] .check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--danger);
+}
+[data-tpl="pos-servis"] .save {
+  width: 100%;
+  margin-top: 14px;
+  border: none;
+  cursor: pointer;
+  background: var(--brand);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--brand) 30%, transparent);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .save:active {
+  transform: scale(0.98);
+}
+/* Status pipeline chips (detail sheet) */
+[data-tpl="pos-servis"] .pipe {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+[data-tpl="pos-servis"] .pipe button {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--secondary);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: all 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .pipe button:active {
+  transform: scale(0.95);
+}
+[data-tpl="pos-servis"] .pipe button[aria-current="true"] {
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: none;
+}
+[data-tpl="pos-servis"] .detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+[data-tpl="pos-servis"] .detail-row:last-of-type {
+  border-bottom: none;
+}
+[data-tpl="pos-servis"] .detail-row .k {
+  color: var(--muted);
+}
+[data-tpl="pos-servis"] .detail-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 16px;
+}
+[data-tpl="pos-servis"] .detail-actions button {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  background: var(--card);
+  color: var(--ink);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .detail-actions button:active {
+  transform: scale(0.97);
+}
+[data-tpl="pos-servis"] .detail-actions .del {
+  color: var(--danger);
+}
+[data-tpl="pos-servis"] .toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(90px + var(--safe-b));
+  transform: translateX(-50%) translateY(10px);
+  background: var(--ink);
+  color: var(--card);
+  padding: 11px 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+}
+[data-tpl="pos-servis"] .toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tpl="pos-servis"] .ticket,
+  [data-tpl="pos-servis"] .fab,
+  [data-tpl="pos-servis"] .icon-btn,
+  [data-tpl="pos-servis"] .pipe button,
+  [data-tpl="pos-servis"] .save,
+  [data-tpl="pos-servis"] .filters button {
+    transition: opacity 180ms ease !important;
+    transform: none !important;
+  }
+}

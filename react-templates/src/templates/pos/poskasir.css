@@ -1,0 +1,1182 @@
+/* Kasir POS — tokens + component CSS ported 1:1 from the no-build kasir.html.
+   Scoped to [data-tpl="pos-kasir"]; hex values copied EXACTLY from the source
+   :root (light) and its prefers-color-scheme: dark override. Dialog #id
+   selectors from the source are rewritten as .d-* classes to avoid global-id
+   collisions; the visual rules are otherwise unchanged. */
+
+[data-tpl="pos-kasir"] {
+  --brand: #8b5cf6;
+  --brand-ink: #6d28d9;
+  --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+  --ink: #1a1420;
+  --secondary: #524b5e;
+  --muted: #857e91;
+  --line: #ece8f1;
+  --bg: #faf9fb;
+  --card: #ffffff;
+  --ok: #17984e;
+  --ok-ink: #0f7a3d;
+  --danger: #c2410c;
+  --r-card: 18px;
+  --r-ctl: 12px;
+  --shadow-card: 0 1px 2px rgba(26, 20, 32, 0.04), 0 4px 14px rgba(26, 20, 32, 0.05);
+  --shadow-ctl: 0 2px 8px rgba(26, 20, 32, 0.14), 0 0 0 1px rgba(26, 20, 32, 0.04);
+  --shadow-pop: 0 1px 1px rgba(26, 20, 32, 0.05), 0 -8px 40px rgba(26, 20, 32, 0.14);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-optical-sizing: auto;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(150px + var(--safe-b));
+  min-height: 100%;
+}
+@media (prefers-color-scheme: dark) {
+  [data-tpl="pos-kasir"] {
+    --ink: #f4eefc;
+    --secondary: #b8b0c6;
+    --muted: #8b8399;
+    --line: #2a2436;
+    --bg: #131019;
+    --card: #1c1626;
+    --brand: #a78bfa;
+    --brand-ink: #c4b5fd;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-ctl: 0 3px 10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --shadow-pop: 0 1px 1px rgba(0, 0, 0, 0.4), 0 -8px 44px rgba(0, 0, 0, 0.55);
+  }
+}
+
+[data-tpl="pos-kasir"] * {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-tpl="pos-kasir"] header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(14px + var(--safe-t)) 16px 13px;
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  backdrop-filter: saturate(1.8) blur(20px);
+  -webkit-backdrop-filter: saturate(1.8) blur(20px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 60%, transparent);
+}
+[data-tpl="pos-kasir"] header .store {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-tpl="pos-kasir"] header .tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-ink);
+  background: var(--brand-soft);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+[data-tpl="pos-kasir"] .icon-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+  font-size: 17px;
+  display: grid;
+  place-items: center;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .icon-btn:active {
+  transform: scale(0.9);
+}
+[data-tpl="pos-kasir"] .icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+[data-tpl="pos-kasir"] .method .mi svg {
+  width: 23px;
+  height: 23px;
+}
+[data-tpl="pos-kasir"] .proof-drop svg {
+  width: 18px;
+  height: 18px;
+}
+[data-tpl="pos-kasir"] .bank .del svg {
+  width: 18px;
+  height: 18px;
+}
+
+[data-tpl="pos-kasir"] main {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 14px 16px 8px;
+}
+
+[data-tpl="pos-kasir"] .seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--card);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  margin-bottom: 18px;
+}
+[data-tpl="pos-kasir"] .seg button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  font-size: 14px;
+  color: var(--secondary);
+  padding: 9px;
+  border-radius: 999px;
+  transition: color 160ms var(--ease-out), background 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .seg button[aria-current="true"] {
+  background: var(--ink);
+  color: var(--card);
+}
+
+/* Amount display — big, centered (Universe/Cash App pattern) */
+[data-tpl="pos-kasir"] .amount {
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-size: clamp(40px, 13vw, 58px);
+  font-variant-numeric: tabular-nums;
+  margin: 14px 0 4px;
+}
+[data-tpl="pos-kasir"] .amount .z {
+  color: var(--muted);
+}
+[data-tpl="pos-kasir"] .amount-cap {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+/* Keypad */
+[data-tpl="pos-kasir"] .keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+[data-tpl="pos-kasir"] .key {
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  font: inherit;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 16px 0;
+  border-radius: 16px;
+  transition: transform 130ms var(--ease-out), background 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .key:active {
+  transform: scale(0.95);
+  background: var(--brand-soft);
+}
+[data-tpl="pos-kasir"] .key.wide {
+  grid-column: span 1;
+}
+
+/* Item mode */
+[data-tpl="pos-kasir"] .items {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+[data-tpl="pos-kasir"] .irow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--card);
+  border-radius: var(--r-card);
+  padding: 12px 13px;
+  box-shadow: var(--shadow-card);
+}
+[data-tpl="pos-kasir"] .irow .info {
+  flex: 1;
+  min-width: 0;
+}
+[data-tpl="pos-kasir"] .irow .nm {
+  font-weight: 640;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-tpl="pos-kasir"] .irow .pr {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .irow .stp {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg);
+  border-radius: 999px;
+  padding: 0 3px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+[data-tpl="pos-kasir"] .irow .stp button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--brand-ink);
+  font-size: 17px;
+  border-radius: 999px;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .irow .stp button:active {
+  transform: scale(0.86);
+}
+[data-tpl="pos-kasir"] .irow .stp .q {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .add-item {
+  display: flex;
+  gap: 8px;
+}
+[data-tpl="pos-kasir"] .add-item input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: var(--r-ctl);
+  padding: 12px 13px;
+  font: inherit;
+  background: var(--card);
+  color: var(--ink);
+  transition: box-shadow 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .add-item input.price {
+  flex: 0 0 118px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .add-item input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+[data-tpl="pos-kasir"] .add-item .addbtn {
+  border: none;
+  cursor: pointer;
+  background: var(--brand);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  padding: 0 16px;
+  border-radius: var(--r-ctl);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 34%, transparent);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .add-item .addbtn:active {
+  transform: scale(0.94);
+}
+[data-tpl="pos-kasir"] .empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 22px 10px;
+}
+
+/* Persistent action bar */
+[data-tpl="pos-kasir"] .bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 12px 16px calc(12px + var(--safe-b));
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  backdrop-filter: saturate(1.8) blur(20px);
+  -webkit-backdrop-filter: saturate(1.8) blur(20px);
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--line) 70%, transparent);
+}
+[data-tpl="pos-kasir"] .bar .in {
+  max-width: 520px;
+  margin: 0 auto;
+}
+[data-tpl="pos-kasir"] .bar .qris {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+[data-tpl="pos-kasir"] .bar .qris .lbl {
+  font-weight: 650;
+}
+[data-tpl="pos-kasir"] .bar .qris .amt {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .bar .actions {
+  display: flex;
+  gap: 10px;
+}
+[data-tpl="pos-kasir"] .bar button {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 15px;
+  border-radius: 14px;
+  transition: transform 150ms var(--ease-out), opacity 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .bar button:active {
+  transform: scale(0.98);
+}
+[data-tpl="pos-kasir"] .bar button[disabled] {
+  opacity: 0.4;
+}
+[data-tpl="pos-kasir"] .bar .qris {
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: 0 4px 16px rgba(26, 20, 32, 0.18);
+}
+[data-tpl="pos-kasir"] .bar .print {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+  flex: 0 0 34%;
+}
+
+/* Dialogs (QRIS + settings) */
+[data-tpl="pos-kasir"] dialog {
+  border: none;
+  padding: 0;
+  width: 100%;
+  max-width: 520px;
+  color: var(--ink);
+  background: var(--card);
+  box-shadow: var(--shadow-pop);
+}
+[data-tpl="pos-kasir"] dialog::backdrop {
+  background: rgba(16, 10, 26, 0);
+  backdrop-filter: blur(0);
+  transition: background 420ms var(--ease-out), backdrop-filter 420ms var(--ease-out),
+    overlay 420ms allow-discrete, display 420ms allow-discrete;
+}
+[data-tpl="pos-kasir"] dialog[open]::backdrop {
+  background: rgba(16, 10, 26, 0.55);
+  backdrop-filter: blur(2px);
+}
+@starting-style {
+  [data-tpl="pos-kasir"] dialog[open]::backdrop {
+    background: rgba(16, 10, 26, 0);
+    backdrop-filter: blur(0);
+  }
+}
+
+/* QRIS modal: centered card */
+[data-tpl="pos-kasir"] dialog.d-qris {
+  margin: auto;
+  border-radius: 24px;
+  max-width: 400px;
+  transform: scale(0.94);
+  opacity: 0;
+  transition: transform 300ms var(--ease-out), opacity 220ms var(--ease-out),
+    overlay 300ms allow-discrete, display 300ms allow-discrete;
+}
+[data-tpl="pos-kasir"] dialog.d-qris[open] {
+  transform: scale(1);
+  opacity: 1;
+}
+@starting-style {
+  [data-tpl="pos-kasir"] dialog.d-qris[open] {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+}
+
+/* Payment success — clean confirmation before the next sale (Apple/Shopify). */
+[data-tpl="pos-kasir"] dialog.d-success {
+  margin: auto;
+  border-radius: 24px;
+  max-width: 340px;
+  transform: scale(0.94);
+  opacity: 0;
+  transition: transform 300ms var(--ease-out), opacity 220ms var(--ease-out),
+    overlay 300ms allow-discrete, display 300ms allow-discrete;
+}
+[data-tpl="pos-kasir"] dialog.d-success[open] {
+  transform: scale(1);
+  opacity: 1;
+}
+@starting-style {
+  [data-tpl="pos-kasir"] dialog.d-success[open] {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+}
+[data-tpl="pos-kasir"] .okwrap {
+  padding: 28px 22px calc(20px + var(--safe-b));
+  text-align: center;
+}
+[data-tpl="pos-kasir"] .okcheck {
+  width: 60px;
+  height: 60px;
+  border-radius: 999px;
+  margin: 2px auto 14px;
+  display: grid;
+  place-items: center;
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 13%, transparent);
+  animation: kasir-ok-pop 380ms var(--ease-out) both;
+}
+[data-tpl="pos-kasir"] .okcheck svg {
+  width: 30px;
+  height: 30px;
+}
+@keyframes kasir-ok-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+[data-tpl="pos-kasir"] .oktitle {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+[data-tpl="pos-kasir"] .okamt {
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  margin: 6px 0 2px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .oksub {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-bottom: 18px;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tpl="pos-kasir"] .okcheck {
+    animation: none;
+  }
+}
+
+[data-tpl="pos-kasir"] .qwrap {
+  padding: 22px 22px calc(20px + var(--safe-b));
+  text-align: center;
+}
+[data-tpl="pos-kasir"] .qwrap .qtitle {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+[data-tpl="pos-kasir"] .qwrap .qamt {
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  margin: 2px 0 2px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .qwrap .qsub {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}
+[data-tpl="pos-kasir"] .qbox {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  width: min(260px, 72vw);
+  margin: 0 auto 14px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+[data-tpl="pos-kasir"] .qbox svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+[data-tpl="pos-kasir"] .qlogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+[data-tpl="pos-kasir"] .qnote {
+  background: color-mix(in srgb, var(--brand) 7%, var(--card));
+  color: var(--secondary);
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  line-height: 1.45;
+}
+[data-tpl="pos-kasir"] .qactions {
+  display: flex;
+  gap: 10px;
+}
+[data-tpl="pos-kasir"] .qactions button {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: 14px;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .qactions button:active {
+  transform: scale(0.97);
+}
+[data-tpl="pos-kasir"] .qactions .done {
+  background: var(--ok);
+  color: #fff;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--ok) 30%, transparent);
+}
+[data-tpl="pos-kasir"] .qactions .pr {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* Settings sheet (bottom drawer) */
+[data-tpl="pos-kasir"] dialog.d-settings,
+[data-tpl="pos-kasir"] dialog.d-history {
+  margin: auto auto 0;
+  border-radius: 24px 24px 0 0;
+  max-height: 90vh;
+  transform: translateY(100%);
+  transition: transform 440ms var(--ease-drawer), overlay 440ms allow-discrete,
+    display 440ms allow-discrete;
+}
+[data-tpl="pos-kasir"] dialog.d-settings[open],
+[data-tpl="pos-kasir"] dialog.d-history[open] {
+  transform: translateY(0);
+}
+@starting-style {
+  [data-tpl="pos-kasir"] dialog.d-settings[open],
+  [data-tpl="pos-kasir"] dialog.d-history[open] {
+    transform: translateY(100%);
+  }
+}
+
+/* Riwayat / rekap */
+[data-tpl="pos-kasir"] .rekap {
+  background: color-mix(in srgb, var(--ink) 5%, var(--card));
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 12px;
+}
+[data-tpl="pos-kasir"] .rekap-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+[data-tpl="pos-kasir"] .rekap-total .rl {
+  color: var(--secondary);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+[data-tpl="pos-kasir"] .rekap-total .rv {
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .rekap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+[data-tpl="pos-kasir"] .rekap-grid .cell {
+  background: var(--card);
+  border-radius: 11px;
+  padding: 9px 10px;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+[data-tpl="pos-kasir"] .rekap-grid .cell .k {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+}
+[data-tpl="pos-kasir"] .rekap-grid .cell .n {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .rekap-grid .cell .c {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+[data-tpl="pos-kasir"] .rekap-actions {
+  display: flex;
+  gap: 8px;
+}
+[data-tpl="pos-kasir"] .rekap-actions .mini {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: 12px;
+  padding: 11px 8px;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13px;
+  color: var(--ink);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .rekap-actions .mini:active {
+  transform: scale(0.96);
+}
+[data-tpl="pos-kasir"] .rekap-actions .mini.danger {
+  color: var(--danger);
+}
+[data-tpl="pos-kasir"] .txn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+[data-tpl="pos-kasir"] .txn:last-child {
+  border-bottom: none;
+}
+[data-tpl="pos-kasir"] .txn .tm {
+  flex: 1;
+  min-width: 0;
+}
+[data-tpl="pos-kasir"] .txn .tm .t1 {
+  font-weight: 640;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+}
+[data-tpl="pos-kasir"] .txn .tm .t2 {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+[data-tpl="pos-kasir"] .txn .tv {
+  font-weight: 700;
+  font-size: 14.5px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .txn .mtag {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--secondary);
+  background: color-mix(in srgb, var(--ink) 7%, var(--card));
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+[data-tpl="pos-kasir"] .grabber {
+  width: 38px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--line);
+  margin: 10px auto 0;
+}
+[data-tpl="pos-kasir"] .sin {
+  padding: 8px 18px calc(22px + var(--safe-b));
+  overflow-y: auto;
+}
+[data-tpl="pos-kasir"] .sin h3 {
+  font-size: 18px;
+  letter-spacing: -0.015em;
+  margin: 6px 0 14px;
+}
+[data-tpl="pos-kasir"] .sec {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+[data-tpl="pos-kasir"] .fld {
+  margin-bottom: 11px;
+}
+[data-tpl="pos-kasir"] .fld label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--secondary);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+[data-tpl="pos-kasir"] .fld input,
+[data-tpl="pos-kasir"] .fld textarea,
+[data-tpl="pos-kasir"] .fld select {
+  width: 100%;
+  border: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: var(--r-ctl);
+  padding: 11px 12px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--ink);
+  transition: box-shadow 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .fld input:focus,
+[data-tpl="pos-kasir"] .fld textarea:focus,
+[data-tpl="pos-kasir"] .fld select:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+[data-tpl="pos-kasir"] .fld textarea {
+  resize: vertical;
+  min-height: 64px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+[data-tpl="pos-kasir"] .hint {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.45;
+}
+[data-tpl="pos-kasir"] .seg2 {
+  display: flex;
+  gap: 6px;
+}
+[data-tpl="pos-kasir"] .seg2 button {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13.5px;
+  padding: 10px;
+  border-radius: var(--r-ctl);
+  background: var(--bg);
+  color: var(--secondary);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: all 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .seg2 button[aria-current="true"] {
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: none;
+}
+
+/* Receipt preview */
+[data-tpl="pos-kasir"] .rcpt {
+  background: #fff;
+  color: #111;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+[data-tpl="pos-kasir"] .save {
+  width: 100%;
+  margin-top: 18px;
+  border: none;
+  cursor: pointer;
+  background: var(--brand);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--brand) 30%, transparent);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .save:active {
+  transform: scale(0.98);
+}
+[data-tpl="pos-kasir"] .close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .close:active {
+  transform: scale(0.9);
+}
+[data-tpl="pos-kasir"] .toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(160px + var(--safe-b));
+  transform: translateX(-50%) translateY(10px);
+  background: var(--ink);
+  color: var(--card);
+  padding: 11px 16px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 30;
+  transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Payment method picker (bottom sheet) */
+[data-tpl="pos-kasir"] dialog.d-methods,
+[data-tpl="pos-kasir"] dialog.d-transfer,
+[data-tpl="pos-kasir"] dialog.d-cash {
+  margin: auto auto 0;
+  border-radius: 24px 24px 0 0;
+  max-height: 92vh;
+  transform: translateY(100%);
+  transition: transform 440ms var(--ease-drawer), overlay 440ms allow-discrete,
+    display 440ms allow-discrete;
+}
+[data-tpl="pos-kasir"] dialog.d-methods[open],
+[data-tpl="pos-kasir"] dialog.d-transfer[open],
+[data-tpl="pos-kasir"] dialog.d-cash[open] {
+  transform: translateY(0);
+}
+@starting-style {
+  [data-tpl="pos-kasir"] dialog.d-methods[open],
+  [data-tpl="pos-kasir"] dialog.d-transfer[open],
+  [data-tpl="pos-kasir"] dialog.d-cash[open] {
+    transform: translateY(100%);
+  }
+}
+[data-tpl="pos-kasir"] .method {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 10px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  transition: transform 150ms var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .method:active {
+  transform: scale(0.985);
+}
+[data-tpl="pos-kasir"] .method .mi {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  flex: 0 0 44px;
+  background: color-mix(in srgb, var(--ink) 6%, var(--card));
+}
+[data-tpl="pos-kasir"] .method .mt {
+  flex: 1;
+  min-width: 0;
+}
+[data-tpl="pos-kasir"] .method .mt .ml {
+  display: block;
+  font-weight: 650;
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+}
+[data-tpl="pos-kasir"] .method .mt .ms {
+  display: block;
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+[data-tpl="pos-kasir"] .method .chev {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+/* Bank account rows (transfer sheet + settings) */
+[data-tpl="pos-kasir"] .bank {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 12px 13px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  margin-bottom: 9px;
+}
+[data-tpl="pos-kasir"] .bank .binfo {
+  flex: 1;
+  min-width: 0;
+}
+[data-tpl="pos-kasir"] .bank .bname {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--brand-ink);
+}
+[data-tpl="pos-kasir"] .bank .bnum {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 1px 0;
+}
+[data-tpl="pos-kasir"] .bank .bhold {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+[data-tpl="pos-kasir"] .copy {
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: 10px;
+  padding: 9px 13px;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13px;
+  color: var(--brand-ink);
+  flex: 0 0 auto;
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .copy:active {
+  transform: scale(0.92);
+}
+[data-tpl="pos-kasir"] .bank .del {
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--danger);
+  font-size: 18px;
+  padding: 4px 6px;
+}
+
+/* Proof-of-payment uploader */
+[data-tpl="pos-kasir"] .proof {
+  margin-top: 4px;
+}
+[data-tpl="pos-kasir"] .proof-drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 16px;
+  background: var(--bg);
+  color: var(--secondary);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: inset 0 0 0 1.5px dashed var(--line);
+  border: 1.5px dashed color-mix(in srgb, var(--brand) 32%, var(--line));
+  transition: transform 150ms var(--ease-out), border-color 160ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .proof-drop:active {
+  transform: scale(0.99);
+}
+[data-tpl="pos-kasir"] .proof-thumb {
+  position: relative;
+  margin-top: 2px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+[data-tpl="pos-kasir"] .proof-thumb img {
+  width: 100%;
+  max-height: 230px;
+  object-fit: cover;
+  display: block;
+}
+[data-tpl="pos-kasir"] .proof-thumb .rm {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 15px;
+  display: grid;
+  place-items: center;
+}
+[data-tpl="pos-kasir"] .proof-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 9px;
+}
+[data-tpl="pos-kasir"] .proof-actions .mini {
+  flex: 1;
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: 12px;
+  padding: 11px;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13.5px;
+  color: var(--ink);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .proof-actions .mini:active {
+  transform: scale(0.97);
+}
+
+/* Cash: change display */
+[data-tpl="pos-kasir"] .change {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 12px 0 2px;
+  padding: 13px 15px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+}
+[data-tpl="pos-kasir"] .change .cl {
+  color: var(--brand-ink);
+  font-weight: 650;
+  font-size: 14px;
+}
+[data-tpl="pos-kasir"] .change .cv {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-ink);
+}
+[data-tpl="pos-kasir"] .chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+[data-tpl="pos-kasir"] .chips button {
+  border: none;
+  cursor: pointer;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line);
+  border-radius: 999px;
+  padding: 9px 14px;
+  font: inherit;
+  font-weight: 650;
+  font-size: 13.5px;
+  color: var(--ink);
+  transition: transform 150ms var(--ease-out);
+}
+[data-tpl="pos-kasir"] .chips button:active {
+  transform: scale(0.94);
+}
+[data-tpl="pos-kasir"] .pay-amt {
+  text-align: center;
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  margin: 2px 0 2px;
+  font-variant-numeric: tabular-nums;
+}
+[data-tpl="pos-kasir"] .pay-cap {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tpl="pos-kasir"] dialog,
+  [data-tpl="pos-kasir"] dialog::backdrop,
+  [data-tpl="pos-kasir"] .key,
+  [data-tpl="pos-kasir"] .icon-btn,
+  [data-tpl="pos-kasir"] .bar button,
+  [data-tpl="pos-kasir"] .qactions button,
+  [data-tpl="pos-kasir"] .save {
+    transition: opacity 180ms ease !important;
+    transform: none !important;
+  }
+}
+
+/* Print-only receipt (fallback when no Bluetooth). The print area is portaled
+   to <body> so it is a direct body child, mirroring the source #printArea. */
+@media print {
+  body > *:not(.fp-kasir-print) {
+    display: none !important;
+  }
+  .fp-kasir-print {
+    display: block !important;
+  }
+}
+.fp-kasir-print {
+  display: none;
+}
+.fp-kasir-print .paper {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  white-space: pre;
+  color: #000;
+  width: 100%;
+}
