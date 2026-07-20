@@ -1,5 +1,6 @@
 import { useState, type ComponentType } from "react";
 import { LinkInBio } from "./templates/LinkInBio.tsx";
+import { PremiumLanding } from "./templates/PremiumLanding.tsx";
 
 /**
  * Showcase shell. Each template is a self-contained component that owns its own
@@ -14,6 +15,12 @@ interface Entry {
 }
 
 const TEMPLATES: Entry[] = [
+  {
+    id: "premium-landing",
+    name: "Premium landing",
+    blurb: "Landing gelap premium — hero, fitur, angka count-up, harga, CTA.",
+    Component: PremiumLanding,
+  },
   {
     id: "link-in-bio",
     name: "Link in bio",
