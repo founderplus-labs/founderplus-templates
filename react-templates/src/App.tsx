@@ -2,6 +2,7 @@ import { useState, type ComponentType } from "react";
 import { LinkInBio } from "./templates/LinkInBio.tsx";
 import { PremiumLanding } from "./templates/PremiumLanding.tsx";
 import { Katalog } from "./templates/Katalog.tsx";
+import { Booking } from "./templates/Booking.tsx";
 
 /**
  * Showcase shell. Each template is a self-contained component that owns its own
@@ -33,6 +34,12 @@ const TEMPLATES: Entry[] = [
     name: "Katalog",
     blurb: "Toko online — filter kategori, keranjang, order via WhatsApp. Light + dark.",
     Component: Katalog,
+  },
+  {
+    id: "booking",
+    name: "Booking",
+    blurb: "Janji temu jasa — pilih layanan, tanggal, slot jam, konfirmasi WhatsApp.",
+    Component: Booking,
   },
 ];
 
