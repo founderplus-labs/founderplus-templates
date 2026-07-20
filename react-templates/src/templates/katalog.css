@@ -1,0 +1,25 @@
+/* Katalog tokens — light-first, dark via prefers-color-scheme (matches the
+   original no-build template exactly). Scoped to [data-tpl="katalog"]. */
+[data-tpl="katalog"] {
+  --k-bg: #f6f6f7;
+  --k-card: #ffffff;
+  --k-ink: #17171b;
+  --k-secondary: #55555f;
+  --k-muted: #8a8a94;
+  --k-line: #e9e9ee;
+  --k-accent: #8b5cf6;
+  --k-accent-ink: #6d28d9;
+  --k-ok: #17984e;
+}
+@media (prefers-color-scheme: dark) {
+  [data-tpl="katalog"] {
+    --k-bg: #0f0f12;
+    --k-card: #17171c;
+    --k-ink: #f3f3f6;
+    --k-secondary: #b3b3bd;
+    --k-muted: #8a8a94;
+    --k-line: #26262e;
+    --k-accent: #a78bfa;
+    --k-accent-ink: #c4b5fd;
+  }
+}
