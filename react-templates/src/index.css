@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Founder+ design tokens — Tailwind v4 CSS-first config.
+   Brand gradient: #8B5CF6 → #A78BFA → #C084FC → #E879F9 → #FB7185 → #F97316
+   Anchor purple #8B5CF6. Accent is used as a signature, not a large fill.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Brand */
+  --color-accent: #8b5cf6;
+  --color-accent-ink: #6d28d9;
+  --color-accent-soft: #c4b5fd;
+  --color-ok: #17984e;
+  --color-warn: #b45309;
+  --color-danger: #dc2626;
+
+  /* Gradient stops (signature accent) */
+  --color-brand-1: #8b5cf6;
+  --color-brand-2: #a78bfa;
+  --color-brand-3: #c084fc;
+  --color-brand-4: #e879f9;
+  --color-brand-5: #fb7185;
+  --color-brand-6: #f97316;
+
+  /* Motion — Apple-ish easings */
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Animations */
+  --animate-pop: pop 0.7s var(--ease-out-quint) both;
+  --animate-rise: rise 0.6s var(--ease-out-quint) both;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Global niceties shared by every template */
+* { -webkit-tap-highlight-color: transparent; }
+html { -webkit-font-smoothing: antialiased; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+/* Respect reduced-motion globally: disable token-driven entrance animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
